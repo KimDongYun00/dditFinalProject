@@ -1,0 +1,121 @@
+package kr.or.ddit.controller.admin;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.admin.inter.IAdminCommonService;
+import kr.or.ddit.service.admin.inter.IAdminFacilityService;
+import kr.or.ddit.service.admin.inter.IAdminLectureService;
+import kr.or.ddit.vo.BuildingVO;
+import kr.or.ddit.vo.CommonVO;
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/admin")
+public class AdminLecController {
+
+	
+	@Inject
+	private IAdminLectureService lecService;
+
+	@Inject
+	private IAdminFacilityService facilityService;
+
+	@Inject
+	private IAdminCommonService commonService;
+	
+	
+	@RequestMapping(value = "/lectureList", method = RequestMethod.GET)
+	public String lectureList(@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "99") String searchType,
+			@RequestParam(required = false) String searchYear,
+			@RequestParam(required = false) String searchSemester,
+			Model model) {
+		log.info("lectureList()...!");
+		log.info("### currentPage >> " + currentPage);
+		log.info("### searchType >> " + searchType);
+		log.info("### searchYear >> " + searchYear);
+		log.info("### searchSemester >> " + searchSemester);
+		
+		PaginationInfoVO<LectureVO> pagingVO = new PaginationInfoVO<LectureVO>();
+		
+		// 총 4가지의 필드 설정하기 위해서
+		// 현제 페이지를 전달 후, start/endRow, start/endPage 설정		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setSearchType(searchType);
+		pagingVO.setSearchYear(searchYear);
+		pagingVO.setSearchSemester(searchSemester);
+		
+		// 총 게시글 수를 얻어온다.
+		int totalRecord = lecService.selectLectureCount(pagingVO);
+		log.info("totalRecord >> " + totalRecord);
+		
+		// 총 게시글 수 전달 후, 총 페이지 수를 설정
+		pagingVO.setTotalRecord(totalRecord);
+		List<LectureVO> dataList =  lecService.getLectureList(pagingVO);
+		log.info("pagingVO searchType >> " + pagingVO.getSearchType());
+		for(LectureVO d: dataList)  log.info("dataList >> " + d.toString());
+		pagingVO.setDataList(dataList);
+		// 총 게시글 수가 포함된 PaginationInfoVO 객체를 넘겨주고 1페이지에 해당하는 10개(screenSize)의
+		// 게시글을 얻어온다. (dataList)
+		
+		model.addAttribute("pagingVO", pagingVO);
+		
+		return "admin/lecture/lectureList";
+	}
+	
+	@RequestMapping(value = "/lectureInsertForm", method = RequestMethod.GET)
+	public String lectureInsertForm(Model model) {
+		log.info("lectureInsertForm()...!");
+		
+		List<BuildingVO> builingList = facilityService.getBuildingList();
+		List<BuildingVO> facilityList = facilityService.getLecRoomFacilityList();
+		List<CommonVO> lecTypeList = commonService.getComDetailList("L01");
+		
+		model.addAttribute("builingList", builingList);
+		model.addAttribute("facilityList", facilityList);
+		model.addAttribute("lecTypeList", lecTypeList);
+		
+		return "admin/lecture/lectureInsertForm";
+	}
+	
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,17 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ScholarshipVO;
+
+public interface IScholarshipMapper {
+		List<ScholarshipVO> getScholarshipList();
+		
+		List<ScholarshipVO> getScholarshipRequestList();
+
+		List<ScholarshipVO> getScholarshipRequestDetail(String schNo);
+
+		List<ScholarshipVO> scholarshipRequestsApprove(String comDetCNo);
+
+		List<ScholarshipVO> selectUnApproveScholarshipRequestList(String comDetCNo);
+}

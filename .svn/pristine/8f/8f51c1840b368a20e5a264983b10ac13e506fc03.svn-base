@@ -1,0 +1,14 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.DepartmentVO;
+import kr.or.ddit.vo.ProfessorVO;
+
+public interface IProfessorMapper {
+
+	public ProfessorVO selectProfessor(String userNo);
+
+	public DepartmentVO selectProfessorDep(String userNo);
+
+	public int profileUpdate(ProfessorVO professorVO);
+
+}

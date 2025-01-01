@@ -1,0 +1,55 @@
+package kr.or.ddit.controller.student;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.student.facility.IStuFacService;
+import kr.or.ddit.vo.FacilityReserveVO;
+import kr.or.ddit.vo.FacilityVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/student")
+public class StuFacController {
+	
+	@Inject
+	private IStuFacService service;
+	
+	@RequestMapping(value = "/facMain", method = RequestMethod.GET)
+	public String facList(Model model, @RequestParam(required = false) String facTypeNo) {
+		log.info("facList() 실행...!");
+
+		log.info("facTypeNo >>>>> " + facTypeNo);
+		
+		List<FacilityVO> facList =  service.selectList(facTypeNo);
+		
+		
+		model.addAttribute("facList", facList);
+		
+		model.addAttribute("facType", facTypeNo);
+		
+		return "student/fac/facList";
+	}
+	
+	@RequestMapping(value="/facDetail", method=RequestMethod.GET)
+	public String facDetail(Model model, String facNo) {
+		log.info("facDetail 실행...!");
+		log.info("시설번호 : " + facNo);
+		
+		FacilityVO facVO = service.selectDetail(facNo); 
+		FacilityReserveVO facreVO = service.read(facNo);
+		
+		model.addAttribute("facVO", facVO);
+		model.addAttribute("facre", facreVO);
+		return "student/fac/facDetail";
+	}
+	
+}

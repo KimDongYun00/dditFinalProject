@@ -1,0 +1,12 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.DepartmentVO;
+
+public interface IDepartmentMapper {
+	List<DepartmentVO> getDepartmentsByColleageNo(String colNo);
+	DepartmentVO getDepartmentByDeptNo(String deptNo);
+}
+
+

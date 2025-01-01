@@ -1,0 +1,31 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ScholarshipVO;
+
+public interface IScholarshipMapper {
+		List<ScholarshipVO> getScholarshipList();
+		
+		List<ScholarshipVO> getScholarshipRequestList();
+
+		// 장학 종류 세부 조회
+		List<ScholarshipVO> scholarshipDetail(String schNo);
+		
+		// 장학 신청 내역 세부 조회
+		List<ScholarshipVO> getScholarshipRequestDetail(String schNo);
+
+		// 미승인 장학 신청 일괄 처리
+		boolean scholarshipRequestsApprove(List<String> scholarshipIds);
+
+		List<ScholarshipVO> getUnApproveScholarshipRequestList(String comDetCNo);
+
+		// 미승인 장학 신청 개별 승인 처리
+		int scholarshipRequestApprove(String schRecNo);
+
+		// 미승인 장학 신청 개별 반려 처리
+		int scholarshipRequestWait(String schRecNo);
+
+		
+
+}

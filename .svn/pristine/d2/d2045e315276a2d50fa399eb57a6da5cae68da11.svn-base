@@ -1,0 +1,7 @@
+package kr.or.ddit.service.common;
+
+import kr.or.ddit.vo.YearSemesterVO;
+
+public interface IYearSemesterService {
+	public YearSemesterVO getYearSemester();
+}

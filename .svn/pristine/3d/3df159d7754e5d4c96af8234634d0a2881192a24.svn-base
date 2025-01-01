@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IConsultingMapper">
+
+	<!-- 관리자용 동적 쿼리 -->
+	<sql id="consultingSearch">
+		<if test="searchType != null and searchType == 'student'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'professor'">
+			and (p.pro_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<!-- 상담 테이블 -->
+	<resultMap type="consultingVO" id="consultingMap">
+		<id property="conNo" column="con_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="proNo" column="pro_no"/>
+		<result property="conTitle" column="con_title"/>
+		<result property="conContent" column="con_content"/>
+		<result property="conRegdate" column="con_regdate"/>
+		<result property="conDate" column="con_date"/>
+		<result property="conOnoff" column="con_onoff"/>
+		<result property="comDetSNo" column="com_det_s_no"/>
+		<result property="comDetNNo" column="com_det_n_no"/>
+		<result property="conResult" column="con_result"/>
+		<association property="studentVO" resultMap="studentMap"/>		
+	</resultMap>
+
+	<!-- 조인해서 쓰기 위한 student 데이터 -->
+	<resultMap type="studentVO" id="studentMap">
+		<result property="stuNo" column="stu_no"/>	
+		<result property="deptNo" column="dept_no"/>	
+		<result property="stuYear" column="stu_year"/>	
+		<result property="stuName" column="stu_name"/>	
+		<result property="comDetGNo" column="com_det_g_no"/>	
+		<result property="stuRegno" column="stu_regno"/>	
+		<result property="stuPostcode" column="stu_postcode"/>	
+		<result property="stuAdd1" column="stu_add1"/>	
+		<result property="stuAdd2" column="stu_add2"/>	
+		<result property="stuEmail" column="stu_email"/>	
+		<result property="stuImg" column="stu_img"/>	
+		<result property="stuIp" column="stu_ip"/>	
+		<result property="enabled" column="enabled"/>	
+		<result property="comDetBNo" column="com_det_b_no"/>	
+		<result property="stuAccount" column="stu_account"/>	
+		<result property="stuDelYn" column="stu_delyn"/>	
+		<result property="stuSdate" column="stu_sdate"/>	
+		<result property="stuEdate" column="stu_edate"/>	
+		<result property="comDetMNo" column="com_det_m_no"/>	
+		<result property="stuPhone" column="stu_phone"/>	
+	</resultMap>
+
+
+	<!-- 교수용 search sql 지도학생 아직 구현안함-->
+	<sql id="consultingPro">
+		<if test="searchType != null and searchType ==1">
+			and com_det_s_no = 'S0101'
+		</if>
+		<if test="searchType != null and searchType ==2">
+			and com_det_s_no = 'S0102'
+		</if>
+		<if test="searchLecType != null and searchLecType == 1">
+			and (c.stu_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchLecType != null and searchLecType == 2">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		
+	</sql>
+
+	<!-- 현재 관리자용 상담 게시글 수 -->
+	<select id="selectConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		  from CONSULTING c, student s, professor p			
+		 where c.stu_no = s.stu_no
+		   and c.pro_no = p.pro_no	
+		<include refid="consultingSearch"/>	
+	</select>
+	
+	<!-- 관리자 상담 리스트 -->
+	<select id="selectConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+						c.CON_NO
+					  , c.STU_NO
+					  , c.PRO_NO
+					  , c.CON_TITLE
+					  , c.CON_CONTENT
+					  , to_char(c.CON_REGDATE, 'yyyy-mm-dd') con_regdate
+					  , to_char(c.CON_DATE, 'yyyy-mm-dd') con_date
+					  , c.CON_ONOFF
+					  , c.COM_DET_S_NO
+					  , c.COM_DET_N_NO
+	                  , s.stu_name
+	                  , p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 <include refid="consultingSearch"/>	
+			     )a
+              )b
+        <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<!-- 관리자 상담 상세보기 -->
+	<select id="selectConsultingDetail" resultType="consultingVO" parameterType="string">
+		 select c.CON_NO
+			  , c.STU_NO
+			  , c.PRO_NO
+			  , c.CON_TITLE
+			  , c.CON_CONTENT
+			  , to_char(c.CON_REGDATE, 'yyyy-mm-dd') con_regdate
+			  , to_char(c.CON_DATE, 'yyyy-mm-dd') con_date
+			  , c.CON_ONOFF
+			  , c.COM_DET_S_NO
+			  , c.COM_DET_N_NO
+              , s.stu_name
+              , p.pro_name
+		 from CONSULTING c, STUDENT s, PROFESSOR p
+		where c.stu_no = s.stu_no
+		  and c.pro_no = p.pro_no
+		  and con_no = #{conNo} 
+	</select>
+	
+	<!-- 관리자가 상담 상태 수정하는 쿼리 -->
+	<update id="updateConsulting" parameterType="consultingVO">
+		update consulting
+		   set 
+		       com_det_s_no = #{comDetSNo}
+		 where con_no = #{conNo}	
+	</update>
+	
+	<!-- 관리자가 상담 상태 삭제하는 쿼리 -->
+	<delete id="deleteConsulting" parameterType="string">
+		delete consulting
+		 where con_no = #{conNo}
+	</delete>
+	
+	<!-- 교수용 상담 목록 -->
+	<select id="proConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+						c.CON_NO
+					  , c.STU_NO
+					  , c.PRO_NO
+					  , c.CON_TITLE
+					  , c.CON_CONTENT
+					  , to_char(c.CON_REGDATE, 'yyyy-mm-dd') con_regdate
+					  , to_char(c.CON_DATE, 'yyyy-mm-dd') con_date
+					  , c.CON_ONOFF
+					  , c.COM_DET_S_NO
+					  , c.COM_DET_N_NO
+	                  , s.stu_name
+	                  , p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 and c.pro_no = #{lecNo}
+				 <include refid="consultingPro"/>	
+			     )a
+              )b
+	</select>
+	
+	<!-- 페이징처리를 위한 카운트 -->
+	<select id="proConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		  from CONSULTING c, student s, professor p			
+		 where c.stu_no = s.stu_no
+		   and c.pro_no = p.pro_no	
+		   and c.pro_no = #{lecNo}
+		   <include refid="consultingPro"/>		   
+	</select>
+	
+	<!-- 교수가 상담 상세내역 조회 -->
+	<select id="proConsultingDetail" parameterType="string" resultMap="consultingMap">
+		select 	c.con_no
+			  , c.stu_no
+			  , c.pro_no
+			  , c.con_title
+			  , c.con_content
+			  , to_char(c.con_regdate, 'yyyy-mm-dd') con_regdate
+			  , to_char(c.con_date, 'yyyy-mm-dd') con_date
+			  , c.con_onoff
+			  , c.com_det_s_no
+			  , c.com_det_n_no
+              , s.stu_name 
+              , s.stu_year
+              , s.stu_phone
+              , con_result
+		  from consulting c, student s
+		 where c.stu_no = s.stu_no
+		   and con_no = #{conNo} 
+	</select>
+	
+	<!-- 상담완료후 결과 업데이트 -->
+	<update id="proConsultingUpdate" parameterType="consultingVO">
+		update consulting
+		   set 
+		       com_det_s_no = #{comDetSNo}
+		     , con_result = #{conResult}
+		 where con_no = #{conNo}     
+	</update>
+	
+	<!-- 학생목록 찾는 쿼리 -->
+	<select id="proSearchStu" parameterType="string" resultType="studentVO">
+		select stu_no, stu_name, stu_phone
+		  from student
+		 where 1=1
+		   and stu_name like '%'||#{stuName}||'%'		
+	</select>
+	
+	<!-- 교수가 상담 등록 -->
+	<insert id="consultingInsert" parameterType="consultingVO">
+	    <selectKey keyProperty="conNo" resultType="string" order="BEFORE">
+			select 'CON_'||lpad(seq_consulting.nextval, 4, '0') as con_no from dual
+		</selectKey>
+		insert into consulting(con_no, stu_no, pro_no, con_title, con_content, con_regdate, con_date, con_onoff, com_det_s_no, com_det_n_no)
+		values(#{conNo}, #{stuNo}, #{proNo}, #{conTitle}, #{conContent}, sysdate, #{conDate}, #{conOnoff}, 'S0102', #{comDetNNo})
+	</insert>
+	
+	<!-- 교수가 상담 삭제 -->
+	<delete id="consultingDelete" parameterType="string">
+		delete consulting
+		 where con_no = #{conNo}
+	</delete>
+	
+	<select id="stuConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		  from CONSULTING c, student s, professor p			
+		 where c.stu_no = s.stu_no
+		   and c.pro_no = p.pro_no	
+		   and c.stu_no = #{lecNo}
+	</select>
+	
+	<select id="stuConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+						c.CON_NO
+					  , c.STU_NO
+					  , c.PRO_NO
+					  , c.CON_TITLE
+					  , c.CON_CONTENT
+					  , to_char(c.CON_REGDATE, 'yyyy-mm-dd') con_regdate
+					  , to_char(c.CON_DATE, 'yyyy-mm-dd') con_date
+					  , c.CON_ONOFF
+					  , c.COM_DET_S_NO
+					  , c.COM_DET_N_NO
+	                  , s.stu_name
+	                  , p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 and c.stu_no = #{lecNo}				 
+			     )a
+              )b
+	</select>
+	
+	<!-- 학생 자신이 쓴 상담 상세내역 -->
+	<select id="stuconsultingDetail" resultType="consultingVO" parameterType="string">
+		select con_no
+		     , c.stu_no
+		     , c.pro_no
+		     , con_title
+		     , con_content
+		     , con_regdate
+		     , to_char(CON_DATE, 'yyyy-mm-dd') con_date
+		     , con_onoff
+		     , com_det_s_no
+		     , com_det_n_no
+		     , con_result
+		     , p.pro_name
+		     , s.stu_name
+		  from consulting c, professor p, student s
+		 where c.pro_no = p.pro_no
+		   and c.stu_no = s.stu_no
+		   and con_no = #{conNo}
+	</select>
+	
+	<!-- 교수 검색 -->
+	<select id="stuSearchPro" parameterType="string" resultType="professorVO">
+	   select pro_no
+	        , pro_name
+	        , pro_phone 
+		 from professor
+		where 1=1 
+		  and pro_name like '%'||#{proName}||'%'
+	</select>
+	
+	<!-- 학생 상담 등록 -->
+	<insert id="stuConsultingInsert" parameterType="professorVO">
+	    <selectKey keyProperty="conNo" resultType="string" order="BEFORE">
+			select 'CON_'||lpad(seq_consulting.nextval, 4, '0') as con_no from dual
+		</selectKey>
+		insert into consulting(con_no
+		                     , stu_no
+		                     , pro_no
+		                     , con_title
+		                     , con_content
+		                     , con_regdate
+		                     , con_date
+		                     , con_onoff
+		                     , com_det_s_no
+		                     , com_det_n_no
+		                     )
+		                values(
+		                	 #{conNo}
+		                	 , #{stuNo}
+		                	 , #{proNo}
+		                	 , #{conTitle}
+		                	 , #{conContent}
+		                	 , sysdate
+		                	 , #{conDate}
+		                	 , #{conOnoff}
+		                	 , #{comDetSNo}
+		                	 , #{comDetNNo}
+		                )      
+		
+	</insert>
+	
+	<!-- 학생 상담 수정 쿼리 -->
+	<update id="stuConsultingUpdate" parameterType="string">
+		update consulting
+		   set
+		       con_title = #{conTitle}
+		     , con_content = #{conContent}
+		     , con_date = #{conDate}
+		     , con_onoff = #{conOnoff}
+		     , com_det_n_no = #{comDetNNo}  
+		 where con_no = #{conNo}   
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

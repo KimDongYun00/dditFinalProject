@@ -1,0 +1,29 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/student")
+public class StuLecController {
+	
+	// 나의 강의 목록이 카드로 보이는 메소드 구조는 student안에 lecCard안에 만들면 메뉴의 
+	// 사이드 사이드바가 안생김
+	// tiles1의 menu를 이용하여 a링크 컨트롤
+	@RequestMapping(value="/lecList", method=RequestMethod.GET)
+	public String test() {
+		
+		return "student/lecCard/lecList";
+	}
+	
+	
+	// 카드를 눌렀을때 수강번호를 들고와서 강의에 대한 자료실을 보여주는 메소드 아래의 메소드로 들어가면 사이드바가 생김
+	// 구조는 student 안에 lec안에 lecCard로 해놨는데 jsp명은 바껴도 상관없음
+	// tiles1의 menu_lec을 이용하여 a링크 컨트롤
+	@RequestMapping(value="/lecCard", method=RequestMethod.GET)
+	public String test1() {
+		
+		return "student/lec/lecCard";
+	}
+}

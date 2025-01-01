@@ -1,0 +1,50 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IAdminMemberMapper;
+import kr.or.ddit.service.admin.inter.IAdminMemberService;
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.StudentVO;
+
+@Service
+public class AdminMemberServiceImpl implements IAdminMemberService {
+	
+	@Inject
+	private IAdminMemberMapper memMapper;
+	
+	@Override
+	public List<ProfessorVO> searchProfessor(String proName) {
+		return memMapper.searchProfessor(proName);
+	}
+
+	@Override
+	public List<StudentVO> selectStuList() {
+		
+		return memMapper.selectStuList();
+	}
+
+	@Override
+	public StudentVO stuDetail(String stuNo) {
+		
+		return memMapper.stuDetail(stuNo);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.ILoginMapper">
+
+	<resultMap type="userVO" id="userMap">
+		<id property="userNo" column="user_no"/>
+		<result property="userNo" column="user_no"/>
+		<result property="userPw" column="user_pw"/>
+		<result property="comDetUNo" column="com_det_u_no"/>
+		<collection property="userAuthList" resultMap="userAuthMap"/>
+	</resultMap>
+	
+	<resultMap type="userAuthVO" id="userAuthMap">
+		<result property="userNo" column="user_no"/>
+		<result property="userAuthNo" column="user_auth_no"/>
+	</resultMap>
+	
+	 <resultMap type="kr.or.ddit.vo.ProfessorVO" id="professorMap">
+        <id property="proNo" column="pro_no"/>
+        <result property="deptNo" column="dept_no"/>
+        <result property="comDetPNo" column="com_det_p_no"/>
+        <result property="proName" column="pro_name"/>
+        <result property="comDetGNo" column="com_det_g_no"/>
+        <result property="proRegno" column="pro_regno"/>
+        <result property="proPostcode" column="pro_postcode"/>
+        <result property="proAdd1" column="pro_add1"/>
+        <result property="proAdd2" column="pro_add2"/>
+        <result property="proEmail" column="pro_email"/>
+        <result property="proImg" column="pro_img"/>
+        <result property="proIp" column="pro_ip"/>
+        <result property="enabled" column="enabled"/>
+        <result property="comDetBNo" column="com_det_b_no"/>
+        <result property="proAccount" column="pro_account"/>
+        <result property="proDelYn" column="pro_del_yn"/>
+        <result property="proSdate" column="pro_sdate"/>
+        <result property="proEdate" column="pro_edate"/>
+        <result property="comDetMNo" column="com_det_m_no"/>
+    </resultMap>
+	
+
+    <select id="loginCheck" parameterType="kr.or.ddit.vo.UserVO" resultType="kr.or.ddit.vo.UserVO">
+        SELECT USER_NO, USER_PW, COM_DET_U_NO
+        FROM  USER
+        WHERE USER_NO = #{userNo} AND USER_PW = #{userPw}
+    </select>
+
+	<!-- 로그인 -->
+	<select id="readByUserId" parameterType="string" resultMap="userMap">
+		  select 
+	         u.user_no, user_pw, com_det_u_no, user_auth_no
+	      from "USER" u left outer join user_auth ua on(u.user_no = ua.user_no)
+	      where u.user_no = #{userNo}
+	</select>
+	
+	<!-- 교수 아이디로 교수 정보 꺼내오는 sql -->
+	<select id="professorInfo" parameterType="string" resultMap="professorMap">
+		select p.*
+		from professor p
+		join user u on p.pro_no = u.user_no
+		join common_code_detail ccd on u.com_det_u_no = ccd.com_det_no
+		where ccd.com_det_no = #{comDetUNo}
+		and u.user_no = #{userNo}
+	</select>
+	
+
+</mapper>

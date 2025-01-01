@@ -1,0 +1,27 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class StudentVO {
+	private String stu_no;
+	private String dept_no;
+	private int stu_year;
+	private String stu_name;
+	private String com_det_g_no;
+	private String stu_regno;
+	private String stu_postcode;
+	private String stu_add1;
+	private String stu_add2;
+	private String stu_email;
+	private String stu_img;
+	private String stu_ip;
+	private String enabled;
+	private String com_det_b_no;
+	private String stu_account;
+	private String stu_del_yn;
+	private String stu_sdate;
+	private String stu_edate;
+	private String com_det_m_no;
+	private String stu_phone;
+}

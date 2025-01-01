@@ -1,0 +1,18 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/student")
+public class StuMypageController {
+
+	// 학생 로그인 초기화면
+	@RequestMapping(value = "/mypage.do", method = RequestMethod.GET)
+	public String mypage(Model model) {
+		return "student/mypage/mypage";
+	}
+	
+}

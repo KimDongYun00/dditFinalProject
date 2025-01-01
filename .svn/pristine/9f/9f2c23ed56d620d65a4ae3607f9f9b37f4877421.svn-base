@@ -1,0 +1,18 @@
+package kr.or.ddit.service.student.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IConsultingMapper;
+import kr.or.ddit.service.student.inter.IStuConsultingService;
+
+@Service
+public class StuConsultingServiceImpl implements IStuConsultingService {
+
+	@Inject
+	private IConsultingMapper mapper;
+	
+
+
+}

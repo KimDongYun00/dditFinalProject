@@ -1,0 +1,11 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.TuitionVO;
+
+public interface IAdminTuitionService {
+	public List<TuitionVO> getTuitionListByDeptNo(String deptNo);
+	public void insertTuition(TuitionVO tuitionVO);
+	public List<TuitionVO> selectTuiList();
+}

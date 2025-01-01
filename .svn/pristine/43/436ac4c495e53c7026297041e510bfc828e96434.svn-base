@@ -1,0 +1,9 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.CommonVO;
+
+public interface ICommonMapper {
+	public List<CommonVO> getBankList();
+}

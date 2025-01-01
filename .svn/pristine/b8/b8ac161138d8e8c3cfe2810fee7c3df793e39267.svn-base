@@ -1,0 +1,135 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<h4 class="py-3 mb-4" style="font-weight:bold; padding-left:20px;">등록금 납부</h4>
+	<div class="row">
+		
+		<div class="col-xl-12">
+			<div class="card mb-4 bg-white">
+				<h4 class="card-header" width="500">
+					납부내역
+					<button class="btn btn-primary" type="button" style="float:right;"
+						 data-bs-toggle="modal" data-bs-target="#modalTui">납부</button>
+				</h4>
+				<hr class="my-0">
+				<div class="card-body">
+					<div class="table-responsive text-nowrap">
+	    				<table class="table table-hover" style="overflow:hidden;">
+	      					<thead>
+	        					<tr>
+						          	<th width="5%">번호</th>
+						          	<th width="15%">년도/학기</th>
+						          	<th width="10%">등록금(원)</th>
+						          	<th width="10%">차감금액(원)</th>
+						          	<th width="10%">납부금액(원)</th>
+						          	<th width="10%">납부구분</th>
+						          	<th width="15%">납부일자</th>
+						          	<th width="10%">납부상태</th>
+						          	<th width="10%">납부상세</th>
+						     	</tr>
+	      					</thead>
+	      					<tbody class="table-border-bottom-0" id="tbody">
+	      						<c:choose>
+	      							<c:when test="${fn:length(pagingVO.dataList) != 0}">
+	      								<c:set value="1" var="cnt"/>
+			      						<c:forEach items="${pagingVO.dataList }" var="tui">
+				      						<c:forEach items="${tui.tuiPayList }" var="pay">
+					      						<tr class="tui" data-tuiNo="${tui.tuiNo }">
+					      							<td>${cnt }</td>
+					      							<td>${tui.year }년도 ${tui.semester }학기</td>
+					      							<td><fmt:formatNumber value="${tui.tuiPayment }" pattern="#,###" /></td>
+					      							<td>
+						      							<c:set value="0" var="totalSch"/>
+							                      		<c:forEach items="${scholarList }" var="sch">
+								                      		<c:set value="${totalSch + sch.schAmount }" var="totalSch"/>
+							                      		</c:forEach>
+								                      	<fmt:formatNumber value="${totalSch }" pattern="#,###" />
+					      							</td>
+					      							<td>
+					      								<c:set value="0" var="payAmount"/>
+					      								<c:forEach items="${pay.tuiPayDetList }" var="det">
+						      								<c:set value="${payAmount + det.tuiPayDetAmount }" var="payAmount"/>
+					      								</c:forEach>
+					      								<fmt:formatNumber value="${payAmount }" pattern="#,###" />
+					      							</td>
+					      							<td>
+					      								<c:choose>
+					      									<c:when test="${pay.comDetY2No == 'Y0201' }">일시불</c:when>
+					      									<c:otherwise>분할납부</c:otherwise>
+					      								</c:choose>
+					      							</td>
+					      							<td>${fn:substring(pay.tuiPayDate, 0, 16) }</td>
+					      							<td>
+					      								<c:if test="${pay.comDetYNo eq 'Y0101' }">납부중</c:if>
+					      								<c:if test="${pay.comDetYNo ne 'Y0101' }">납부완료</c:if>
+					      							</td>
+					      							<td>
+					      								<button type="button" class="btn btn-sm btn-primary detBtn"
+					      									data-bs-toggle="modal" data-bs-target="#modalDet">상세보기</button>
+					      							</td>
+					      						</tr>      
+					      						<c:set value="${cnt + 1 }" var="cnt"/>						
+					      					</c:forEach>
+				      					</c:forEach>
+	      							</c:when>
+	      							<c:otherwise>
+	      								<tr>
+	      									<td colspan="7" align="center">조회된 납부 내역이 없습니다.</td>
+	      								</tr>
+	      							</c:otherwise>
+	      						</c:choose>
+	      					</tbody>
+	   	 				</table>
+	  				</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script>
+
+$(function(){
+	
+	
+});
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

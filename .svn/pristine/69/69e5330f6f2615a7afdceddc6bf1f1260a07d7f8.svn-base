@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.StudentFacMapper">
+	<!-- 셀렉트바이용 검색 -->
+	<sql id="facilityType">
+		<if test="facTypeNo != null and facTypeNo == '1'">
+			and fac_type_no = '1'
+		</if>
+		<if test="facTypeNo != null and facTypeNo == '2'">
+			and fac_type_no = '2'
+		</if>
+		<if test="facTypeNo != null and facTypeNo == '3'">
+			and fac_type_no = '3'
+		</if>
+	</sql>
+	
+	<select id="selectFacList" resultType="facilityVO" parameterType="String">
+		select FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, BUI_NAME
+		from facility f, BUILDING b
+		where fac_yn = 'Y'
+		and f.bui_no = b.bui_no
+		<include refid="facilityType"/>
+	</select>
+	
+	<select id="selectDetail" resultType="facilityVO" parameterType="String">
+		select *
+		from facility
+		where fac_no = #{facNo}
+	</select>
+	
+</mapper>

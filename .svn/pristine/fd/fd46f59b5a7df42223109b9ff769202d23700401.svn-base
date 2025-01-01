@@ -1,0 +1,8 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.YearSemesterVO;
+
+public interface IYearSemesterMapper {
+	public YearSemesterVO getYearSemester();
+	public YearSemesterVO getYearSemesterDate();
+}

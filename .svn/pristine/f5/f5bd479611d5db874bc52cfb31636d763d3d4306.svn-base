@@ -1,0 +1,16 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FacilityReserveVO;
+import kr.or.ddit.vo.FacilityVO;
+
+public interface StudentFacMapper {
+
+	public List<FacilityVO> selectFacList(String facTypeNo);
+
+	public FacilityVO selectDetail(String facNo);
+
+	public FacilityReserveVO facreDetail(String facNo);
+
+}

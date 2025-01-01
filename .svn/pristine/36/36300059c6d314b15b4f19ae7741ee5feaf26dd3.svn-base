@@ -1,0 +1,29 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FreeBoardVO;
+import kr.or.ddit.vo.FreeCommentVO;
+
+public interface FreeBoardMapper {
+
+	public List<FreeBoardVO> freeList();
+
+	public FreeBoardVO detail(String freeNo);
+
+	public void incrementViewCount(String freeNo);
+
+	public List<FreeBoardVO> search(String keyword);
+
+	public void freeboardInsert(FreeBoardVO freeboardVO);
+
+	public void freecommentInsert(FreeCommentVO freeCommentVO);
+
+	public List<FreeCommentVO> getCommentsByFreeNo(String freeNo);
+
+	
+
+}
+
+
+    

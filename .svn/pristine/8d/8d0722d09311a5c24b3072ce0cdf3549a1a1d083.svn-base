@@ -1,0 +1,134 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+<!DOCTYPE html>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+<!-- 	<h4 class="py-3 mb-4" style="font-weight:bold; padding-left:20px;">회원관리</h4> -->
+	<div class="row">
+		<div class="col-xl-12">
+			<div class="card mb-4 bg-white">
+				<h5 class="card-header">인원관리 > 학생조회</h5>
+				<hr class="my-0">
+				<div class="card-body">
+					
+					<div class="table-responsive text-nowrap"  style="overflow:hidden;">	    				
+	    						
+		    				<div class="col-sm-3">
+		    					
+		    					<select class="form-select" id="memberSelect">
+		    						<option value="stu" selected>학생</option>
+		    						<option value="pro">교수</option>
+		    						<option value="admin">직원</option>
+		    					</select>
+		    				</div>
+		    				<div class="row mb-3">
+		    					<form id="searchForm">
+			    					<div class="col-sm-2">				    					
+				    						<input type="hidden" name="page" id="page">
+				    						<select class="form-select" id="searchType" name="searchType">
+				    							<option value="stuNo" <c:if test="${searchType eq 'stuNo' }">selected</c:if>>학번</option>
+				    							<option value="stuName" <c:if test="${searchType eq 'stuName' }">selected</c:if>>이름</option>
+				    							<option value="stuDept"<c:if test="${searchType eq 'stuDept' }">selected</c:if>>학과</option>
+				    						</select>
+				    				</div>		
+				    				<div class="col-sm-2">		
+				    						<input type="text" name="searchWord" class="form-control float-right" placeholder="Search" value="${searchWord }">
+				    						<div class="input-group-append">
+					                           <button type="submit" class="btn btn-primary">
+					                              <i class="fas fa-search">검색</i>
+					                           </button>
+					                        </div>			    					
+			    					</div>
+		    					</form>	
+	    					</div>
+	    				<table class="table table-hover"  style="overflow:hidden;">
+	      					<thead>
+	        					<tr>
+						          	<th width="">학번/사번</th>
+						          	<th width="">학과</th>
+						          	<th width="">학년</th>
+						          	<th width="">이름</th>
+						          	<th width="">성별</th>
+						          	<th width="">이메일</th>
+						          	<th width="">전화번호</th>
+						          	<th width="">학적상태</th>
+						          	<th width=""></th>
+						     	</tr>
+	      					</thead>
+	      					<c:set value="${pagingVO.dataList }" var="stuList"/>
+	      					<tbody class="table-border-bottom-0" id="tbody">
+	      						<c:forEach items="${stuList }" var="stu">
+	      							<tr class="subject">
+	      								<td class="stuNo">${stu.stuNo }</td>
+	      								<td>${stu.deptName }</td>
+	      								<td>${stu.stuYear }</td>
+	      								<td>${stu.stuName }</td>
+	      								<td>
+	      									<c:if test="${stu.comDetGNo eq 'G0101'}">남자</c:if> 
+	      									<c:if test="${stu.comDetGNo eq 'G0102'}">여자</c:if>	      								
+	      								</td>
+	      								<td>${stu.stuEmail }</td>
+	      								<td>${stu.stuPhone }</td>
+	      								<td>
+	      									<c:if test="${stu.comDetMNo eq 'M0101'}">재학</c:if>
+	      									<c:if test="${stu.comDetMNo eq 'M0102'}">휴학</c:if>
+	      									<c:if test="${stu.comDetMNo eq 'M0103'}">자퇴</c:if>
+	      									<c:if test="${stu.comDetMNo eq 'M0104'}">졸업</c:if>	      								
+	      								</td>
+	      								<td>
+											<a class="btn btn-sm btn-secondary" href="/admin/stuDetail?stuNo=${stu.stuNo }">상세보기</a>
+										</td>
+	      							</tr>
+	      						</c:forEach>
+	      					</tbody>
+	   	 				</table>	   	 				
+	  				</div>	  	
+	  				<div class="card-footer clearfix" id="pagingArea">
+                  		${pagingVO.pagingHTML }
+               		</div>			
+				</div>
+				<div class="card-footer">
+					<!-- 등록 버튼 이 버튼을 통해 일괄등록을 진행하는 페이지...-->
+					<button type="button" class="btn btn-primary" id="insertBtn">등록</button>
+					<button type="button" class="btn btn-primary" id="insertAllBtn">일괄등록</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$(function(){
+	var pagingArea = $("#pagingArea");
+	var memberSelect = $("#memberSelect");
+	var searchForm = $("#searchForm");
+	
+	pagingArea.on("click", "a", function(event){
+		event.preventDefault();	// a태그의 href속성 이벤트를 꺼준다.
+		var pageNo = $(this).data("page");	// pageNo 전달
+		
+		// 검색 시 사용할 form태그 안에 넣어준다.
+		// 검색 시 사용할 form 태그를 활용해서 검색도하고 페이징 처리도 같이 진행함
+		searchForm.find("#page").val(pageNo);
+		searchForm.submit();
+	});
+	
+	// 셀렉트바가 바뀔때
+	memberSelect.on("change", function(){
+		if($("#memberSelect option:selected").text() == '교수'){
+			location.href="/admin/proList";
+			return false;
+		}
+		if($("#memberSelect option:selected").text() == '직원'){
+			location.href="/admin/empList";
+			return false;
+		}
+	});
+	
+	$("#insertBtn").click(function(){
+		location.href="/admin/stuInsertForm";
+	});
+	
+})
+
+</script>

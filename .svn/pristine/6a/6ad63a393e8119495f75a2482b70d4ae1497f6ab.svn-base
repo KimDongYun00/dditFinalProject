@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.VolunteerMapper">
+	<sql id="volunteerType">
+		<if test="searchType != '' and searchType == 'C0101'">
+			and com_det_c_no = 'C0101'
+		</if>
+		<if test="searchType != '' and searchType == 'C0102'">
+			and com_det_c_no = 'C0102'
+		</if>
+		<if test="searchType != '' and searchType == 'C0103'">
+			and com_det_c_no = 'C0103'
+		</if>
+		<if test="searchLecType != '99'">
+			and d.dept_no = #{searchLecType}
+		</if>
+		<if test="searchScore != null and searchScore == 1">			
+			and s.stu_name like '%'||#{searchWord}||'%'
+		</if>
+		<if test="searchScore != null and searchScore == 2">			
+			and v.stu_no like '%'||#{searchWord}||'%'
+		</if>
+	</sql>
+	
+	<!-- 학생이 로그인 했을때 자기 봉사 신청 내역  -->
+	<select id="selectVolunteer" parameterType="string" resultType="volunteerVO">
+		select vol_no
+		     , stu_no
+		     , vol_name
+		     , vol_content
+		     , vol_time 
+		     , to_char(vol_regdate, 'yyyy-mm-dd') vol_regdate
+		     , to_char(vol_sdate, 'yyyy-mm-dd') vol_sdate
+		     , to_char(vol_edate, 'yyyy-mm-dd') vol_edate
+		     , com_det_c_no
+		     , file_group_no
+		     , rej_content
+		  from volunteer
+		 where stu_no = #{stuNo}		
+	</select>
+	
+	<!-- 학생이 본인 봉사 신청 -->
+	<insert id="insertVolunteer" parameterType="volunteerVO" useGeneratedKeys="true">
+		<selectKey keyProperty="volNo" resultType="String" order="BEFORE">
+			select 'VOL_'||lpad(seq_volunteer.nextval, 4, '0') from dual
+		</selectKey>
+		insert into volunteer(vol_no
+		                    , stu_no
+		                    , vol_name
+		                    , vol_content
+		                    , vol_time
+		                    , vol_regdate
+		                    , vol_sdate
+		                    , vol_edate
+		                    , com_det_c_no)
+		               values(#{volNo}
+		                    , #{stuNo}
+		                    , #{volName}
+		                    , #{volContent}
+		                    , #{volTime}
+		                    , sysdate
+		                    , #{volSdate}
+		                    , #{volEdate}
+		                    ,'C0102')		               
+	</insert>
+	
+	<!-- 봉사활동 등록시 파일 그룹번호 처리 -->
+	<update id="insertFileGroupNo" parameterType="volunteerVO">
+		update volunteer
+		   set 
+		       file_group_no = #{fileGroupNo}
+		 where vol_no = #{volNo}      
+	</update>
+	
+	<!-- 학생 자기 상세내역 -->
+	<select id="stuDetailVolunteer" parameterType="string" resultType="volunteerVO">
+		select vol_no
+		     , stu_no
+		     , vol_name
+		     , vol_content
+		     , vol_time 
+		     , to_char(vol_regdate, 'yyyy-mm-dd') vol_regdate
+		     , to_char(vol_sdate, 'yyyy-mm-dd') vol_sdate
+		     , to_char(vol_edate, 'yyyy-mm-dd') vol_edate
+		     , com_det_c_no
+		     , file_group_no
+		     , rej_content
+		  from volunteer
+		 where vol_no = #{volNo}
+	</select>
+	
+	<!-- 학생의 봉사내역 수정 -->
+	<update id="updateVolunteer" parameterType="volunteerVO">
+		update volunteer
+		   set
+		       vol_name = #{volName}
+		     , vol_content = #{volContent}
+		     , vol_time = #{volTime}
+		     , vol_sdate = #{volSdate}
+		     , vol_edate = #{volEdate}
+		     , file_group_no = #{fileGroupNo}
+		 where vol_no = #{volNo}      
+	</update>
+	
+	<!-- 학생의 미승인된 봉사내역 삭제 처리 -->
+	<delete id="deleteVolunteer" parameterType="string">
+		delete volunteer
+		 where vol_no = #{volNo} 
+	</delete>
+	
+	<!-- 관리자 쿼리 -->
+	<!-- 봉사 목록 조회 -->
+	<select id="selectList" parameterType="pagingVO" resultType="volunteerVO">
+		select b.*   
+          from
+          (select a.*, row_number() over(order by a.vol_no) AS rnum
+             from(
+                   select v.vol_no, v.stu_no, v.vol_name, v.vol_content, v.vol_time, to_char(v.vol_regdate, 'YYYY/MM/DD') vol_regdate, v.vol_sdate, v.vol_edate,
+                          v.com_det_c_no, v.file_group_no, v.rej_content
+                          , s.stu_name
+                          , d.dept_name
+                     from volunteer v
+                        , student s
+                        , department d
+                    where v.stu_no = s.stu_no
+                      and s.dept_no = d.dept_no
+                    <include refid="volunteerType"/>	
+                 ) a
+          )b
+        <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]> 	 
+	</select>
+	
+	<!-- 페이징 처리를 위한 카운트 -->
+	<select id="selectCount" parameterType="pagingVO" resultType="int">
+	  select count(vol_no)
+		from volunteer v, student s, department d	
+	   where v.stu_no = s.stu_no	
+	     and s.dept_no = d.dept_no
+	 <include refid="volunteerType"/>	
+	</select>
+	
+	<!-- volunteer 일괄 승인처리 -->
+	<update id="volunteerAgree" parameterType="string">
+		update volunteer
+		set 
+		  com_det_c_no = 'C0101'
+		, rej_content = ''
+      where 
+          vol_no = #{volNo}   
+	</update>
+	
+	<!-- 학과 정보를 가져오기 위해 -->
+	<select id="selectDept" resultType="departmentVO">
+		select dept_no, dept_name
+		  from department
+	</select>
+	
+	<!-- 봉사활동내역상세조회 -->
+	<select id="volunteerDetail" resultType="volunteerVO" parameterType="string">
+		select v.stu_no
+		     , v.vol_name
+		     , v.vol_content
+		     , v.vol_time
+		     , to_char(v.vol_regdate, 'YYYY-MM-DD') vol_regdate
+		     , to_char(v.vol_sdate, 'yyyy-mm-dd') vol_sdate
+		     , to_char(v.vol_edate, 'yyyy-mm-dd') vol_edate
+		     , v.com_det_c_no
+		     , v.file_group_no
+		     , v.rej_content
+		     , d.dept_name
+		     , s.stu_name
+		     , v.vol_no
+		  from volunteer v
+		     , student s
+		     , department d
+		 where v.stu_no = s.stu_no
+		   and s.dept_no = d.dept_no
+		   and vol_no = #{volNo}  
+	</select>
+	
+	<!-- 한개 승인처리 -->
+	<update id="volunteerApprove" parameterType="string">
+		update volunteer
+		   set 
+		       com_det_c_no = 'C0101'
+		     , rej_content = ' '  
+		 where vol_no = #{volNo} 	
+	</update>
+	
+	<!-- 반려처리 -->
+	<update id="volunteerReject" parameterType="volunteerVO">
+		update volunteer
+		   set
+		       com_det_c_no = 'C0103'
+		     , rej_content = #{rejContent}
+		 where vol_no = #{volNo}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

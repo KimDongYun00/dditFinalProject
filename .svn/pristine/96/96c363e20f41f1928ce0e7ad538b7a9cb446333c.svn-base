@@ -1,0 +1,50 @@
+package kr.or.ddit.controller.student;
+
+import java.util.List;
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.student.inter.INotificationService;
+import kr.or.ddit.vo.BoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/student")
+public class StuBoardController {
+
+	@Inject
+	private INotificationService service;
+
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String announcementList(Model model) {
+		List<BoardVO> boardList = service.list();
+		model.addAttribute("boardList", boardList);
+		return "student/board/notificationList";
+
+	}
+
+	@RequestMapping(value = "/detail/{boNo}", method = RequestMethod.GET)
+	public String announcementDetail(@PathVariable("boNo") String boNo, Model model) {
+		service.incrementViewCount(boNo);
+		BoardVO board = service.detail(boNo);
+		model.addAttribute("board", board);
+		return "student/board/notificationDetail";
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public String search(@RequestParam("keyword") String keyword, Model model) {
+		List<BoardVO> searchResults = service.search(keyword);
+		model.addAttribute("boardList", searchResults);
+		model.addAttribute("keyword", keyword);
+		return "student/board/notificationList";
+	}
+
+}

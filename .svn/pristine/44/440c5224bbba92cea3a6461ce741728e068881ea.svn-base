@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IYearSemesterMapper">
+
+	<select id="getYearSemester" resultType="yearSemesterVO">
+		select ys_year, ys_semester
+		from YEAR_SEMESTER
+		where ys_sdate = (select max(ys_sdate) from year_semester)
+	</select>
+	
+	<select id="getYearSemesterDate" resultType="yearSemesterVO">
+		select YS_YEAR,YS_SEMESTER,YS_SDATE,YS_EDATE
+		from year_semester
+		where ys_sdate = (select max(ys_sdate) from year_semester)
+	</select>
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

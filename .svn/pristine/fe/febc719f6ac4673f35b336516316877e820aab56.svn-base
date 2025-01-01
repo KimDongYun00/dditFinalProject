@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ICourseMapper">
+
+
+	<select id="getAllLecNow" resultType="map">
+		select lec_no, count(lec_no) as cnt
+		from course
+		group by lec_no
+	</select>
+	
+	<select id="getLecNowByLecNo" parameterType="String" resultType="int">
+		select count(lec_no) cnt
+		from course
+		where lec_no = #{lecNo}
+	</select>
+	
+	<select id="getLecMaxByLecNo" parameterType="String" resultType="int">
+		select lec_max
+		from lecture
+		where lec_no = #{lecNo}
+	</select>
+	
+	<insert id="insertCourse" parameterType="courseVO" useGeneratedKeys="true">
+		<selectKey order="BEFORE" resultType="String" keyProperty="couNo">
+			select 'COU_'||seq_course.nextval from dual
+		</selectKey>
+		insert into course(
+			COU_NO
+			,LEC_NO
+			,STU_NO
+			,COU_YN
+		) values(
+			#{couNo}
+			,#{lecNo}
+			,#{stuNo}
+			,'Y'
+		)
+	</insert>
+
+	<select id="hasCourseCart" parameterType="courseVO" resultType="int">
+		select count(cou_cart_no)
+		from COURSE_CART
+		where lec_no = #{lecNo}
+		and stu_no = #{stuNo}
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

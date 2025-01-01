@@ -1,0 +1,38 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IColleageMapper;
+import kr.or.ddit.service.admin.inter.IAdminDepartmentService;
+import kr.or.ddit.vo.ColleageVO;
+
+@Service
+public class AdminDepartmentServiceImpl implements IAdminDepartmentService {
+	
+	@Inject
+	private IColleageMapper ColleageMapper;
+	
+	@Override
+	public List<ColleageVO> getColleageList() {
+		return ColleageMapper.getColleageList();
+	}
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

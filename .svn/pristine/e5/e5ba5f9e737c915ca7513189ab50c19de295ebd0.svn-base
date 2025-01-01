@@ -1,0 +1,26 @@
+package kr.or.ddit.service.professor.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IProfessorMapper;
+import kr.or.ddit.service.professor.IProLectureService;
+import kr.or.ddit.vo.LectureVO;
+
+@Service
+public class ProLectureServiceImpl  implements IProLectureService{
+	@Inject
+	private IProfessorMapper professorMapper;
+
+	@Override
+	public List<LectureVO> lectureList(String userNo) {
+		
+		return professorMapper.lectureList(userNo);
+	}
+
+
+	
+}

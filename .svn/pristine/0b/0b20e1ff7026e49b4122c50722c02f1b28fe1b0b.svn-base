@@ -1,0 +1,18 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class FacilityReserveVO {
+
+	private String fac_res_no;
+	private String user_no;
+	private String fac_no;
+	private int fac_res_num;
+	private String rac_res_purpose;
+	private String com_det_c_no;
+	private String fac_res_regdate;
+	private String fac_res_sdate;
+	private String fac_res_edate;
+	private String rej_content;
+}

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IFacilityMapper">
+	
+	<!-- 셀렉트바이용 검색 -->
+	<sql id="facilityType">
+		<if test="searchType != '' and searchType == 1">
+			and fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 2">
+			and fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 3">
+			and fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 4">
+			and fac_type_no = #{searchType}
+		</if>
+	</sql>
+	
+	<select id="selectFacList" resultType="facilityVO" parameterType="String">
+		select FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, BUI_NAME
+		from facility f, BUILDING b
+		where fac_yn = 'Y'
+		and f.bui_no = b.bui_no
+		<include refid="facilityType"/>
+	</select>
+	
+	<select id="selectDetail" resultType="facilityVO" parameterType="String">
+		select *
+		from facility
+		where fac_no = #{facNo}
+	</select>
+	
+	<select id="facreDetail" resultType="facReserveVO" parameterType="string">
+		select FAC_RES_NO, USER_NO, FAC_NO, FAC_RES_NUM, RAC_RES_PURPOSE, COM_DET_C_NO, FAC_RES_REGDATE, FAC_RES_SDATE, FAC_RES_EDATE, REJ_CONTENT
+		from FACILITY_RESERVE
+		where fac_no = #{facNo}
+	</select>
+	
+	<select id="selectFacility" resultType="facilityVO">
+		select FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, b.BUI_NAME
+		from facility f, BUILDING b
+		where fac_yn = 'Y'
+		and f.bui_no = b.bui_no
+	</select>
+	
+	<select id="selectFacilityType" resultType="facilityVO" parameterType="string">
+		select FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, b.BUI_NAME
+		from facility f, BUILDING b
+		where fac_yn = 'Y'
+		and f.bui_no = b.bui_no
+		and fac_type_no = #{string}
+	</select>
+	
+	<select id="selectBuildingList" resultType="buildingVO">
+		select BUI_NO, BUI_NAME
+		from building
+	</select>
+	
+	<select id="facDetail" resultType="facilityVO" parameterType="string">
+		select FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, b.BUI_NAME
+		from facility f, BUILDING b
+		where fac_yn = 'Y'
+		and f.bui_no = b.bui_no
+		and FAC_NO = #{facNo}
+	</select>
+	
+	<insert id="facInsert" parameterType="facilityVO" useGeneratedKeys="true">
+		<selectKey keyProperty="facNo" resultType="String" order="BEFORE">
+			select 'FAC_'||seq_facility.nextval from dual
+		</selectKey>
+		insert into facility(fac_no, fac_type_no, bui_no, fac_name, fac_max, fac_yn, fac_img )
+		values(#{facNo}, #{facTypeNo}, #{buiNo}, #{facName}, ${facMax}, 'Y', #{facImg})
+	</insert>
+	
+	<update id="facUpdate" parameterType="facilityVO">
+		update facility
+		set
+			fac_type_no = #{facTypeNo},
+			bui_no = #{buiNo},
+			fac_name = #{facName},
+			fac_max = #{facMax},
+			fac_img = #{facImg}
+		where fac_no = #{facNo}
+	</update>
+	
+	<update id="facDelete" parameterType="string">
+		update facility
+		set fac_yn = 'N'
+		where fac_no = #{facNo}
+	</update>
+	
+	<select id="selectFacilityList" parameterType="pagingVO" resultType="facilityVO">
+		select
+            c.*
+        from( 
+	        select
+				a.*, row_number() over(order by a.FAC_NO) AS rnum
+			from(select 
+					FAC_NO, FAC_TYPE_NO, f.BUI_NO, FAC_NAME, FAC_MAX, FAC_IMG, FAC_YN, BUI_NAME
+				 from facility f, BUILDING b
+			     where fac_yn = 'Y'
+				 and f.bui_no = b.bui_no
+				 <include refid="facilityType"/>
+			     order by fac_no )a
+	        )c
+        <![CDATA[
+			where c.rnum >= #{startRow} and c.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<select id="selectFacilityCount" parameterType="pagingVO" resultType="int">
+		select count(fac_no)
+		from facility	
+		where 1=1	
+		<include refid="facilityType"/>	
+	</select>
+	
+	
+	
+</mapper>

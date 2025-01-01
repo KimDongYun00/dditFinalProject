@@ -1,0 +1,156 @@
+package kr.or.ddit.service.professor.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ServiceResult;
+import kr.or.ddit.mapper.IProfessorMapper;
+import kr.or.ddit.service.professor.inter.IProLectureService;
+import kr.or.ddit.vo.AssignmentSubmitVO;
+import kr.or.ddit.vo.AssignmentVO;
+import kr.or.ddit.vo.CourseVO;
+import kr.or.ddit.vo.ExamVO;
+import kr.or.ddit.vo.LectureNoticeVO;
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+@Service
+public class ProLectureServiceImpl  implements IProLectureService{
+	@Inject
+	private IProfessorMapper professorMapper;
+
+	@Override
+	public List<LectureVO> lectureList(String userNo) {
+		
+		return professorMapper.lectureList(userNo);
+	}
+
+	@Override
+	public List<LectureNoticeVO> selectLectureNotice(String lecNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectLectureNotice(lecNo);
+	}
+	
+	@Override
+	public List<AssignmentVO> selectAssignment(String lecNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignment(lecNo);
+	}
+
+	@Override
+	public List<ExamVO> selectExam(String lecNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectExam(lecNo);
+	}
+
+	@Override
+	public LectureVO selectLecture(String lecNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectLecture(lecNo);
+	}
+
+	@Override
+	public int selectAssignmentCount(PaginationInfoVO<AssignmentVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignmentCount(pagingVO);
+	}
+
+	@Override
+	public List<AssignmentVO> selectAssignmentList(PaginationInfoVO<AssignmentVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignmentList(pagingVO);
+	}
+
+	@Override
+	public AssignmentVO selectAssignmentDetail(String assNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignmentDetail(assNo);
+	}
+
+	@Override
+	public int selectAssignmentSubmitCount(PaginationInfoVO<AssignmentSubmitVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignmentSubmitCount(pagingVO);
+	}
+
+	@Override
+	public List<AssignmentSubmitVO> selectAssignmentSubmitList(PaginationInfoVO<AssignmentSubmitVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectAssignmentSubmitList(pagingVO);
+	}
+
+	@Override
+	public int selectStudentCount(PaginationInfoVO<CourseVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectStudentCount(pagingVO);
+	}
+
+	@Override
+	public List<CourseVO> selectStudentList(PaginationInfoVO<CourseVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectStudentList(pagingVO);
+	}
+
+	@Override
+	public List<AssignmentSubmitVO> selectASList(String assNo) {
+		// TODO Auto-generated method stub
+		return professorMapper.selectASList(assNo);
+	}
+
+	@Override
+	public List<AssignmentSubmitVO> selStuAss(Map<String, String> skMap) {
+		// TODO Auto-generated method stub
+		return professorMapper.selStuAss(skMap);
+	}
+
+
+	@Override
+	public ServiceResult insertAssignment(HttpServletRequest req, AssignmentVO assignmentVO) {
+		ServiceResult result = null;
+		
+		int status = professorMapper.insertAssignment(assignmentVO);
+		if(status > 0) {
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult updateAssignment(HttpServletRequest req, AssignmentVO assignmentVO) {
+		ServiceResult result = null; 
+		int status = professorMapper.updateAssignment(assignmentVO);
+		if (status > 0) {
+			result = ServiceResult.OK;
+		} else {
+			result = ServiceResult.FAILED;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult deleteAssignment(HttpServletRequest req, String assNo) {
+		ServiceResult result = null; 
+		int status = professorMapper.deleteAssignment(assNo);
+		if (status > 0) {
+			result = ServiceResult.OK;
+		} else {
+			result = ServiceResult.FAILED;
+		}
+		return result;
+	}
+
+
+
+
+
+	
+}

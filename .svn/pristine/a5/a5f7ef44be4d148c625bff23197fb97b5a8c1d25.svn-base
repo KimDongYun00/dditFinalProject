@@ -1,0 +1,48 @@
+package kr.or.ddit.controller.admin;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/admin")
+public class AdminSubjectController {
+
+	@RequestMapping(value = "/subjectInsertForm", method = RequestMethod.GET)
+	public String SubjectList() {
+		
+		
+		
+		return "admin/subjectInsertForm";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

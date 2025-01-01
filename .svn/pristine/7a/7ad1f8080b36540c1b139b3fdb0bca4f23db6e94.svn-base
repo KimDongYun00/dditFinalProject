@@ -1,0 +1,30 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+public interface ICourseMapper {
+	public List<Map<String, Object>> getAllLecNow();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

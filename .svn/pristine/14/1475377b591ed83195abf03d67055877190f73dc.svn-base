@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.ILectureDataMapper">
+	<!-- 강의 자료실 글갯수 -->
+	<select id="selectLectureDataCount" resultType="int">
+		select count(*)
+		from lecture_data
+		where lec_no = #{lecNo}
+	</select>
+	<!-- 강의자료실 조회(페이징) -->
+	<select id="selectLectureDataList" parameterType="pagingVO" resultType="lectureDataVO">
+		select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.lec_data_no desc) rnum
+			from(
+				select 
+                    lec_data_no,
+			        lec_data_title,
+			        lec_data_content,
+			        lec_data_regdate,
+			        lec_data_cnt,
+			        file_group_no
+                from lecture_data                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+                where lec_no=#{lecNo}
+				order by lec_data_no desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 강의실 상세보기 -->
+	<select id="selectLectureDataDetail" parameterType="string" resultType="lectureDataVO">
+		select *
+		from lecture_data
+		where lec_data_no = #{lecDataNo}
+	</select>
+	<!-- 조회수 증가 -->
+	<update id="updateLectureDataCnt">
+		update lecture_data
+		set lec_data_cnt = lec_data_cnt +1
+		where lec_data_no= #{lecDataNo}
+	</update>
+
+	<!--  -->
+	<select id="getLecDataNo" resultType="String">
+		select 'LEC_DATA_'|| to_char(sysdate,'yyyy')|| LPAD(seq_lecture_data.nextval, 4, '0')
+		from dual
+	</select>
+
+	<!-- 자료실 등록 -->
+	<insert id="insertLectureData" parameterType="lectureDataVO">
+		insert into lecture_data(lec_data_no,lec_no,lec_data_title,lec_data_content,lec_data_regdate,lec_data_cnt,file_group_no)
+		values(#{lecDataNo},#{lecNo},#{lecDataTitle},#{lecDataContent},sysdate,0,#{fileGroupNo})
+	</insert>
+
+	<!-- 자료실 수정 -->
+	<update id="updateLectureData" parameterType="lectureDataVO">
+		update lecture_data
+	    set lec_data_title=#{lecDataTitle},
+	        lec_data_content=#{lecDataContent},
+	        lec_data_regdate=sysdate,
+	        file_group_no=#{fileGroupNo}
+		where lec_no =#{lecNo}
+		and lec_data_no=#{lecDataNo}
+	</update>
+	
+	<!-- 파일리스트 삭제 -->
+	<delete id="deleteFile" parameterType="string">
+		delete from "FILE"
+		where file_group_no = #{fileGroupNo}
+	</delete>
+	
+	<!-- 자료실 삭제 -->
+	<delete id="deleteLectureData" parameterType="string">
+		delete 
+		from lecture_data
+		where lec_data_no=#{lecDataNo}
+	</delete>
+	
+	<!-- 파일그룹번호 얻기 -->
+	<select id="selectFileGroupNo" parameterType="string" resultType="string">
+		select file_group_no 
+		from lecture_data
+		where lec_data_no = #{lecDataNo}
+	</select>
+	
+	<select id="selectFileList" parameterType="string" resultType="fileVO">
+		select * from "FILE" 
+		where file_group_NO = #{fileGroupNo}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class ProfessorVO {
+	private String proNo;
+	private String deptNo;
+	private String comDetPNo;
+	private String proName;
+	private String comDetGNo;
+	private String proRegno;
+	private String proPostcode;
+	private String proAdd1;
+	private String proAdd2;
+	private String proEmail;
+	private String proImg;
+	private String proIp;
+	private String enabled;
+	private String comDetBNo;
+	private String proAccount;
+	private String proDelYn;
+	private String proSdate;
+	private String proEdate;
+	private String comDetMNo;
+	
+}

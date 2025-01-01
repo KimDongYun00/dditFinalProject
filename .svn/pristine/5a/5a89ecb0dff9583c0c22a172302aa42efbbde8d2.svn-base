@@ -1,0 +1,249 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>아이디/비밀번호 찾기</title>
+<meta charset="utf-8" />
+<meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<link rel="icon" type="image/x-icon"
+    href="../assets/img/favicon/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap"
+    rel="stylesheet" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/vendor/fonts/boxicons.css" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/vendor/css/core.css"
+    class="template-customizer-core-css" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/vendor/css/theme-default.css"
+    class="template-customizer-theme-css" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/css/demo.css" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath }/resources/assets/vendor/libs/apex-charts/apex-charts.css" />
+<script
+    src="${pageContext.request.contextPath }/resources/assets/vendor/js/helpers.js"></script>
+<script
+    src="${pageContext.request.contextPath }/resources/assets/js/config.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .input-error {
+        border-color: red;
+    }
+</style>
+</head>
+<body
+    class="d-flex flex-column justify-content-center align-items-center"
+    style="min-height: 100vh;">
+
+
+        <!-- 탭 테스트용 -->
+        <div class="col-md-8">
+            <h6 class="text-muted">사용자 유형 선택</h6>
+            <div class="nav-align-top mb-4">
+                <ul class="nav nav-pills mb-3 nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" role="tab" name="roleStudent"
+                            data-bs-toggle="tab" data-bs-target="#navs-pills-justified-home"
+                            aria-controls="navs-pills-justified-home" aria-selected="true">
+                            <i class="tf-icons bx bx-home me-1"></i>
+                            <span class="d-none d-sm-block">학생</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-pills-justified-profile"
+                            aria-controls="navs-pills-justified-profile"
+                            aria-selected="true" name="roleProfessor">
+                            <i class="tf-icons bx bx-user me-1"></i>
+                            <span class="d-none d-sm-block">교육자</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-pills-justified-messages"
+                            aria-controls="navs-pills-justified-messages"
+                            aria-selected="true" name="roleAdmin">
+                            <i class="tf-icons bx bx-message-square me-1"></i>
+                            <span class="d-none d-sm-block">교직원</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active"
+                        id="navs-pills-justified-home" role="tabpanel">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <h5 class="card-header">학번/사번 찾기</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlInput1" class="form-label">이름</label>
+                                            <input type="text" class="form-control" id="personalNameId"
+                                                placeholder="예)홍길동" /><br> <span id="nameErr"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlReadOnlyInput1"
+                                                class="form-label">생년월일</label> <input class="form-control"
+                                                type="text" id="personalBirthId" placeholder="예)950921" /><br> 
+                                                <span id="birthErrId"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlReadOnlyInputPlain1"
+                                                class="form-label">이메일</label> <input type="text"
+                                                class="form-control" id="personalEmailId"
+                                                placeholder="email@example.com" /><br> 
+                                                <span id="emailErrId"></span>
+                                        </div>
+                                        <input id="findId" class="btn btn-primary" type="button" value="학번/사번 찾기">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <h5 class="card-header">비밀번호 찾기</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlInput2" class="form-label">학번/사번</label>
+                                            <input type="text" class="form-control" id="personalId"
+                                                placeholder="예)202401323" /><br> <span id="idErr"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlReadOnlyInput2" class="form-label">생년월일</label>
+                                            <input class="form-control" type="text" id="personalBirth"
+                                                placeholder="예)950921" /><Br> 
+                                                <span id="birthErr"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlReadOnlyInputPlain2"
+                                                class="form-label">이메일</label> <input type="text"
+                                                class="form-control" id="personalEmail"
+                                                placeholder="email@example.com" /><br> 
+                                                <span id="emailErr"></span>
+                                        </div>
+                                        <input id="findPw" class="btn btn-primary" type="button" value="임시 비밀번호 발급받기">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script type="text/javascript">
+    
+    $(document).ready(function() {
+
+        // Input 태그 validation 체크
+        $("#personalNameId").on("keyup", function(){
+            var personalNameId = $(this).val();
+            var nameErr = $("#nameErr");
+            if(personalNameId.length > 5){
+                nameErr.html("이름이 너무 깁니다.").css("color","red");
+            } else {
+                nameErr.html("");
+            }
+        });
+        
+        $("#personalBirthId").on("keyup", function(){
+            var personalBirthId = $(this).val();
+            var birthErrId = $("#birthErrId");
+            if(personalBirthId.length > 6){
+               birthErrId.html("생년월일은 6자리로 입력해주세요.").css("color","red");
+               $(this).addClass("input-error");
+            } else {
+               birthErrId.html("");
+               $(this).removeClass("input-error");
+            }
+        });
+
+        $("#personalEmailId, #personalEmail").on("keyup", function(){
+            var email = $(this).val();
+            var emailErr = $(this).attr('id') === 'personalEmailId' ? $("#emailErrId") : $("#emailErr");
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!emailPattern.test(email)){
+            emailErr.html("유효한 이메일 주소를 입력해주세요.").css("color", "red");
+            $(this).addClass("input-error");
+        } else {
+            emailErr.html("");
+            $(this).removeClass("input-error");
+        }
+            
+    });
+
+    // 학번/사번 찾기 버튼 이벤트
+    $("#findId").on("click", function() {
+        var personalNameId = $("#personalNameId").val();
+        var personalBirthId = $("#personalBirthId").val();
+        var personalEmailId = $("#personalEmailId").val();
+        var nameErr = $("#nameErr");
+        var birthErrId = $("#birthErrId");
+        var emailErrId = $("#emailErrId");
+        
+        if(personalNameId == null || personalNameId == "") {
+            nameErr.html("이름을 입력해주세요").css("color","red");
+            return false;
+        } 
+        
+        if(personalBirthId == null || personalBirthId == "") {
+            birthErrId.html("생년월일을 입력해주세요").css("color","red");
+            return false;
+        }
+        if(personalEmailId == null || personalEmailId == "") {
+            emailErrId.html("이메일을 입력해주세요").css("color","red");
+            return false;
+        }
+        
+        swal('학번/사번 찾기!', '회원님의 학번/사번은 XXXXXXXXXX입니다!', 'success');
+    });
+
+    // 비밀번호 발급 버튼 이벤트
+    $("#findPw").on("click", function() {
+        var personalId = $("#personalId").val();
+        var personalBirth = $("#personalBirth").val();
+        var personalEmail = $("#personalEmail").val();
+        var idErr = $("#idErr");
+        var birthErr = $("#birthErr");
+        var emailErr = $("#emailErr");
+
+        if(personalId == null || personalId == "") {
+            idErr.html("학번/사번을 입력해주세요").css("color","red");
+            return false;
+        }
+        if(personalBirth == null || personalBirth == "") {
+            birthErr.html("생년월일을 입력해주세요").css("color","red");
+            return false;
+        }
+        if(personalEmail == null || personalEmail == "") {
+            emailErr.html("이메일을 입력해주세요").css("color","red");
+            return false;
+        }
+
+        swal('임시 비밀번호 전송 완료!', '회원님의 이메일로 임시 비밀번호가 전송되었습니다!', 'success');
+    });
+
+    // 탭 클릭 이벤트 
+    $("button[name='roleStudent'], button[name='roleProfessor'], button[name='roleAdmin']").on("click", function() {
+        $("button[name='roleStudent'], button[name='roleProfessor'], button[name='roleAdmin']").removeClass("active");
+        $(this).addClass("active");
+        
+        
+    });
+    
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+package kr.or.ddit.service.student;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FreeBoardVO;
+
+public interface FreeBoardService {
+
+	public List<FreeBoardVO> freeList();
+
+	public void incrementViewCount(String freeNo);
+
+	public FreeBoardVO detail(String freeNo);
+
+	public List<FreeBoardVO> search(String keyword);
+
+
+}

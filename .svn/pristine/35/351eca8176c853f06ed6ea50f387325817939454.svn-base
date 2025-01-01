@@ -1,0 +1,87 @@
+package kr.or.ddit.controller.student;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.student.inter.IFreeBoardService;
+import kr.or.ddit.vo.FreeBoardVO;
+import kr.or.ddit.vo.FreeCommentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/student")
+public class StuFreeBoardController {
+
+	@Inject
+	private IFreeBoardService service;
+
+
+    @RequestMapping(value = "/freeList", method = RequestMethod.GET)
+    public String freeboardList(Model model) {
+        List<FreeBoardVO> freeboardList = service.freeList();
+        log.info("FreeBoard List: {}", freeboardList);
+        model.addAttribute("freeboardList", freeboardList);
+        return "student/board/freeboardList";
+    }
+
+    @RequestMapping(value = "/freeDetail/{freeNo}", method = RequestMethod.GET)
+    public String freeboardDetail(@PathVariable("freeNo") String freeNo, Model model) {
+        service.incrementViewCount(freeNo);
+        FreeBoardVO freeboardVO = service.detail(freeNo);
+        log.info("FreeBoard Detail: {}", freeboardVO);
+        model.addAttribute("freeboard", freeboardVO);
+        return "student/board/freeboardDetail";
+    }
+    
+    
+    
+    @RequestMapping(value = "/freeSearch", method = RequestMethod.GET)
+    public String search(@RequestParam("keyword") String keyword, Model model) {
+    	List<FreeBoardVO> searchResults = service.search(keyword);
+    	model.addAttribute("freeboardList", searchResults);
+    	model.addAttribute("keyword", keyword);
+    	return "student/board/freeboardList";
+    	
+    }
+    @RequestMapping(value = "/freeWrite", method = RequestMethod.GET)
+    public String freeboardWriteForm() {
+        return "student/board/freeboardInsert";
+    }
+    
+    // 자유게시판 새 글 등록
+    @RequestMapping(value = "/freeWrite", method = RequestMethod.POST)
+    public String freeboardWrite(FreeBoardVO freeboardVO, Model model) {
+        service.freeboardInsert(freeboardVO);
+        model.addAttribute("message", "새 글 등록이 완료되었습니다!");
+        return "redirect:/student/freeList";
+    }
+    
+    // 댓글등록
+    @RequestMapping(value = "/freeCommentInsert", method = RequestMethod.POST)
+    public String freeComment(FreeCommentVO freeCommentVO, Model model) {
+        service.freecommentInsert(freeCommentVO);
+        model.addAttribute("message", "댓글 등록이 완료되었습니다!");
+        return "redirect:/student/freeDetail/" + freeCommentVO.getFree_no();
+    }
+    
+    
+
+    // 본인이 작성한 댓글만 수정
+    
+    // 본인이 작성한 댓글만 삭제
+    
+    
+    
+
+
+}

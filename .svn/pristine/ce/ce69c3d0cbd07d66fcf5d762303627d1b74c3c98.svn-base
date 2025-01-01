@@ -1,0 +1,141 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <title>로그인</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/vendor/fonts/boxicons.css" />
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/vendor/css/core.css" class="template-customizer-core-css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/css/demo.css" />
+
+  <!-- Vendors CSS -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/assets/vendor/libs/apex-charts/apex-charts.css" />
+
+  <!-- Page CSS -->
+
+  <!-- Helpers -->
+  <script src="${pageContext.request.contextPath }/resources/assets/vendor/js/helpers.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+  <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+  <script src="${pageContext.request.contextPath }/resources/assets/js/config.js"></script>
+</head>
+<body class="d-flex justify-content-center align-items-center min-vh-100">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="mb-2 text-center">로그인</h4>
+            <form id="loginForm" class="mb-3" method="post" action="/login">
+              <div class="mb-3">
+                <label for="email" class="form-label">학번/사번</label>
+                <input type="text" class="form-control" id="personalId" name="username" placeholder="학번/사번을 입력해주세요." autofocus /><br>
+            
+              </div>
+              <div class="mb-3 form-password-toggle">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label" for="password">비밀번호</label>
+                </div>
+                <div class="input-group input-group-merge">
+                  <input type="password" id="personalPw" class="form-control" name="password" 
+                  	placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" /><br>
+					 <span id="pwErr"></span>
+					                   	
+                  <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="remember-me" />
+                  <label class="form-check-label" for="remember-me"> 로그인 정보 저장하기 </label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <button class="btn btn-primary d-grid w-100" type="button" id="loginBtn">로그인</button>
+              </div>
+              <sec:csrfInput/>
+            </form>
+
+            <p class="text-center">
+              <a href="/common/findIdPw"><span>학번/사번찾기 | 비밀번호찾기</span></a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+<script type="text/javascript">
+// 	$(function() {
+
+// 		$(document).ready(function() {
+// 			$('#loginForm').submit(function(event) {
+// 				event.preventDefault();
+
+// 				$.ajax({
+// 					type : 'POST',
+// 					url : '/common/login',
+// 					data : $(this).serialize(),
+// 					success : function(response) {
+// 						if (response.success) {
+// 							var role = response.role;
+// 							if (role === 'U0101') {
+// 								window.location.href = '/student/mypage.do';
+// 							} else if (role === 'U0102') {
+// 								window.location.href = '/professor/mypage.do';
+// 							} else if (role === 'U0103') {
+// 								window.location.href = '/admin/main';
+// 							}
+// 						} else {
+// 							$('#errorModal').modal('show');
+// 						}
+// 					}
+// 				});
+// 			});
+// 		});
+
+		var loginBtn = $("#loginBtn");
+		var loginForm = $("#loginForm");
+
+		loginBtn.on("click", function() {
+			var personalId = $("#personalId").val();
+			var personalPw = $("#personalPw").val();
+			var idErr = $("#idErr");
+			var pwErr = $("#pwErr");
+
+			if (personalId == null || personalId == "") {
+				idErr.html("학번/사번을 입력해주세요!").css("color", "red");
+				return false;
+			}
+			if (personalPw == null || personalPw == "") {
+				pwErr.html("비밀번호를 입력해주세요!").css("color", "red");
+				return false;
+			}
+
+			loginForm.submit();
+
+		});
+
+// 	})
+</script>
+</html>

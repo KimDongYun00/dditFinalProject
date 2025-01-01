@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.AdminReportBoardMapper">
+
+	<select id="getReportCount" parameterType="hashMap"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM report
+		WHERE 1=1
+		AND (rep_reason LIKE '%'
+		|| #{keyword} || '%' OR rep_reason LIKE '%' ||
+		#{keyword} || '%')
+	</select>
+
+	<select id="list" parameterType="hashMap"
+		resultType="kr.or.ddit.vo.ReportVO">
+		SELECT T.*
+		FROM (
+		SELECT row_number() over(ORDER BY
+		to_number(rep_no) DESC) rnum
+		, rep_no
+		, user_no
+		, rep_reason
+		,
+		TO_CHAR(rep_date, 'YYYY-MM-DD') AS rep_date
+		, board_pk_no
+		, com_det_x_no
+		FROM report
+		WHERE 1=1
+		AND (rep_reason LIKE '%' || #{keyword} || '%' OR
+		rep_reason LIKE '%' ||
+		#{keyword} || '%')
+		) T
+		WHERE T.rnum
+		BETWEEN
+		(#{page} * #{itemsPerPage}) - (#{itemsPerPage} - 1) AND (#{page} *
+		#{itemsPerPage})
+	</select>
+
+	<select id="detail" parameterType="String"
+		resultType="kr.or.ddit.vo.ReportVO">
+		SELECT rep_no, user_no, rep_reason, TO_CHAR(rep_date,
+		'YYYY-MM-DD') AS
+		rep_date, board_pk_no, com_det_x_no
+		FROM report
+		WHERE
+		rep_no = #{repNo} 
+	</select>
+
+	<!-- 삭제 -->
+	<!-- <delete id="deleteReport" parameterType="String"> -->
+	<!-- DELETE FROM report WHERE -->
+	<!-- rep_no = #{repNo} -->
+	<!-- </delete> -->
+
+	<!-- 신고글 숨기기 -->
+	<update id="updateReportStatus" parameterType="String">
+		UPDATE report
+		SET
+		COM_DET_X_NO = 'X0101'
+		WHERE rep_no = #{repNo}
+	</update>
+
+
+</mapper>

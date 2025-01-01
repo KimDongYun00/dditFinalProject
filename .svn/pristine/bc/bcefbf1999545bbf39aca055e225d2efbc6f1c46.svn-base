@@ -1,0 +1,468 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+
+
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<h4 class="py-3 mb-4" style="font-weight:bold; padding-left:20px;">강의등록</h4>
+	<form action="/admin/lectureInsert.do" method="post" id="insertFrm">
+	<sec:csrfInput/>
+		<div class="row mb-5">
+			<div class="col-md-6 col-lg-8 mb-3">
+				<div class="card mb-4 bg-white">
+					<h5 class="card-header">정보</h5>
+					<hr class="my-0">
+					<div class="card-body">
+				
+						<div class="row mb-3">
+							
+							<label class="col-sm-2 col-form-label" for="subName"><font size="4">과목</font></label>
+							<div class="col-sm-8">
+								<input type="hidden" name="proNo" id="subNo" value="">
+								<input type="text" class="form-control" name="subName" id="subName"
+									value="" readonly="readonly">
+							</div>
+							<div class="col-sm-2 d-flex flex-wrap justify-content-between">
+								<span></span>
+								<span class="btn btn-info" id="proSearchBtn"
+									data-bs-toggle="modal" data-bs-target="#modalSub">검색</span>	
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="proName"><font size="4">담당교수</font></label>
+							<div class="col-sm-8">
+								<input type="hidden" name="proNo" id="proNo" value="">
+								<input type="text" class="form-control" name="proName" id="proName"
+									value="" readonly="readonly">
+							</div>
+							<div class="col-sm-2 d-flex flex-wrap justify-content-between">
+								<span></span>
+								<span class="btn btn-info" id="proSearchBtn"
+									data-bs-toggle="modal" data-bs-target="#modalPro">검색</span>	
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="buiNo"><font size="4">건물</font></label>
+							<div class="col-sm-10">
+								<select class="form-select" name="buiNo" id="buiNo">
+									<c:forEach items="${builingList }" var="building">
+										<option value="${building.buiNo }">${building.buiName }</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="facNo"><font size="4">강의실 선택</font></label>
+							<div class="col-sm-10">
+								<select class="form-select" name="facNo" id="facNo">
+									<c:forEach items="${facilityList }" var="facility">
+										<option value="${facility.facNo }" class="facOption">${facility.facName }</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="comDetLNo"><font size="4">강의구분</font></label>
+							<div class="col-sm-10">
+								<select class="form-select" name="comDetLNo" id="comDetLNo">
+									<c:forEach items="${lecTypeList }" var="lecType">
+										<option value="${lecType.comDetNo }" class="lecTypeOption">${lecType.comDetName }</option>
+									</c:forEach>
+								</select>
+							</div>
+						
+							<label class="col-sm-2 col-form-label" for="lecName"><font size="4">강의명</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="lecName" id="lecName">
+							</div>
+						
+							<label class="col-sm-2 col-form-label" for="lecExplain"><font size="4">강의설명</font></label>
+							<div class="col-sm-10">
+								<textarea rows="10" class="form-control" name="lecExplain" id="lecExplain"></textarea>
+							</div>
+						
+							<label class="col-sm-2 col-form-label" for="lecMax"><font size="4">수강인원</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="lecMax" id="lecMax">
+							</div>
+						
+							<label class="col-sm-2 col-form-label" for="lecOnoff"><font size="4">대면여부</font></label>
+							<div class="col-sm-10">
+								<select class="form-select" name="lecOnoff" id="lecOnoff">
+									<option value="Y">대면</option>
+									<option value="N">비대면</option>
+								</select>
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="lecAge"><font size="4">수강학년</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="lecAge" id="lecAge">
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="lecScore"><font size="4">학점</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="lecScore" id="lecScore">
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="year"><font size="4">년도</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="year" id="year">
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="semester"><font size="4">학기</font></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="semester" id="semester">
+							</div>
+							
+							<label class="col-sm-2 col-form-label" for="fileGroupNo"><font size="4">강의계획서</font></label>
+							<div class="col-sm-10">
+								<input type="file" class="form-control" name="fileGroupNo" id="fileGroupNo">
+							</div>
+							
+						</div>
+				
+					</div>
+					<div class="card-footer">
+						<!-- 등록 버튼 -->
+						<button type="button" class="btn btn-primary" id="insertBtn">등록</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 col-lg-4 mb-3">
+				<div class="card mb-4 bg-white">
+					<h5 class="card-header">시간표</h5>
+					<hr class="my-0">
+					<div class="card-body">
+					
+					
+					</div>
+				</div>
+				<div class="card mb-4 bg-white">
+					<h5 class="card-header">성적반영비율(%)</h5>
+					<hr class="my-0">
+					<div class="card-body">
+						<div class="row mb-3">
+							
+							<label class="col-sm-4 col-form-label" for="lecMidRate"><font size="4">중간고사</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecMidRate" id="lecMidRate">
+							</div>	
+							
+							<label class="col-sm-4 col-form-label" for="lecLastRate"><font size="4">기말고사</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecLastRate" id="lecLastRate">
+							</div>	
+							
+							<label class="col-sm-4 col-form-label" for="lecAssRate"><font size="4">과제</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecAssRate" id="lecAssRate">
+							</div>	
+							
+							<label class="col-sm-4 col-form-label" for="lecExamRate"><font size="4">시험</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecExamRate" id="lecExamRate">
+							</div>	
+							
+							<label class="col-sm-4 col-form-label" for="lecAdRate"><font size="4">출석</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecAdRate" id="lecAdRate">
+							</div>	
+							
+							<label class="col-sm-4 col-form-label" for="lecAtRate"><font size="4">태도</font></label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="lecAtRate" id="lecAtRate">
+							</div>	
+								
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 과목 검색 Modal -->
+	        <div class="modal fade" id="modalSub" tabindex="-1" aria-hidden="true">
+	           	<div class="modal-dialog" role="document">
+	              	<div class="modal-content">
+	                	<div class="modal-header">
+	                  		<h5 class="modal-title" id="modalSubLabel" 
+	                  			style="font-weight:bold;">과목 검색</h5>
+	                  		<button type="button" id="modal3Btn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	                	</div>
+	               		<div class="modal-body">
+		                  	<div class="row mb-3">
+		                    	<div class="col-sm-12">
+		                      		<label for="searchSubName" class="form-label">이름</label>
+		                      		<input type="text" class="form-control" id="searchSubName" name="subName">
+		                      	</div>
+	                      		<div class="col-sm-12 table-responsive text-nowrap">
+				    				<table class="table table-hover">
+				      					<thead>
+				        					<tr>
+									          	<th width="20%">과목번호</th>
+									          	<th width="30%">과목명</th>
+									          	<th width="30%">담당학과</th>
+									          	<th width="20%">활성화여부</th>
+									     	</tr>
+				      					</thead>
+				      					<tbody class="table-border-bottom-0" id="tbody_sub">
+				      						
+				      					</tbody>
+				   	 				</table>
+		                      	</div>	
+		                	</div>
+	         			</div>
+	            	</div>
+	    	   	</div>
+	 		</div>
+			<!-- 교수 검색 Modal -->
+	        <div class="modal fade" id="modalPro" tabindex="-1" aria-hidden="true">
+	           	<div class="modal-dialog" role="document">
+	              	<div class="modal-content">
+	                	<div class="modal-header">
+	                  		<h5 class="modal-title" id="modalProLabel" 
+	                  			style="font-weight:bold;">교수 검색</h5>
+	                  		<button type="button" id="modal3Btn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	                	</div>
+	               		<div class="modal-body">
+		                  	<div class="row mb-3">
+		                    	<div class="col-sm-12">
+		                      		<label for="searchProName" class="form-label">이름</label>
+		                      		<input type="text" class="form-control" id="searchProName" name="proName">
+		                      	</div>
+	                      		<div class="col-sm-12 table-responsive text-nowrap">
+				    				<table class="table table-hover">
+				      					<thead>
+				        					<tr>
+									          	<th width="20%">교번</th>
+									          	<th width="30%">학과</th>
+									          	<th width="20%">교수이름</th>
+									          	<th width="30%">전화번호</th>
+									     	</tr>
+				      					</thead>
+				      					<tbody class="table-border-bottom-0" id="tbody_pro">
+				      						
+				      					</tbody>
+				   	 				</table>
+		                      	</div>	
+		                	</div>
+	         			</div>
+	            	</div>
+	    	   	</div>
+	 		</div>
+		</div>
+	</form>
+</div>
+
+
+<meta id="_csrf" name="_csrf" content="${_csrf.token }">
+<meta id="_csrf_header" name="_csrf_header" content="${_csrf.headerName }">
+
+<script type="text/javascript">
+$(function(){
+	
+	token = $("meta[name='_csrf']").attr("content");
+	header = $("meta[name='_csrf_header']").attr("content");
+	
+	$("#searchProName").on('input', function(){
+		console.log("proName keydown...!");
+
+		if($("#searchProName").val().trim() == "") return false;
+		
+		var searchWord = {
+			proName : $("#searchProName").val()
+		}
+		
+		$.ajax({
+			url : "/admin/searchProfessor.do",
+			type : "post",
+			beforeSend : function(xhr){	// 데이터 전송 전, 헤더에 csrf 값 설정
+				xhr.setRequestHeader(header, token);
+			},
+			data : JSON.stringify(searchWord),
+			contentType : "application/json;charset=utf-8",
+			success : function(res){
+				console.log("result : " + res);
+				
+				$(".searchedProList").remove();
+				var html = "";
+				
+				$.each(res, function(i, v){
+					console.log(i +" >> " + v.proName);
+					
+					html += "<tr class='searchedProList'>" +
+						"<td class='searchedProNo'>"+v.proNo+"</span></td>" +
+						"<td>"+v.deptName+"</td>" +
+						"<td class='searchedProName'>"+v.proName+"</td>" +
+						"<td>"+v.proPhone+"</td>" +
+					"</tr>";
+				});
+				
+				$("#tbody_pro").append(html);
+			}
+		});
+	});
+	
+	$(document).on('click', '.searchedProList', function(){
+		console.log("searchedProList click...!");
+		
+		var searchedProNo = $(this).find('.searchedProNo').text();
+		var searchedProName = $(this).find('.searchedProName').text();
+		
+		console.log("proNo >> " + searchedProNo);
+		console.log("proName >> " + searchedProName);
+		
+		$("#proNo").val(searchedProNo);
+		$("#proName").val(searchedProName);
+		
+		$("#modalPro").click();
+		$("#searchProName").val("");
+		$(".searchedProList").remove();
+	});
+	
+	$("#searchSubName").on('input', function(){
+		console.log("subName keydown...!");
+		
+		if($("#searchSubName").val().trim() == "") return false;
+		
+		var searchWord = {
+			subName : $("#searchSubName").val()
+		}
+		
+		$.ajax({
+			url : "/admin/searchSubject.do",
+			type : "post",
+			beforeSend : function(xhr){	// 데이터 전송 전, 헤더에 csrf 값 설정
+				xhr.setRequestHeader(header, token);
+			},
+			data : JSON.stringify(searchWord),
+			contentType : "application/json;charset=utf-8",
+			success : function(res){
+				console.log("result : " + res);
+				
+				$(".searchedSubList").remove();
+				var html = "";
+				
+				$.each(res, function(i, v){
+					console.log(i +" >> " + v.subName);
+					
+					html += "<tr class='searchedSubList'>" +
+								"<td class='searchedSubNo'>"+v.subNo+"</span></td>" +
+								"<td class='searchedSubName'>"+v.subName+"</td>" +
+								"<td>"+v.deptName+"</td>";
+					if(v.comDetVNo == "V0101"){
+						html += "<td>O</td>";
+					} else{
+						html += "<td>X</td>";
+					}	
+					html += "</tr>";
+				});
+				
+				$("#tbody_sub").append(html);
+			}
+		});
+	});
+	
+	$(document).on('click', '.searchedSubList', function(){
+		console.log("searchedSubList click...!");
+		
+		var searchedSubNo = $(this).find('.searchedSubNo').text();
+		var searchedSubName = $(this).find('.searchedSubName').text();
+		
+		console.log("subNo >> " + searchedSubNo);
+		console.log("subName >> " + searchedSubName);
+		
+		$("#subNo").val(searchedSubNo);
+		$("#subName").val(searchedSubName);
+		
+		$("#modalSub").click();
+		$("#searchSubName").val("");
+		$(".searchedSubList").remove();
+	});
+	
+	var buiData = {
+			buiNo : $("#buiNo").val()
+	};
+	
+	$.ajax({
+		url : "/admin/facList.do",
+		type : "post",
+		beforeSend : function(xhr){	// 데이터 전송 전, 헤더에 csrf 값 설정
+			xhr.setRequestHeader(header, token);
+		},
+		data : JSON.stringify(buiData),
+		contentType : "application/json;charset=utf-8",
+		success : function(res){
+			console.log("result : " + res);
+			
+			$(".facOption").remove();
+			var html = "";
+			
+			$.each(res, function(i, v){
+				console.log(i + " fac >> " + v.facName);
+				html += "<option value='"+v.facNo+"' class='facOption'>"+v.facName;
+				html += "</option>";
+			});
+			
+			$("#facNo").append(html);
+		}
+	});
+	
+	$("#buiNo").on('change', function(){
+		console.log("buiNo changed...!");
+		
+		var buiData = {
+				buiNo : $("#buiNo").val()
+		};
+		
+		$.ajax({
+			url : "/admin/facList.do",
+			type : "post",
+			beforeSend : function(xhr){	// 데이터 전송 전, 헤더에 csrf 값 설정
+				xhr.setRequestHeader(header, token);
+			},
+			data : JSON.stringify(buiData),
+			contentType : "application/json;charset=utf-8",
+			success : function(res){
+				console.log("result : " + res);
+				
+				$(".facOption").remove();
+				var html = "";
+				
+				$.each(res, function(i, v){
+					console.log(i + " fac >> " + v.facName);
+					html += "<option value='"+v.facNo+"' class='facOption'>"+v.facName;
+					html += "</option>";
+				});
+				
+				$("#facNo").append(html);
+			}
+		});
+	});
+	
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

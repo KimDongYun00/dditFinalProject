@@ -1,0 +1,179 @@
+package kr.or.ddit.controller.admin;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.service.admin.inter.IAdminFacilityService;
+import kr.or.ddit.vo.BuildingVO;
+import kr.or.ddit.vo.FacilityVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/admin")
+public class AdminFacController {
+	
+	@Inject
+	private IAdminFacilityService facilityService;
+	
+	@RequestMapping(value = "/facList", method = RequestMethod.GET)
+	public String facList(@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "99") String searchType,
+			Model model) {
+		log.info("시설 리스트 출력 메서드 ");
+		
+//		List<FacilityVO> facilityList =  facilityService.selectFacility();
+		
+		PaginationInfoVO<FacilityVO> pagingVO = new PaginationInfoVO<FacilityVO>();
+
+		// 총 4가지의 필드 설정하기 위해서
+		// 현제 페이지를 전달 후, start/endRow, start/endPage 설정		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setSearchType(searchType);
+		
+		// 총 게시글 수를 얻어온다.
+		int totalRecord = facilityService.selectFacilityCount(pagingVO);
+		
+		// 총 게시글 수 전달 후, 총 페이지 수를 설정
+		pagingVO.setTotalRecord(totalRecord);
+		List<FacilityVO> dataList =  facilityService.selectFacilityList(pagingVO);
+		log.info("pagingVO searchType >> " + pagingVO.getSearchType());
+		for(FacilityVO d: dataList)  log.info("dataList >> " + d.toString());
+		pagingVO.setDataList(dataList);
+		// 총 게시글 수가 포함된 PaginationInfoVO 객체를 넘겨주고 1페이지에 해당하는 10개(screenSize)의
+		// 게시글을 얻어온다. (dataList)
+		
+		model.addAttribute("pagingVO", pagingVO);
+		return "admin/facility/facList";
+	}
+	
+//	@ResponseBody
+//	@RequestMapping(value="/facList", method=RequestMethod.POST)
+//	public ResponseEntity<List<FacilityVO>> facListType(@RequestBody Map<String, String> map, Model model) {
+//		
+//		
+//		log.info("colType ================ " + map.get("facTypeNo"));
+//		
+//		List<FacilityVO> facilityList = facilityService.selectFacilityType(map.get("facTypeNo"));
+//	
+//		return new ResponseEntity<List<FacilityVO>>(facilityList, HttpStatus.OK);
+//	}
+	
+	@RequestMapping(value="/facInsert", method = RequestMethod.GET)
+	public String facInsertForm(String facTypeNo, Model model) {
+		log.info("시설 등록 폼 메소드 실행...!");
+		log.info("시설타입은? " + facTypeNo);
+		List<BuildingVO> buildingList = facilityService.selectBuildingList();
+		model.addAttribute("facTypeNo", facTypeNo);
+		model.addAttribute("build", buildingList);
+		return "admin/facility/facInsert";
+	}
+		
+	@RequestMapping(value = "/facInsert", method = RequestMethod.POST)	
+	public String facInsert(FacilityVO facilityVO, RedirectAttributes ra) {
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + facilityVO);
+		String goPage="";
+		int cnt = facilityService.insertFacility(facilityVO);
+		
+		if(cnt > 0) {
+			log.info("등록 성공!!!!!!!!!!!!!!!!!!!!!");
+			ra.addFlashAttribute("msg", "등록이 완료되었습니다.");
+			goPage = "redirect:/admin/facDetail?facNo="+facilityVO.getFacNo();
+		} else {		
+			log.info("등록 실패!!!!!!!!!!!!!!!");
+			goPage = "admin/facility/facList";
+		}
+		return goPage;
+	}
+	
+	@RequestMapping(value="/facDetail", method = RequestMethod.GET)
+	public String facDetail(String facNo, Model model) {
+		
+		FacilityVO facility = facilityService.facDetail(facNo);
+		List<BuildingVO> buildingList = facilityService.selectBuildingList();
+		model.addAttribute("build", buildingList);
+		model.addAttribute("facility", facility);
+		
+		return "admin/facility/facDetail";
+	}
+	
+	@RequestMapping(value="/facUpdate", method=RequestMethod.POST)
+	public String facUpdate(FacilityVO facilityVO, RedirectAttributes ra) {
+		String goPage = "";
+		int cnt = facilityService.updateFacility(facilityVO);
+		
+		if(cnt > 0) {
+			log.info("수정 성공!!!!!!!!!!!!!!!!!!!!!");
+			ra.addFlashAttribute("msg", "수정이 완료되었습니다.");
+			goPage = "redirect:/admin/facDetail?facNo="+facilityVO.getFacNo();
+		} else {		
+			log.info("등록 실패!!!!!!!!!!!!!!!");
+			goPage = "admin/facility/facList";
+		}
+		return goPage;
+	}
+	
+	@RequestMapping(value="/facDelete", method = RequestMethod.POST)
+	public String facDelete(String facNo, RedirectAttributes ra) {
+		String goPage="";
+		int cnt = facilityService.deleteFacility(facNo);
+		if(cnt > 0) {
+			log.info("삭제 성공!!!!!!!!!!!!!!!!!!!!!");
+			ra.addFlashAttribute("msg", "삭제가 완료되었습니다.");
+			goPage = "redirect:/admin/facList";
+		} else {		
+			log.info("삭제 실패!!!!!!!!!!!!!!!");
+			goPage = "redirect:/admin/facDetail?facNo="+facNo;
+		}
+		return goPage;
+	}
+	
+	@RequestMapping(value = "/facList.do", method = RequestMethod.POST)
+	public ResponseEntity<List<FacilityVO>> facilityListByBuilding(@RequestBody Map<String, String> map, Model model){
+		log.info("facilityListByBuilding()...!");
+		log.info("buiNo >> " + map.get("buiNo"));
+		
+		List<FacilityVO> facList = facilityService.getLecRoomFacilityListByBuiNo(map.get("buiNo"));
+		for(FacilityVO d : facList) log.info("facList >> " + d.toString());
+		
+		return new ResponseEntity<List<FacilityVO>>(facList, HttpStatus.OK);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

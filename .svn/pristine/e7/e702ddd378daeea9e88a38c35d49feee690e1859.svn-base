@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IScholarshipMapper">
+
+	<!-- 장학금 종류 내역 조회 쿼리-->
+	<select id="getScholarshipList" resultType="scholarshipVO">
+		select sch_no, sch_name, sch_content, sch_req, sch_amount, sch_type, sch_max 
+		from scholarship
+	</select>
+	
+	<!-- 장학금 신청 내역 조회 쿼리 -->
+	<select id="getScholarshipRequestList" resultType="scholarshipVO">
+		 select sr.sch_rec_no, sr.sch_no, sr.stu_no, sr.sch_rec_date, sr.com_det_c_no, sr.year, sr.semester, sr.rej_content,
+               s.sch_name, s.sch_content, s.sch_req, s.sch_amount, s.sch_type, s.sch_max
+        from scholarship_receive sr
+        join scholarship s on sr.sch_no = s.sch_no
+	</select>
+	
+	<!-- 장학금 신청 상세보기 -->
+	<select id="getScholarshipRequestDetail" parameterType="String" resultType="scholarshipVO">
+		select sr.sch_rec_no, sr.sch_no, sr.stu_no, sr.sch_rec_date, sr.com_det_c_no, sr.year, sr.semester, sr.rej_content,
+        s.sch_name, s.sch_content, s.sch_req, s.sch_amount, s.sch_type, s.sch_max
+		from scholarship_receive sr left outer join scholarship s on(sr.sch_no = s.sch_no)
+		where sr.sch_rec_no = #{schRecNo}
+	</select>
+	
+	<!-- 미승인 처리 건들 SELECT  -->
+	<select id="">
+	    select *
+		from scholarship_receive
+        where com_det_c_no = 'N00';
+	</select>
+
+	<!-- 미승인 처리 장학금 승인 처리 -->
+	<update id="scholarshipRequestsApprove">
+		update scholarship_receive
+			set com_det_c_no = 'C01'
+		where com_det_c_no = 'N00';
+	</update>
+	
+	
+</mapper>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

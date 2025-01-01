@@ -1,0 +1,74 @@
+package kr.or.ddit.assignment.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.assignment.service.IAssignmentService;
+import kr.or.ddit.vo.AssignmentSubmitVO;
+import kr.or.ddit.vo.AssignmentVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/assignment")
+public class AssignmentController {
+	
+	@Inject
+	private IAssignmentService service;
+	
+	@RequestMapping(value = "/selectAssignmentList.do", method = RequestMethod.GET)
+	public String selectAssignmentList(String lecNo, Model model,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage) {
+
+		log.info("selectAssignmentList 실행!!!!!!!!");
+		PaginationInfoVO<AssignmentVO> pagingVO = new PaginationInfoVO<AssignmentVO>();
+
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setLecNo(lecNo);
+		
+		int totalRecord = service.selectAssignmentCount(pagingVO);
+		pagingVO.setTotalRecord(totalRecord);
+		
+		List<AssignmentVO> assignmentList = service.selectAssignmentList(pagingVO);
+		pagingVO.setDataList(assignmentList);
+
+		model.addAttribute("pagingVO", pagingVO);
+		model.addAttribute("lecNo", lecNo);
+		return "sum/lecAssignment/list";
+	} 
+	
+	@GetMapping("/selectAssignmentDetail.do")
+	public String selectAssignmentDetail(String lecNo,String assNo, Model model,
+			@RequestParam(name = "page", required = false, defaultValue = "1")int currentPage){
+		AssignmentVO assignmentVO = new AssignmentVO();
+		assignmentVO = service.selectAssignmentDetail(assNo);
+		assignmentVO.setLecNo(lecNo);
+		model.addAttribute("assignmentVO", assignmentVO);
+		
+		
+		return "sum/lecAssignment/detail";
+	}
+	
+	// 과제 제출
+	@ResponseBody
+	@PostMapping("/insertAssignmentSubmit.do")
+	public AssignmentSubmitVO insertAssignmentSubmit(@RequestBody AssignmentSubmitVO assignmentSubmitVO) {
+		log.info("insertAssignmentSubmit->assignmentSubmitVO : " + assignmentSubmitVO);
+		int result = service.insertAssignmentSubmit(assignmentSubmitVO);
+		log.info("result : " + result);
+		return assignmentSubmitVO;
+	}
+
+}

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminLectureMapper">
+
+	<sql id="lectureSearchSql">
+		<if test="searchLecture != null">
+			and lec_name = #{searchLecture}
+		</if>
+		<if test="searchProfessor != null">
+			and b.pro_name like '%'||#{searchProfessor}||'%'
+		</if>
+		<if test="searchLecType != null">
+			and COM_DET_L_NO = #{searchLecType}
+		</if>
+		<if test="searchScore != null">
+			and lec_score = #{searchScore}
+		</if>
+		<if test="searchOnoff != null">
+			and lec_onoff = #{searchOnoff}
+		</if>
+		<if test="searchYear != null">
+			and year = #{searchYear}
+		</if>
+		<if test="searchSemester != null">
+			and semester = #{searchSemester}
+		</if>
+		<if test="searchAge != null">
+			and lec_age = #{searchAge}
+		</if>
+	</sql>
+	
+	<select id="selectLectureCount" parameterType="pagingVO">
+		select count(lec_no)
+		from lecture
+		where 1=1
+		<include refid="lectureSearchSql"/>
+	</select>
+	
+	<select id="getLectureList" parameterType="pagingVO" resultType="lectureVO">
+		select 
+			LEC_NO
+			,a.PRO_NO
+			,b.pro_name
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,COM_DET_C_NO
+			,YEAR
+			,SEMESTER
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		<include refid="lectureSearchSql"/>
+	</select>
+	
+	<insert id="insertLecture" parameterType="lectureVO" useGeneratedKeys="true">
+		<selectKey keyProperty="lecNo" resultType="String" order="BEFORE">
+			select 'LEC_'||seq_lecture.nextval from dual
+		</selectKey>
+		insert into lecture(
+			LEC_NO
+			,PRO_NO
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_EXPLAIN
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,COM_DET_C_NO
+			,FILE_GROUP_NO
+			,YEAR
+			,SEMESTER
+			,LEC_MID_RATE
+			,LEC_LAST_RATE
+			,LEC_ASS_RATE
+			,LEC_EXAM_RATE
+			,LEC_AD_RATE
+			,LEC_AT_RATE
+		) values(
+			#{lecNo}
+			,#{proNo}
+			,#{subNo}
+			,#{facNo}
+			,#{lecName}
+			,#{lecExplain}
+			,#{lecMax}
+			,null
+			,#{lecOnoff}
+			,#{lecAge}
+			,#{lecScore}
+			,#{comDetLNo}
+			,'C0101'
+			,null
+			,#{year}
+			,#{semester}
+			,#{lecMidRate}
+			,#{lecLastRate}
+			,#{lecAssRate}
+			,#{lecExamRate}
+			,#{lecAdRate}
+			,#{lecAtRate}
+		)
+	</insert>
+	
+	<insert id="insertLectureTime" parameterType="map">
+		insert into LECTURE_TIMETABLE(
+			LEC_TT_NO
+			,LEC_NO
+			,COM_DET_W_NO
+			,COM_DET_T_NO
+		) values (
+			'LEC_TT_'||seq_LECTURE_TIMETABLE.nextval
+			,#{lecNo}
+			,#{day}
+			,(select com_det_no from common_code_detail where com_det_name = #{time})
+		)
+	</insert>
+	
+	<select id="getLectureTimeList" parameterType="lectureVO" resultType="lectureTimetableVO">
+		select 
+			LEC_TT_NO
+			,LEC_NO
+			,COM_DET_W_NO
+			,COM_DET_T_NO
+			,(select com_det_name from COMMON_CODE_DETAIL b where b.com_det_no = a.com_det_t_no) com_det_t_name
+		from LECTURE_TIMETABLE a 
+		where lec_no in (select lec_no 
+							from lecture 
+							where fac_no = #{facNo}
+							and year = ${year}
+							and semester = ${semester})
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

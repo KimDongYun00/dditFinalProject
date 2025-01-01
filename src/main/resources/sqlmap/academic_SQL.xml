@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.AcademicMapper">
+	<!-- 페이징처리 헤더  -->
+	<sql id="pagingHeader">
+		select
+	           rn.*
+	       from( 
+	        select
+				tbl.*, row_number() over(order by tbl.ys_year desc, tbl.ys_semester desc) AS rnum
+			from(
+	</sql>
+	
+	<!-- 페이징처리 푸터 -->
+	<sql id="pagingFooter">
+		) tbl
+	        )rn
+        <![CDATA[
+			where rn.rnum >= #{startRow} and rn.rnum <= #{endRow}	
+		]]> 
+	</sql>	
+	<!-- 학사일정등록 -->
+	<insert id="acaInsert" parameterType="academicVO">
+		insert into academic_calendar(
+			  aca_no
+			, aca_sdate
+			, aca_edate
+			, aca_title
+			, aca_content			
+			, aca_color
+		)
+		values(
+			  'ACA_'||lpad(seq_academic_calendar.nextval, 4, '0') 
+			, #{acaSdate}
+			, #{acaEdate}
+			, #{acaTitle}
+			, #{acaContent}			
+			, #{acaColor}
+		)		
+	</insert>
+	<!-- 학사일정리스트 -->
+	<select id="acaList" resultType="academicVO">
+		select aca_no
+		     , aca_sdate
+		     , aca_edate
+		     , aca_title
+		     , aca_content
+		     , file_group_no
+		     , aca_color
+		  from academic_calendar    
+	</select>
+	
+	<select id="acaRead" parameterType="string" resultType="academicVO">
+		select aca_no
+		     , aca_sdate
+		     , aca_edate
+		     , aca_title
+		     , aca_content
+		     , file_group_no
+		     , aca_color
+		  from academic_calendar
+		 where aca_no = #{acaNo}    
+	</select>
+	
+	<update id="acaModify" parameterType="academicVO">
+		update academic_calendar
+		   set
+		       aca_sdate = #{acaSdate}
+		     , aca_edate = #{acaEdate}
+		     , aca_title = #{acaTitle}
+		     , aca_content = #{acaContent}
+		     , aca_color = #{acaColor}
+		 where aca_no = #{acaNo}    
+	</update>
+	
+	<delete id="acaDelete" parameterType="string">
+		delete academic_calendar
+		 where aca_no = #{acaNO}
+	</delete>
+	
+	<select id="getYearCount" parameterType="pagingVO" resultType="int">
+		select count(ys_year)
+		  from year_semester
+	</select>
+	
+	<select id="getYearSemester" parameterType="pagingVO" resultType="yearSemesterVO">
+		<include refid="pagingHeader"/>
+		select ys_year
+		     , ys_semester
+		     , to_char(ys_sdate, 'yyyy-mm-dd') ys_sdate
+		     , to_char(ys_edate, 'yyyy-mm-dd') ys_edate
+		  from year_semester		  
+		<include refid="pagingFooter"/>     
+	</select>
+	
+	<insert id="yearSemesterInsert" parameterType="yearSemesterVO">
+		insert into year_semester
+		values(
+		       #{ysYear}
+		      ,#{ysSemester}
+		      ,#{ysSdate}
+		      ,#{ysEdate}
+		      )
+	</insert>
+	
+	<update id="yearSemesterUpdate" parameterType="yearSemesterVO">
+		update year_semester
+		   set 
+		       ys_sdate = #{ysSdate}
+		     , ys_edate = #{ysEdate}
+		 where ys_year = #{ysYear}
+		   and ys_semester = #{ysSemester}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

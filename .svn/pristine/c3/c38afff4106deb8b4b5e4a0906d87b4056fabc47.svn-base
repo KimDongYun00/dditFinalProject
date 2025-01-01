@@ -1,0 +1,407 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.io.File;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.mapper.IAdminMemberMapper;
+import kr.or.ddit.security.CustomNoOpPasswordEncoder;
+import kr.or.ddit.service.admin.inter.IAdminMemberService;
+import kr.or.ddit.vo.CommonVO;
+import kr.or.ddit.vo.EmployeeVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.StudentVO;
+import kr.or.ddit.vo.UserVO;
+
+@Service
+public class AdminMemberServiceImpl implements IAdminMemberService {
+	
+	@Resource(name="uploadFolder")
+	private String uploadPath;
+	
+	// 패스워드 인코더
+	@Inject
+	private PasswordEncoder pw;
+	
+	@Inject
+	private IAdminMemberMapper memMapper;
+	
+	@Override
+	public List<ProfessorVO> searchProfessor(String proName) {
+		return memMapper.searchProfessor(proName);
+	}
+
+
+
+	@Override
+	public StudentVO stuDetail(String stuNo) {
+		
+		return memMapper.stuDetail(stuNo);
+	}
+
+	@Override
+	public List<CommonVO> commonList(String comNo) {
+		
+		return memMapper.commonList(comNo);
+	}
+
+	@Override
+	public int stuUpdate(StudentVO stuVO, HttpServletRequest req) {
+		String uploadPath = "";
+		uploadPath = req.getServletContext().getRealPath("/resources/stuImg");
+		
+		File file = new File(uploadPath);
+		
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		String stuImg = ""; // 시설이미지 경로
+		
+		try {
+			MultipartFile stuImgFile = stuVO.getImgFile();
+			
+			if(stuImgFile.getOriginalFilename() != null && !stuImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString(); // UUID 파일명 만들기
+				fileName += "_" + stuImgFile.getOriginalFilename();
+				
+				uploadPath += "/" + fileName;
+				
+				stuImgFile.transferTo(new File(uploadPath));
+				
+				stuImg = "/resources/stuImg/" + fileName;
+			}
+			
+			stuVO.setStuImg(stuImg);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		return memMapper.stuUpdate(stuVO);
+	}
+
+	
+	// 학생 페이징처리 위한 카운터
+	@Override
+	public int stuCount(PaginationInfoVO<StudentVO> pagingVO) {
+		
+		return memMapper.stuCount(pagingVO);
+	}
+
+	// 학생 페이징 처리를 위한 리스트
+	@Override
+	public List<StudentVO> stuList(PaginationInfoVO<StudentVO> pagingVO) {
+		
+		return memMapper.stuList(pagingVO);
+	}
+
+
+	// 교수 페이징 처리를 위한 카운터
+	@Override
+	public int proCount(PaginationInfoVO<ProfessorVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return memMapper.proCount(pagingVO);
+	}
+
+
+	// 교수 페이징 처리를 위한 리스트
+	@Override
+	public List<ProfessorVO> proList(PaginationInfoVO<ProfessorVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return memMapper.proList(pagingVO);
+	}
+
+
+	// 교수 상세보기 데이터
+	@Override
+	public ProfessorVO proDetail(String proNo) {
+		// TODO Auto-generated method stub
+		return memMapper.proDetail(proNo);
+	}
+
+
+
+	@Override
+	public int proUpdate(ProfessorVO proVO, HttpServletRequest req) {
+		String uploadPath = "";
+		uploadPath = req.getServletContext().getRealPath("/resources/proImg");
+		
+		File file = new File(uploadPath);
+		
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		String proImg = ""; // 시설이미지 경로
+		
+		try {
+			MultipartFile proImgFile = proVO.getProFile();
+			
+			if(proImgFile.getOriginalFilename() != null && !proImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString(); // UUID 파일명 만들기
+				fileName += "_" + proImgFile.getOriginalFilename();
+				
+				uploadPath += "/" + fileName;
+				
+				proImgFile.transferTo(new File(uploadPath));
+				
+				proImg = "/resources/proImg/" + fileName;
+			}
+			
+			proVO.setProImg(proImg);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		return memMapper.proUpdate(proVO);
+	}
+
+
+
+	@Override
+	public int proIdCheck(String proID) {
+		// TODO Auto-generated method stub
+		return memMapper.proIdCheck(proID);
+	}
+
+
+
+	@Override
+	public int proDelete(String proNo) {
+		// TODO Auto-generated method stub
+		return memMapper.proDelete(proNo);
+	}
+
+
+
+	@Override
+	public int stuDelete(String stuNo) {
+		// TODO Auto-generated method stub
+		return memMapper.stuDelete(stuNo);
+	}
+
+
+
+	@Override
+	public int empCount(PaginationInfoVO<EmployeeVO> pagingVO) {
+		return memMapper.empCount(pagingVO);
+	}
+
+
+
+	@Override
+	public List<EmployeeVO> empList(PaginationInfoVO<EmployeeVO> pagingVO) {
+		return memMapper.empList(pagingVO);
+	}
+
+
+
+	@Override
+	public EmployeeVO empDetail(String empNo) {
+		return memMapper.empDetail(empNo);
+	}
+
+
+
+	@Override
+	public int empUpdate(EmployeeVO empVO, HttpServletRequest req) {
+		String uploadPath = "";
+		uploadPath = req.getServletContext().getRealPath("/resources/empImg");
+		
+		File file = new File(uploadPath);
+		
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		String empImg = ""; // 시설이미지 경로
+		
+		try {
+			MultipartFile empImgFile = empVO.getEmpFile();
+			
+			if(empImgFile.getOriginalFilename() != null && !empImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString(); // UUID 파일명 만들기
+				fileName += "_" + empImgFile.getOriginalFilename();
+				
+				uploadPath += "/" + fileName;
+				
+				empImgFile.transferTo(new File(uploadPath));
+				
+				empImg = "/resources/empImg/" + fileName;
+			}
+			
+			empVO.setEmpImg(empImg);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		return memMapper.empUpdate(empVO);
+	}
+
+
+
+	@Override
+	public int empDelete(String empNo) {
+		// TODO Auto-generated method stub
+		return memMapper.empDelete(empNo);
+	}
+
+
+
+	@Override
+	public int stuInsert(StudentVO stuVO) {
+		stuVO.setEnabled("1");			// enabled? 
+		stuVO.setStuDelYn("N");			// 삭제여부
+		stuVO.setComDetMNo("M0101");	// 재적상태
+		stuVO.setStuYear(1);			// 학년 입학해서 1학년		
+		
+		// selectKey를 이용해 학번을 받아와서 리턴한다.
+		return memMapper.stuInsert(stuVO);
+	}
+
+
+
+	// 학생 회원가입 전에 유저를 먼저 가입해야함
+	@Override
+	public String memInsert(StudentVO stuVO) {		
+		//유저 가입시에 아이디(시퀀스), 권한 등을 가입해야함
+		// 유저VO 객체를 만들어서 비밀번호를 변경해서 넣어준다 기본(주민번호앞자리) 
+		UserVO user = new UserVO();
+		// 학생 비밀번호가 될 주민번호
+		String stuReg = stuVO.getStuRegno();		
+		// 학생 주민번호 앞자리 6자리가 비밀번호가 된다.
+		String pass = stuReg.substring(0, 6);
+		
+		user.setUserPw(pw.encode(pass));
+		user.setComDetUNo("U0101");
+		
+		int cnt = memMapper.memInsert(user);
+		
+		if(cnt > 0 ) {
+			memMapper.memAuthInsert(user.getUserNo());
+		} 
+		
+		return user.getUserNo();
+	}
+
+
+	// 교수 정보를 유저로 저장
+	@Override
+	public int memProInsert(ProfessorVO proVO) {
+		
+		// 교수 아이디
+		String proNo = proVO.getProNo();
+		// 교수 비밀번호가 될 주민번호
+		String proReg = proVO.getProRegno();		
+		// 교수 주민번호 앞자리 6자리가 비밀번호가 된다.
+		String pass = proReg.substring(0, 6);
+		
+		// user 객체에 위 데이터를 넣어준다.
+		UserVO user = new UserVO();
+		user.setUserNo(proNo);
+		// 비밀번호 암호화해서 넘기기
+		user.setUserPw(pw.encode(pass));
+		// 권한설정 U0101학생		U0102교수		U0103교직원
+		user.setComDetUNo("U0102");
+		
+		int cnt = memMapper.memProInsert(user);
+		
+		if(cnt > 0 ) {
+			memMapper.memProAuthInsert(user.getUserNo());
+		}
+		
+		return cnt;
+	}
+
+
+
+	@Override
+	public int proInsert(ProfessorVO proVO) {
+		
+		
+		proVO.setEnabled("1");			// enabled? 
+		proVO.setProDelYn("N");			// 삭제여부
+		proVO.setComDetMNo("M0201");	// 재적상태 M0201 재직 M0202 휴가 M0203 퇴사
+		proVO.setComDetPNo("P0202");	// 새로 들어온 교수는 단과대장부터 시작
+		
+		
+		// selectKey를 이용해 학번을 받아와서 리턴한다.
+		return memMapper.proInsert(proVO);
+	}
+
+
+
+	@Override
+	public int memEmpInsert(EmployeeVO empVO) {
+		// 교수 아이디
+		String empNo = empVO.getEmpNo();
+		// 교수 비밀번호가 될 주민번호
+		String empReg = empVO.getEmpRegno();		
+		// 교수 주민번호 앞자리 6자리가 비밀번호가 된다.
+		String pass = empReg.substring(0, 6);
+		
+		// user 객체에 위 데이터를 넣어준다.
+		UserVO user = new UserVO();
+		user.setUserNo(empNo);
+		// 비밀번호 암호화해서 넘기기
+		user.setUserPw(pw.encode(pass));
+		// 권한설정 U0101학생		U0102교수		U0103교직원
+		user.setComDetUNo("U0103");
+		
+		// 교수랑 같은 기능이라 이거 써도 된다.
+		int cnt = memMapper.memProInsert(user);
+		
+		if(cnt > 0 ) {
+			memMapper.memEmpAuthInsert(user.getUserNo());
+		}
+		
+		return cnt;
+	}
+
+	@Override
+	public int empInsert(EmployeeVO empVO) {
+		empVO.setEnabled("1");			// enabled? 
+		empVO.setEmpDelYn("N");			// 삭제여부
+		empVO.setComDetMNo("M0201");	// 재적상태 M0201 재직 M0202 휴가 M0203 퇴사
+		empVO.setComDetPNo("P0102");	// P0101 과장, P0102직원
+		
+		
+		// selectKey를 이용해 학번을 받아와서 리턴한다.
+		return memMapper.empInsert(empVO);
+	}
+
+
+	
+
+	
+
+	
+
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

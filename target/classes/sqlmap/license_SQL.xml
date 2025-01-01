@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ILicenseMapper">
+
+ <!-- 자격증 신청 내역 조건문 -->
+    <!-- 셀렉트바이용 검색 -->
+    
+    <!-- 학과 조건문 -->
+    <sql id="departmentCondition">
+        <if test="searchDept != null and searchDept != '99'">
+            and d.dept_no = #{searchDept}
+        </if>
+    </sql>
+    
+    <!-- 학과 조건문 -->
+    <sql id="licenseType">
+        <if test="searchType != null and searchType != '99'">
+            and l.lic_name = #{searchType}
+        </if>
+    </sql>
+    
+    <!-- 처리 상태 조건문 -->
+    <sql id="statusCondition">
+         <if test="searchStatus != '' and searchStatus == 1">
+            and l.com_det_c_no = 'C0201'
+        </if>
+         <if test="searchStatus != '' and searchStatus == 2">
+            and l.com_det_c_no = 'C0202'
+        </if>
+         <if test="searchStatus != '' and searchStatus == 3">
+            and l.com_det_c_no = 'C0203'
+        </if>
+    </sql>
+    
+    <!-- 학번 조건문 -->
+	<sql id="studentIdCondition">
+	    <if test="searchStuId != null  and !searchStuId.isEmpty()">
+	        and l.stu_no like '%' || #{searchStuId} || '%'
+	    </if>
+	</sql>
+	
+	 <!-- 학생 이름 조건문 -->
+    <sql id="studentNameCondition">
+        <if test="searchStuName != null and !searchStuName.isEmpty()">
+            and st.stu_name like '%' || #{searchStuName} || '%'
+        </if>
+    </sql>
+    
+
+
+<!-- 학생 -->
+
+ <!-- 자격증 등록 -->
+    <insert id="insertLicense" parameterType="licenseVO">
+        <selectKey keyProperty="licNo" resultType="String" order="BEFORE">
+            select 'LIC_'||seq_license.nextval from dual
+        </selectKey>
+        insert into license(
+            lic_no,
+            stu_no,
+            lic_name,
+            lic_content,
+            lic_limit,
+            lic_date,
+            com_det_c_no,
+            lic_regdate,
+            file_group_no,
+            rej_content
+        ) values(
+            #{licNo},
+            #{stuNo},
+            #{licName},
+            #{licContent},
+            #{licLimit},
+            #{licDate},
+            'C0202',
+            to_char(sysdate, 'YYYY-MM-DD'),
+            null,
+            null
+        )
+    </insert>
+    
+    <update id="insertFileGroupNoToLicense" parameterType="licenseVO">
+        update license
+        set 
+           	file_group_no = #{fileGroupNo}
+        where lic_no = #{licNo}
+    </update>
+    
+    <!-- 본인이 신청한 자격증 내역 조회 -->
+    <select id="myLicenseList" parameterType="String" resultType="licenseVO">
+       select
+       		  rownum as rnum	
+			, lic_no
+			, lic_name
+			, lic_content
+			, to_char(lic_limit, 'YYYY-mm-DD') as lic_limit
+			, to_char(lic_date, 'YYYY-mm-DD') as lic_date
+			, to_char(sysdate, 'YYYY-mm-DD') as lic_regdate
+			, rej_content 
+			, com_det_c_no
+
+		from license
+		where stu_no = #{stuNo}
+		order by lic_regdate asc
+    </select>
+
+    <!-- 상세보기 -->
+    <select id="licenseDetail" parameterType="String" resultType="licenseVO">
+	   select
+	   			 lic_no
+	   			, lic_name
+			    , lic_content
+			    , to_char(lic_limit, 'YYYY-mm-DD') as lic_limit
+			    , to_char(lic_date, 'YYYY-mm-DD') as lic_date
+			    , to_char(sysdate, 'YYYY-mm-DD') as lic_regdate
+			    , com_det_c_no
+			    , file_group_no
+		from license
+		where lic_no = #{licNo}
+    </select>
+    
+    <!-- 자격증 삭제 -->
+	<delete id="licenseDelete" parameterType="string">
+		delete license
+		 where lic_no = #{licNo} 
+	</delete>
+	
+    <!-- 내가 신청한 자격증 내역 수정 -->
+    <update id="licenseUpdate" parameterType="licenseVO">
+    	
+		update license
+		    set    lic_limit = #{licLimit}
+		         , lic_date = #{licDate}
+		        , file_group_no = #{fileGroupNo}
+		  where lic_no = #{licNo} 
+    </update>
+    
+    <!-- /////////////////////////////////////////////////////////////////////////////// -->
+    <!-- 관리자 -->
+    <!-- 페이징 처리를 위한 자격증 신청 count-->
+	<select id="selectLicenseRequestCount" parameterType="map" resultType="int">
+	    select count(l.lic_no)
+	    from license l
+	    join student st on l.stu_no = st.stu_no
+	    join department d on st.dept_no = d.dept_no
+	    where 1=1
+	    <include refid="departmentCondition"/>
+	    <include refid="licenseType"/>
+	    <include refid="statusCondition"/>
+	    <include refid="studentIdCondition"/>
+	    <include refid="studentNameCondition"/>
+	</select>
+	
+	<!-- 페이징 처리 + 검색 + 필터링 기능된 자격증 신청 내역 조회 -->
+	<select id="selectLicenseRequestList" parameterType="pagingVO" resultType="licenseVO">
+	    select
+	        c.*, st.stu_name as stuName, d.dept_name as deptName
+	    from (
+	        select
+	            a.*, row_number() over(order by a.lic_regdate desc) as rnum
+	        from (
+	            select 
+	                l.lic_no
+	                , l.lic_name
+	                , l.lic_content
+	                , to_char(l.lic_limit, 'YYYY-MM-DD') as lic_limit
+	                , l.stu_no
+	                , to_char(l.lic_date, 'YYYY-MM-DD') as lic_date
+	                , to_char(l.lic_regdate, 'YYYY-MM-DD') as lic_regdate
+	                , l.rej_content
+	                , st.dept_no
+	                , d.dept_name
+	                , l.com_det_c_no
+	            from license l
+	            join student st on l.stu_no = st.stu_no
+	            join department d on st.dept_no = d.dept_no
+	            where 1=1
+	            <include refid="departmentCondition"/>
+	            <include refid="licenseType"/>
+	            <include refid="statusCondition"/>
+	            <include refid="studentIdCondition"/>
+	            <include refid="studentNameCondition"/>
+	        ) a
+	    ) c
+	    join student st on c.stu_no = st.stu_no
+	    join department d on st.dept_no = d.dept_no
+	    <![CDATA[
+	        where c.rnum >= #{startRow} and c.rnum <= #{endRow}
+	    ]]>
+	</select>
+
+	  <!-- 전체 자격증 종류 가져오기 -->
+	<select id="getAllLicenseTypes" resultType="licenseVO">
+        select lic_name from license
+    </select>
+    
+    <!-- 자격 신청 상세조회 -->
+    <select id="getLicenseRequestDetail" parameterType="string" resultType="licenseVO">
+    	select 
+    			l.lic_no
+		        , l.lic_name
+		        , to_char(l.lic_regdate, 'YYYY-MM-DD') as lic_regdate
+		        , to_char(l.lic_limit, 'YYYY-mm-DD') as lic_limit
+		        , l.lic_content
+		        , l.stu_no
+		        , to_char(l.lic_date, 'YYYY-MM-DD') as lic_date
+		        , l.com_det_c_no
+		        , l.rej_content
+		        , st.stu_name
+		        , d.dept_name
+		        , l.file_group_no
+		from license l, student st, department d
+		where lic_no = #{licNo}
+		and st.stu_no = l.stu_no
+		and st.dept_no = d.dept_no
+    </select>
+    
+    <!-- ////////////////////////////////////////////////////////////// -->
+    <!-- 승인 / 반려 처리 관련 -->
+    
+    
+    <!-- 미승인 처리 자격증 개별 승인 처리(상세보기 내에서) -->
+    <update id="licenseRequestApprove" parameterType="string">
+        update license
+           set
+               com_det_c_no = 'C0201'
+        where lic_no = #{licNo}   
+    </update>
+
+    <!-- 미승인 처리 자격증 반려 처리(상세보기 내에서) -->
+    <update id="licenseRequestWait" parameterType="licenseVO">
+       update license
+          set  com_det_c_no = 'C0203' 
+               ,rej_content = #{rejContent}
+        where lic_no = #{licNo}   
+    </update>
+    
+    <!-- 미승인 처리 자격증 일괄 승인 처리(리스트에서) -->
+    <update id="licenseRequestAllApprove" parameterType="string">
+		update license
+		set 
+		  com_det_c_no = 'C0201'
+      where 
+          lic_no = #{licNo}   
+	</update>
+    
+	<select id="licenseStatistics" resultType="licenseVO">
+	   select
+	   		    com_det_c_no
+              , lic_name
+   	     from license 
+	</select>
+	
+	
+</mapper>
+
+
+

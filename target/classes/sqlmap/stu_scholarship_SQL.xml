@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IStuScholarshipMapper">
+
+	<!-- 장학 종류 조회 -->
+	<select id="scholarshipList" resultType="scholarshipVO">
+		select 
+				rownum as rnum
+			  ,	sch_no
+			  , sch_name
+			  , sch_content
+			  , sch_req
+			  , sch_amount
+			  , sch_type
+			  , sch_max
+		  from scholarship
+	  order by rnum asc
+	</select>
+
+	<!-- 장학 종류 상세보기 -->
+	<select id="scholarshipDetail" parameterType="String" resultType="scholarshipVO">
+		select 
+				sch_no
+				, sch_name
+				, sch_content
+				, sch_req
+				, sch_amount
+				, sch_type
+				, sch_max
+		 from scholarship
+		where sch_no = #{schNo}
+	</select>
+	
+	<!-- 선차감 목록 조회 -->
+	<select id="preScholarshipList" resultType="scholarshipVO">
+		select 
+				sch_no
+				, sch_name
+				, sch_content
+				, sch_req
+				, sch_amount
+				, sch_type
+				, sch_max
+		from scholarship
+	   where sch_type= '선차감'
+	</select>
+	
+	<!-- 후지급 목록 조회 -->
+	<select id="postScholarshipList" resultType="scholarshipVO">
+		select 
+				sch_no
+				, sch_name
+				, sch_content
+				, sch_req
+				, sch_amount
+				, sch_type
+				, sch_max
+		from scholarship
+	   where sch_type= '후지급'
+	</select>
+
+	<!-- 내가 수혜받은 장학 내역 조회  -->
+	<select id="myScholarshipList" parameterType="String" resultType="scholarshipVO">
+		select	
+				rownum as rnum
+				,sr.sch_rec_no
+    			,s.sch_name
+    			,s.sch_amount
+    			, to_char(sr.sch_apl_date, 'YYYY-MM-DD') as sch_apl_date
+    			,sr.year
+    			,sr.semester
+    			,sr.rej_content
+    			,s.sch_type
+    			,s.sch_content
+    			,s.sch_req
+    			,sr.com_det_c_no
+    			,to_char(sr.sch_rec_date, 'YYYY-MM-DD') as sch_rec_date 
+		from 
+    			scholarship s
+		join 
+   				scholarship_receive sr on s.sch_no = sr.sch_no
+		where 
+    			sr.stu_no = #{stuNo}
+	 order by 
+ 				rnum asc
+	</select>	
+	
+	<!-- 승인 내역 조회 -->
+    <select id="approvedList" parameterType="String" resultType="scholarshipVO">
+        select
+                s.sch_name
+                ,s.sch_amount
+                , to_char(sr.sch_apl_date, 'YYYY-MM-DD') as sch_apl_date
+                ,sr.year
+                ,sr.semester
+                ,sr.rej_content
+                ,s.sch_type
+                ,s.sch_content
+                ,s.sch_req
+                , to_char(sr.sch_rec_date, 'YYYY-MM-DD') as sch_rec_date 
+                ,sr.com_det_c_no
+        from 
+                scholarship s
+        join 
+                scholarship_receive sr on s.sch_no = sr.sch_no
+        where 
+                sr.stu_no = #{stuNo}
+          and   sr.com_det_c_no = 'C0201'    
+     order by 
+                sr.sch_apl_date asc
+    </select>
+	
+	<!-- 미승인 내역 조회 -->
+	<select id="unApprovedList" parameterType="String" resultType="scholarshipVO">
+		select
+    			s.sch_name
+    			,s.sch_amount
+    			, to_char(sr.sch_apl_date, 'YYYY-MM-DD') as sch_apl_date
+    			,sr.year
+    			,sr.semester
+    			,sr.rej_content
+    			,s.sch_type
+    			,s.sch_content
+    			,s.sch_req
+    			,sr.com_det_c_no
+    			,to_char(sr.sch_rec_date, 'YYYY-MM-DD') as sch_rec_date 
+		from 
+    			scholarship s
+		join 
+   				scholarship_receive sr on s.sch_no = sr.sch_no
+		where 
+    			sr.stu_no = #{stuNo}
+    	  and	sr.com_det_c_no = 'C0202'	
+	 order by 
+    			sr.sch_apl_date asc
+	</select>
+	
+	<!-- 반려 내역 조회 -->
+	<select id="rejectedList" parameterType="String" resultType="scholarshipVO">
+		select
+    			s.sch_name
+    			,s.sch_amount
+    			, to_char(sr.sch_apl_date, 'YYYY-MM-DD') as sch_apl_date
+    			,sr.year
+    			,sr.semester
+    			,sr.rej_content
+    			,s.sch_type
+    			,s.sch_content
+    			,s.sch_req
+    			,sr.com_det_c_no
+    			,to_char(sr.sch_rec_date, 'YYYY-MM-DD') as sch_rec_date 
+		from 
+    			scholarship s
+		join 
+   				scholarship_receive sr on s.sch_no = sr.sch_no
+		where 
+    			sr.stu_no = #{stuNo}
+    	  and	sr.com_det_c_no = 'C0203'	
+	 order by 
+    			sr.sch_apl_date asc
+	</select>
+	
+	 <!-- 장학금 신청시 첨부파일 그룹 생성 -->
+    <update id="insertFileGroupNoToScholarship" parameterType="scholarshipVO">
+        update scholarship_receive
+        set 
+            file_group_no = #{fileGroupNo}
+        where sch_rec_no = #{schRecNo}
+    </update>
+	
+	<!-- 장학금 신청 -->
+	<insert id="insertScholarshipRequest" parameterType="scholarshipVO">
+	 <selectKey keyProperty="schRecNo" resultType="String" order="BEFORE">
+            select 'SCH_'||seq_scholarship_receive.nextval from dual
+        </selectKey>
+		insert into scholarship_receive (
+         		sch_rec_no /*장학금수혜번호*/
+		        , sch_no	/*장학금번호*/
+		        , stu_no	/*학번*/
+		        , sch_rec_date /*수혜일자*/
+		        , year /*년도*/
+		        , semester /*학기*/
+		        , com_det_c_no /*공통코드_승인*/
+		        , rej_content	/*반려사유*/
+		        , file_group_no /*파일그룹번호*/
+		        , sch_apl_date /*신청일자*/
+		) values (
+		         #{schRecNo}
+		        , #{schNo}
+		        , #{stuNo}
+		        , null
+		        , #{year}
+		        , #{semester}
+		        , 'C0202'
+		        , null
+		        , null
+		        ,  to_char(sysdate, 'YYYY-MM-DD')
+		)
+	</insert>
+	
+	
+	<!-- 장학금 번호로 장학금명 select -->
+	<select id="getScholarshipByNo" parameterType="String" resultType="scholarshipVO">
+		select sch_name
+		  from scholarship
+ 		 where sch_no = #{schNo} 
+	</select>
+	
+	  <!-- 내가 신청한 장학금 내역 상세 조회 -->
+    <select id="myRequestDetail" parameterType="String" resultType="scholarshipVO">
+        select 
+        	sr.sch_rec_no,
+            s.sch_name,
+            sr.sch_rec_date,
+            sr.com_det_c_no,
+            sr.year,
+            sr.semester,
+            sr.rej_content,
+            sr.sch_apl_date,
+            sr.file_group_no,
+            s.sch_amount,
+            s.sch_type,
+            s.sch_content
+        from 
+            scholarship_receive sr
+        join scholarship s on sr.sch_no = s.sch_no
+        where sr.sch_rec_no = #{schRecNo}
+    </select>
+	
+	<select id="getStuTuitionScholarShipList" parameterType="String" resultType="ScholarshipVO">
+		select 
+			a.SCH_NO
+			,a.SCH_NAME
+			,a.SCH_REQ
+			,a.SCH_AMOUNT
+			,a.SCH_TYPE
+			,b.SCH_REC_NO
+			,b.STU_NO
+			,b.SCH_REC_DATE
+			,b.COM_DET_C_NO
+			,b.YEAR
+			,b.SEMESTER
+			,b.SCH_APL_DATE
+		from SCHOLARSHIP a, SCHOLARSHIP_RECEIVE b
+		where a.SCH_NO = b.SCH_NO
+		and a.SCH_TYPE = '선차감'
+		and b.stu_no = #{stuNo}
+		and b.COM_DET_C_NO = 'C0201'
+		and b.year = 	(select ys_year
+                       from YEAR_SEMESTER
+                      where ys_sdate = (select max(ys_sdate) from year_semester))
+		and b.SEMESTER = 	(select ys_SEMESTER
+                       from YEAR_SEMESTER
+                      where ys_sdate = (select max(ys_sdate) from year_semester))
+	</select>
+	
+	<!-- 본인이 신청한 장학금 내용 수정 -->
+	<update id="scholarshipRequestUpdate" parameterType="scholarshipVO">
+		 update scholarship_receive
+  			set  
+  				   year = #{year}
+      			 , semester = #{semester}
+      			 , file_group_no = #{fileGroupNo}
+ 		  where sch_rec_no = #{schRecNo}
+	</update>
+	
+	<!-- 학생의 미승인된 장학신청 삭제 처리 -->
+	<delete id="scholarshipRequestDelete" parameterType="string">
+		delete scholarship_receive
+		 where sch_rec_no = #{schRecNo}
+	</delete>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

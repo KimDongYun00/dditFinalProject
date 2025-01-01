@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAssignmentMapper">
+
+	<!-- 과제 게시판 글 갯수 -->
+	<select id="selectAssignmentCount" parameterType="pagingVO" resultType="int">
+		select count(ass_no)
+		from assignment
+		where lec_no=#{lecNo}
+	</select>
+	
+	<!-- 과제 리스트 -->
+	<select id="selectAssignmentList" parameterType="pagingVO" resultType="assignmentVO">
+		select
+				b.*
+			from(
+				select 
+					a.*, row_number() over (order by a.ass_no desc) rnum
+				from(
+					select
+						ass_no,
+						lec_no,
+						substr(ass_title,0,15) as ass_title,
+						ass_content,
+						ass_edate,
+						ass_regdate, 
+						ass_maxscore
+					from assignment
+					where lec_no=#{lecNo}
+					order by ass_no desc
+				) a
+			) b
+			<![CDATA[
+				where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+			]]>
+	</select>
+	
+	<!-- 과제 상세보기 -->
+	<select id="selectAssignmentDetail" parameterType="string" resultType="assignmentVO">
+		select *
+		from assignment
+		where ass_no = #{assNo}
+	</select>
+	
+	<!-- 제출된 과제  -->
+	<select id="selectAssignmentSubmit" parameterType="assignmentSubmitVO" resultType="assignmentSubmitVO">
+		select * from assignment_submit
+		where stu_no = #{stuNo} 
+		and ass_no=#{assNo}
+	</select>
+	
+	<!-- 과제제출 pk 가져오기 -->
+	<select id="getAssSubNo" resultType="string">
+		select 'ASS_SUB_'|| to_char(sysdate,'yyyy')|| LPAD(seq_ASSIGNMENT_SUBMIT.nextval, 4, '0')
+		from dual
+	</select>
+	
+	<!-- 과제 제출 -->
+	<insert id="insertAssignmentSubmit" parameterType="assignmentSubmitVO">
+		insert into assignment_submit(ASS_SUB_NO,ass_no,stu_no,ass_sub_comment,ass_sub_date,FILE_GROUP_NO)
+		values('ASS_SUB_'|| to_char(sysdate,'yyyy')|| LPAD(seq_assignment_submit.nextval, 4, '0'),#{assNo},#{stuNo},#{assSubComment,jdbcType=VARCHAR},sysdate,#{fileGroupNo})
+	</insert>
+	
+	<!-- 과제 수정 -->
+	<update id="updateAssignmentSubmit" parameterType="assignmentSubmitVO">
+		update assignment_submit
+		set ass_sub_comment = #{assSubComment},
+		    ass_sub_date = sysdate,
+		    file_group_no = #{fileGroupNo , jdbcType=VARCHAR}
+		where ASS_SUB_NO=#{assSubNo}
+	</update>
+	
+	<!-- 삭제할 파일 리스트 -->
+	<select id="selectDelFileList" parameterType="string" resultType="fileVO">
+		select * from "FILE" 
+		where file_group_NO = #{fileGroupNo}
+		and file_No = #{fileNo}
+	</select>
+	
+	<!-- JSP 에서 보여줄 파일리스트 -->
+	<select id="selectFileList" parameterType="string" resultType="fileVO">
+		select * from "FILE" 
+		where file_group_NO = #{fileGroupNo}
+	</select>
+	
+	<!-- 파일리스트 삭제 -->
+	<delete id="deleteFile" parameterType="string">
+		delete from "FILE"
+		where file_group_no = #{fileGroupNo}
+		and file_No = #{fileNo}
+	</delete>
+	
+	<!-- 제출/미제출 가져오기위해 만든 쿼리 -->
+	<select id="countSubmit" parameterType="hashMap" resultType="int">
+		select count(*) 
+		from assignment_submit
+		where stu_no = #{stuNo}
+		and ass_no = #{assNo}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IDepartmentMapper">
+
+	<select id="getDepartmentsByColleageNo" parameterType="String" resultType="departmentVO">
+		select DEPT_NO,COL_NO
+       		, ((select bui_name from building b where b.bui_no = (select bui_no from facility f where f.fac_no = d.fac_no))||' '||(select fac_name from facility f where f.fac_no = d.fac_no)) bui_fac_name
+       		, (select pro_name from professor p where p.pro_no = d.pro_no) pro_name
+       		,DEPT_NAME,DEPT_CALL,COM_DET_B_NO,DEPT_ACCOUNT,DEPT_CONTENT
+  		from department d
+ 		where col_no = #{colNo}
+	</select>
+
+	<select id="getDepartmentByDeptNo" parameterType="String" resultType="departmentVO">
+		select DEPT_NO,COL_NO
+			, (select bui_no from facility f where f.fac_no = d.fac_no) bui_no
+			, (select bui_name from building b where b.bui_no = (select bui_no from facility f where f.fac_no = d.fac_no)) bui_name
+			, (select fac_name from facility f where f.fac_no = d.fac_no) fac_name
+	       	, (select pro_name from professor p where p.pro_no = d.pro_no) pro_name
+			,DEPT_NAME,DEPT_CALL,com_det_b_no, fac_no
+			, (select com_det_name from common_code_detail where com_det_no = com_det_b_no) bankName
+			,DEPT_ACCOUNT,DEPT_CONTENT
+		from department d
+		where dept_no = #{deptNo}
+	</select>
+	
+	<update id="updateDepartment" parameterType="departmentVO">
+		update department
+		set
+			FAC_NO = #{facNo}
+			,PRO_NO = #{proNo}
+			,DEPT_NAME = #{deptName}
+			,DEPT_CALL = #{deptCall}
+			,COM_DET_B_NO = #{comDetBNo}
+			,DEPT_ACCOUNT = #{deptAccount}
+		where DEPT_NO = #{deptNo}
+	</update>
+	
+	<insert id="insertDeaprtment" parameterType="departmentVO">
+		insert into department(
+			DEPT_NO,COL_NO,FAC_NO,PRO_NO,DEPT_NAME,DEPT_CALL,COM_DET_B_NO,DEPT_ACCOUNT,DEPT_CONTENT
+		) values (
+			'DEPT_'||seq_department.nextval, #{colNo}, #{facNo}, #{proNo}, #{deptName}, #{deptCall}, #{comDetBNo}
+			, #{deptAccount}, null
+		)
+	</insert>
+	
+	<select id="getDeptNameList" resultType="departmentVO">
+		select DEPT_NO,DEPT_NAME
+		from DEPARTMENT
+	</select>
+
+
+	<select id="empDetail" resultType="empVO">
+	
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

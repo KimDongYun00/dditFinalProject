@@ -1,0 +1,8 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.UserVO;
+
+public interface ILoginMapper {
+
+	public UserVO loginCheck(UserVO userVO);
+}

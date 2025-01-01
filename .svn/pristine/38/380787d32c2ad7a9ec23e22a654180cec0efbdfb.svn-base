@@ -1,0 +1,15 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ConsultingVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IConsultingMapper {
+
+	public List<ConsultingVO> selectConsultingList(PaginationInfoVO<ConsultingVO> pagingVO);
+
+	public int selectConsultingCount(PaginationInfoVO<ConsultingVO> pagingVO);
+
+	
+}

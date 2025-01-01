@@ -1,0 +1,11 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IAdminLectureMapper {
+	public int selectLectureCount(PaginationInfoVO<LectureVO> pagingVO);
+	public List<LectureVO> getLectureList(PaginationInfoVO<LectureVO> pagingVO);
+}

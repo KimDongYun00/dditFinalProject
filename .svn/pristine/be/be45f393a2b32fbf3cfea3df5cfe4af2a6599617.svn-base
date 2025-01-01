@@ -1,0 +1,16 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class FreeCommentVO {
+	private String fc_no;
+	private String free_no;
+	private String user_no;
+	private String fc_content;
+	private String fc_writer;
+	private String fc_date;
+	
+	
+
+}

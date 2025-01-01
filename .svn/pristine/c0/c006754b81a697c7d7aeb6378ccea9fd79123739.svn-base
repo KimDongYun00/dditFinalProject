@@ -1,0 +1,17 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class FoodBoardVO {
+	private String food_no;
+	private String user_no;
+	private String food_title;
+	private String food_writer;
+	private String food_content;
+	private int food_cnt;
+	private String food_date;
+	private String food_map_x;
+	private String food_map_y;
+
+}

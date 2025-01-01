@@ -1,0 +1,16 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FreeBoardVO;
+
+public interface FreeBoardMapper {
+
+	public List<FreeBoardVO> freeList();
+
+	public FreeBoardVO detail(String freeNo);
+
+	public void incrementViewCount(String freeNo);
+
+	public List<FreeBoardVO> search(String keyword);
+}

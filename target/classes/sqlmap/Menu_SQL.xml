@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.MenuMapper">
+	<insert id="insertMenu" parameterType="menuVO">
+		insert into menu(menu_no
+		               , menu_food
+		               , menu_price
+		               , com_det_w_no
+		               , menu_day
+		)
+		values(          seq_menu.nextval
+		               , #{menuFood}
+		               , #{menuPrice}
+		               , #{comDetWNo}
+		               , #{menuDay}
+		)		               
+		            
+	</insert>
+	
+	<select id="selectMenu" resultType="menuVO">
+		select menu_no
+             , menu_food
+             , menu_price
+             , com_det_w_no
+             , menu_day
+             , menu_img
+          from menu   
+	</select>
+	
+	<delete id="deleteMenu">
+		delete menu
+	</delete>
+	
+	<select id="selectMenuDay" parameterType="string" resultType="menuVO">
+		select menu_no
+             , menu_food
+             , menu_price
+             , com_det_w_no
+             , menu_day
+             , menu_img
+          from menu
+         where menu_day = #{menuDay}
+         order by com_det_w_no     
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

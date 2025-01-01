@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.VacationMapper">
+<!-- vacation SQL -->
+	<sql id="pagingHeader">
+		select
+	           rn.*
+	       from( 
+	        select
+				tbl.*, row_number() over(order by tbl.vac_regdate desc) AS rnum
+			from(
+	</sql>
+	<sql id="pagingFooter">
+		) tbl
+	        )rn
+        <![CDATA[
+			where rn.rnum >= #{startRow} and rn.rnum <= #{endRow}	
+		]]> 
+	</sql>
+	
+	<!-- 휴가신청내역리스트 -->
+	<select id="selProVacationList" parameterType="string" resultType="vacationVO">
+		select v.vac_no
+		     , v.user_no
+		     , v.vac_content
+		     , to_char(v.vac_regdate, 'yyyy-mm-dd') vac_regdate
+		     , v.com_det_c_no
+		     , v.vac_sdate
+		     , v.vac_edate
+		     , v.com_det_m_no
+		     , v.rej_content
+		     , p.pro_name
+		  from vacation v, professor p
+		 where v.user_no = #{username} 
+		   and v.user_no = p.pro_no
+	</select>
+	
+	<!-- 휴가신청 -->
+	<insert id="proVacationInsert" parameterType="vacationVO" useGeneratedKeys="true">
+		<selectKey keyProperty="vacNo" resultType="string" order="BEFORE">
+			select 'VAC_'||lpad(seq_vacation.nextval, 4, '0') from dual
+		</selectKey>
+		insert into vacation(
+			  vac_no
+			, user_no
+			, vac_content
+			, vac_regdate
+			, com_det_c_no
+			, vac_sdate
+			, vac_edate
+			, com_det_m_no			
+		)
+		 values(
+			  #{vacNo}
+			, #{userNo}
+			, #{vacContent}
+			, sysdate
+			, 'C0102'
+			, #{vacSdate}
+			, #{vacEdate}
+			, 'M0202'
+		 )
+	</insert>
+	
+	<!-- 휴가신청내역 상세보기 -->
+	<select id="proVacationDetail" parameterType="string" resultType="vacationVO">
+		select v.vac_no
+		     , v.user_no
+		     , v.vac_content
+		     , to_char(v.vac_regdate, 'yyyy-mm-dd') vac_regdate
+		     , v.com_det_c_no
+		     , v.vac_sdate
+		     , v.vac_edate
+		     , v.com_det_m_no
+		     , v.rej_content
+		     , p.pro_name
+		  from vacation v, professor p
+		 where v.vac_no = #{vacNo}
+		   and v.user_no = p.pro_no
+	</select>
+	
+	<!-- 휴가 신청 내역 수정 -->
+	<update id="proVacationUpdate" parameterType="vacationVO">
+		update vacation
+		   set vac_content = #{vacContent}
+		     , vac_sdate = #{vacSdate}
+		     , vac_edate = #{vacEdate}
+		 where vac_no = #{vacNo}    
+	</update>
+	
+	<delete id="proVacationDelete" parameterType="string">
+		delete vacation
+		 where vac_no = #{vacNo}
+	</delete>
+	
+	<!-- 관리자 페이징처리 게시글 숫자-->
+	<select id="selEmpVacationCount" parameterType="pagingVO" resultType="int">
+		select count(v.vac_no)		     
+		  from vacation v, professor p
+		 where v.user_no = p.pro_no
+		<if test="assNo == 'proNo'">
+		 	and user_no like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="assNo == 'proName'">
+		 	and p.pro_name like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="searchType != 'C99'">
+		 	and v.com_det_c_no = #{searchType}
+		 </if>		   
+	</select>
+	<!--관리자 페이징처리 리스트  -->
+	<select id="selEmpVacationList" parameterType="pagingVO" resultType="vacationVO">
+		<include refid="pagingHeader"/>
+		select v.vac_no
+		     , v.user_no
+		     , v.vac_content
+		     , to_char(v.vac_regdate, 'yyyy-mm-dd') vac_regdate
+		     , v.com_det_c_no
+		     , v.vac_sdate
+		     , v.vac_edate
+		     , v.com_det_m_no
+		     , v.rej_content
+		     , p.pro_name
+		  from vacation v, professor p
+		 where v.user_no = p.pro_no
+		 <if test="assNo == 'proNo'">
+		 	and user_no like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="assNo == 'proName'">
+		 	and p.pro_name like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="searchType != 'C99'">
+		 	and v.com_det_c_no = #{searchType}
+		 </if>		 
+		 <include refid="pagingFooter"/>  
+	</select>
+	
+	<update id="rejectVacation" parameterType="vacationVO">
+		update vacation
+		   set 
+		       com_det_c_no = 'C0103'
+		      ,rej_content = #{rejContent}
+		 where vac_no = #{vacNo}      
+	</update>
+	
+	<update id="approveVacation" parameterType="string">
+		update vacation
+		   set 
+		       com_det_c_no = 'C0101'
+		     , rej_content = null
+		 where vac_no = #{vacNo}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

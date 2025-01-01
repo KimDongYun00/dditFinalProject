@@ -1,0 +1,25 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ColleageVO;
+
+public interface IAdminDepartmentService {
+	List<ColleageVO> getColleageList();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

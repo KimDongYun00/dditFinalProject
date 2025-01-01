@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ITuitionMapper">
+
+	<select id="getTuitionListByDeptNo" parameterType="String" resultType="tuitionVO">
+		select TUI_NO,DEPT_NO,TUI_PAYMENT,com_det_b_no
+		,(select com_det_name from common_code_detail where com_det_no = com_det_b_no) bankName
+		,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		from tuition
+		where dept_no = #{deptNo}
+	</select>
+	
+	<insert id="insertTuition" parameterType="tuitionVO">
+		insert into tuition (
+			TUI_NO,DEPT_NO,TUI_PAYMENT,COM_DET_B_NO,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		) values(
+			'TUI_'||seq_tuition.nextval, #{deptNo}, #{tuiPayment}, #{comDetBNo}, #{tuiAccount}
+			, #{tuiSdate}, #{tuiEdate}, #{year}, #{semester}
+		)
+	</insert>
+
+	<select id="selectTuitionCount" parameterType="pagingVO" resultType="int">
+		select count(a.tui_no)
+		from tuition a
+		where 1=1
+		<if test="searchWord != ''">
+			and a.dept_no = (select b.dept_no 
+							   from department b 
+							  where b.dept_name like '%'|| #{searchWord} ||'%')
+		</if>
+		<if test="searchYear != 99">
+			and a.year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and a.semester = #{searchSemester}
+		</if>
+	</select>
+	
+	<select id="getTuitionList" parameterType="pagingVO" resultType="tuitionVO">
+		select
+            ro.*
+        from( 
+	        select
+				tbl.*, row_number() over(order by tbl.YEAR desc, tbl.semester desc) AS rnum
+			from(
+		select 
+			a.TUI_NO
+			,a.DEPT_NO
+			,(select b.dept_name 
+				from department b 
+			   where b.dept_no = a.dept_no) dept_name
+			,a.TUI_PAYMENT
+			,a.COM_DET_B_NO
+			,(select b.com_det_name
+				from common_code_detail b
+			   where b.com_det_no = a.com_det_b_no) bankName
+			,a.TUI_ACCOUNT
+			,a.TUI_SDATE
+			,a.TUI_EDATE
+			,a.YEAR
+			,a.SEMESTER
+		from tuition a
+		where 1=1
+		<if test="searchWord != ''">
+			and a.dept_no = (select b.dept_no 
+							   from department b 
+							  where b.dept_name like '%'|| #{searchWord} ||'%')
+		</if>
+		<if test="searchYear != 99">
+			and a.year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and a.semester = #{searchSemester}
+		</if>
+		order by a.YEAR desc, a.semester desc
+		)tbl
+	        )ro
+        <![CDATA[
+			where ro.rnum >= #{startRow} and ro.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<select id="getYearList" resultType="String">
+		select distinct(YEAR)
+		from tuition
+	</select>
+	
+	<insert id="insertTuition2" parameterType="tuitionVO">
+		insert into tuition (
+			TUI_NO,DEPT_NO,TUI_PAYMENT,COM_DET_B_NO,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		) values(
+			'TUI_'||seq_tuition.nextval, #{deptNo}, #{tuiPayment}, #{comDetBNo}, #{tuiAccount}
+			, #{tuiSdate}, #{tuiEdate}, #{year}, #{semester}
+		)
+	</insert>
+	
+	<update id="updateTuition" parameterType="tuitionVO">
+		update tuition 
+		set 
+			DEPT_NO = #{deptNo}
+			,TUI_PAYMENT = #{tuiPayment}
+			,COM_DET_B_NO = #{comDetBNo}
+			,TUI_ACCOUNT = #{tuiAccount}
+			,TUI_SDATE = #{tuiSdate}
+			,TUI_EDATE = #{tuiEdate}
+			,YEAR = #{year}
+			,SEMESTER = #{semester}
+		where tui_no = #{tuiNo}
+	</update>
+	
+	<delete id="deleteTuition" parameterType="tuitionVO">
+		delete from tuition
+		where tui_no = #{tuiNo}
+	</delete>
+	
+	<select id="getTuitionByStuNo" parameterType="String" resultType="tuitionVO">
+		select 
+			TUI_NO
+			,a.DEPT_NO
+            ,(select dept_name
+                from department b
+               where b.dept_no = a.dept_no) dept_name
+			,TUI_PAYMENT
+			,COM_DET_B_NO
+            ,(select com_det_name
+                from common_code_detail
+               where com_det_no = com_det_b_no) bankName
+			,TUI_ACCOUNT
+			,TUI_SDATE
+			,TUI_EDATE
+			,YEAR
+			,SEMESTER
+		from tuition a
+		where a.dept_no = (select b.dept_no 
+							 from student b 
+							where b.stu_no = #{stuNo})
+		and year = (select YS_YEAR
+					  from year_semester
+					 where ys_sdate = (select max(ys_sdate) from year_semester))
+		and semester = (select YS_SEMESTER
+					      from year_semester
+					     where ys_sdate = (select max(ys_sdate) from year_semester))
+	</select>
+	
+	<resultMap type="tuitionVO" id="tuiMap">
+		<id property="tuiNo" column="tui_no"/>
+		<result property="tuiNo" column="tui_no"/>
+		<result property="deptNo" column="dept_no"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="tuiPayment" column="tui_payment"/>
+		<result property="comDetBNo" column="com_det_b_no"/>
+		<result property="bankName" column="bank_name"/>
+		<result property="tuiAccount" column="tui_account"/>
+		<result property="tuiSdate" column="tui_sdate"/>
+		<result property="tuiEdate" column="tui_edate"/>
+		<result property="year" column="year"/>
+		<result property="semester" column="semester"/>
+		<collection property="tuiPayList" resultMap="tuiPayMap"/>
+	</resultMap>
+	
+	<resultMap type="tuiPayVO" id="tuiPayMap">
+		<id property="tuiPayNo" column="tui_pay_no"/>
+		<result property="tuiPayNo" column="tui_pay_no"/>
+		<result property="tuiNo" column="tui_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="tuiPayDate" column="tui_pay_date"/>
+		<result property="tuiPayAmount" column="tui_pay_amount"/>
+		<result property="tuiPayYn" column="tui_pay_yn"/>
+		<result property="tuiPayDed" column="tui_pay_ded"/>
+		<result property="comDetYNo" column="com_det_y_no"/>
+		<result property="comDetY2No" column="com_det_y2_no"/>
+		<association property="stuVO" resultMap="stuMap"/>
+		<collection property="tuiPayDetList" resultMap="tuiPayDetMap"/>
+	</resultMap>
+	
+	<resultMap type="tuiPayDetVO" id="tuiPayDetMap">
+		<id property="tuiPayDetNo" column="tui_pay_det_no"/>
+		<result property="tuiPayDetNo" column="tui_pay_det_no"/>
+		<result property="tuiPayDetAmount" column="tui_pay_det_amount"/>
+		<result property="tuiPayDetDate" column="tui_pay_det_date"/>
+	</resultMap>
+	
+	<resultMap type="studentVO" id="stuMap">
+		<id property="stuNo" column="stu_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="deptNo" column="dept_no"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="stuYear" column="stu_year"/>
+		<result property="stuName" column="stu_name"/>
+		<result property="comDetGNo" column="com_det_g_no"/>
+		<result property="stuRegno" column="stu_regno"/>
+		<result property="stuPostcode" column="stu_postcode"/>
+		<result property="stuAdd1" column="stu_add1"/>
+		<result property="stuAdd2" column="stu_add2"/>
+		<result property="stuEmail" column="stu_email"/>
+		<result property="stuImg" column="stu_img"/>
+		<result property="stuIp" column="stu_ip"/>
+		<result property="comDetBNo" column="com_det_b_no"/>
+		<result property="stuAccount" column="stu_account"/>
+		<result property="stuDelYn" column="stu_del_yn"/>
+		<result property="stuSdate" column="stu_sdate"/>
+		<result property="stuEdate" column="stu_edate"/>
+		<result property="comDetMNo" column="com_det_m_no"/>
+		<result property="stuPhone" column="stu_phone"/>
+	</resultMap>
+	
+	<select id="getTuiPayListByStuNo" parameterType="String" resultMap="tuiMap">
+		select
+			a.TUI_NO
+			,a.DEPT_NO
+			,a.TUI_PAYMENT
+			,a.COM_DET_B_NO
+			,a.TUI_ACCOUNT
+			,a.TUI_SDATE
+			,a.TUI_EDATE
+			,a.YEAR
+			,a.SEMESTER
+			,b.TUI_PAY_NO
+			,b.STU_NO
+			,b.TUI_PAY_DATE
+			,b.TUI_PAY_AMOUNT
+			,b.TUI_PAY_YN
+			,b.TUI_PAY_DED
+			,b.COM_DET_Y_NO
+			,b.COM_DET_Y2_NO
+			,c.TUI_PAY_DET_NO
+			,c.TUI_PAY_DET_AMOUNT
+			,c.TUI_PAY_DET_DATE
+		from tuition a, tuition_payment b, tuition_payment_detail c
+		where a.tui_no = b.tui_no
+		and b.tui_pay_no = c.tui_pay_no
+		and b.stu_no = #{stuNo}	
+	</select>
+	
+	<select id="submitTuitionListCount" parameterType="pagingVO" resultType="int">
+		select count(s.STU_NO)
+		from student s 
+        left outer join tuition_payment b on s.stu_no = b.stu_no
+                                          and (select c.year from tuition c where c.tui_no = b.tui_no) = #{searchYear}
+                                          and (select c.semester from tuition c where c.tui_no = b.tui_no) = #{searchSemester}
+        where stu_del_yn = 'N'
+        <if test="searchStuId != ''">
+        	and s.stu_no = #{searchStuId}
+        </if>   
+        <if test="searchStuName != ''">
+        	and s.stu_name like '%'||#{searchStuName}||'%'
+        </if>   
+        <if test="searchType == ''">
+		        	and b.COM_DET_Y_NO is null
+		</if>
+        <if test="searchType != ''">
+        	and b.COM_DET_Y_NO = #{searchType}
+        </if>
+        <if test="searchStatus != ''">
+        	and b.COM_DET_Y2_NO = #{searchStatus}
+        </if>
+	</select>
+	
+	<select id="submitTuitionList" parameterType="pagingVO" resultType="map">
+		select
+            ro.*
+        from( 
+	        select
+				tbl.*, row_number() over(order by tbl.year desc, tbl.semester desc) AS rnum
+			from(
+				select 
+					s.STU_NO
+		            ,s.DEPT_NO
+		            ,(select d.dept_name from department d where d.dept_no = s.dept_no) dept_name
+		            ,s.STU_YEAR
+		            ,s.STU_NAME
+		            ,b.tui_pay_no
+		            ,b.tui_no
+		            ,(select c.year from tuition c where c.tui_no = b.tui_no) year
+		            ,(select c.semester from tuition c where c.tui_no = b.tui_no) semester
+		            ,b.COM_DET_Y_NO
+		            ,b.COM_DET_Y2_NO
+		 		from student s 
+		        left outer join tuition_payment b on s.stu_no = b.stu_no
+		                                          and (select c.year from tuition c where c.tui_no = b.tui_no) = #{searchYear}
+		                                          and (select c.semester from tuition c where c.tui_no = b.tui_no) = #{searchSemester}
+				where stu_del_yn = 'N'
+		        <if test="searchStuId != ''">
+		        	and s.stu_no = #{searchStuId}
+		        </if>   
+		        <if test="searchStuName != ''">
+		        	and s.stu_name like '%'||#{searchStuName}||'%'
+		        </if>   
+		        <if test="searchType == ''">
+		        	and b.COM_DET_Y_NO is null
+		        </if>
+		        <if test="searchType != ''">
+		        	and b.COM_DET_Y_NO = #{searchType}
+		        </if>
+		        <if test="searchStatus != ''">
+		        	and b.COM_DET_Y2_NO = #{searchStatus}
+		        </if>
+				order by year desc, semester desc
+				)tbl
+	        )ro
+        <![CDATA[
+			where ro.rnum >= #{startRow} and ro.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<select id="checkTuitionSubmit" parameterType="tuiPayVO" resultType="map">
+		select 
+			COM_DET_Y_NO
+			,COM_DET_Y2_NO
+		from tuition_payment
+		where tui_no = #{tuiNo}
+		and stu_no = #{stuNo}
+	</select>
+	
+	<insert id="submit1Tuition" parameterType="tuiPayVO" useGeneratedKeys="true">
+		<selectKey keyProperty="tuiPayNo" order="BEFORE" resultType="String">
+			select 'TUI_PAY_'||seq_tuition_payment.nextval from dual
+		</selectKey>
+		insert into tuition_payment(
+			TUI_PAY_NO
+			,TUI_NO
+			,STU_NO
+			,TUI_PAY_DATE
+			,TUI_PAY_AMOUNT
+			,TUI_PAY_YN
+			,TUI_PAY_DED
+			,COM_DET_Y_NO
+			,COM_DET_Y2_NO
+		)values(
+			#{tuiPayNo}
+			,#{tuiNo}
+			,#{stuNo}
+			,sysdate
+			,#{tuiPayAmount}
+			,'Y'
+			,#{tuiPayDed}
+			,'Y0102'
+			,'Y0201'
+		)
+	</insert>
+	
+	<insert id="submit1TuitionDetail" parameterType="tuiPayVO">
+		insert into tuition_payment_detail(
+			TUI_PAY_DET_NO
+			,TUI_PAY_NO
+			,TUI_PAY_DET_AMOUNT
+			,TUI_PAY_DET_DATE
+		) values(
+			'TUI_PAY_DET_'||seq_tuition_payment_detail.nextval
+			,#{tuiPayNo}
+			,#{tuiPayAmount}
+			,sysdate
+		)
+	</insert>
+	
+	<select id="checkTuitionSubmit2" parameterType="tuiPayVO" resultType="int">
+		select count(a.tui_pay_det_no)
+		from TUITION_PAYMENT_DETAIL a
+		where a.TUI_PAY_NO = (select b.TUI_PAY_NO
+								from tuition_payment b
+							   where b.tui_no = #{tuiNo}
+							   	 and b.stu_no = #{stuNo})
+	</select>
+	
+	<insert id="submit2TuitionFirst" parameterType="tuiPayVO" useGeneratedKeys="true">
+		<selectKey keyProperty="tuiPayNo" order="BEFORE" resultType="String">
+			select 'TUI_PAY_'||seq_tuition_payment.nextval from dual
+		</selectKey>
+		insert into tuition_payment(
+			TUI_PAY_NO
+			,TUI_NO
+			,STU_NO
+			,TUI_PAY_DATE
+			,TUI_PAY_AMOUNT
+			,TUI_PAY_YN
+			,TUI_PAY_DED
+			,COM_DET_Y_NO
+			,COM_DET_Y2_NO
+		)values(
+			#{tuiPayNo}
+			,#{tuiNo}
+			,#{stuNo}
+			,sysdate
+			,0
+			,'Y'
+			,#{tuiPayDed}
+			,'Y0101'
+			,'Y0202'
+		)
+	</insert>
+	
+	<update id="submit2TuitionLast" parameterType="tuiPayVO" useGeneratedKeys="true">
+		<selectKey keyProperty="tuiPayNo" order="BEFORE" resultType="String">
+			select TUI_PAY_NO 
+			from tuition_payment
+			where stu_no = #{stuNo}
+			and tui_no = #{tuiNo}
+		</selectKey>
+		update tuition_payment
+		set
+			COM_DET_Y_NO = 'Y0102'
+		where TUI_PAY_NO = #{tuiPayNo}
+	</update>
+	
+	<update id="updateSubmit2Tuition" parameterType="tuiPayVO" useGeneratedKeys="true">
+		<selectKey keyProperty="tuiPayNo" order="BEFORE" resultType="String">
+			select TUI_PAY_NO 
+			from tuition_payment
+			where stu_no = #{stuNo}
+			and tui_no = #{tuiNo}
+		</selectKey>
+		update TUITION_PAYMENT
+		set 
+			TUI_PAY_AMOUNT = TUI_PAY_AMOUNT + #{tuiPayAmount}
+		where TUI_PAY_NO = #{tuiPayNo}
+	</update>
+	
+	<insert id="submit2TuitionDetail" parameterType="tuiPayVO" useGeneratedKeys="true">
+		<selectKey keyProperty="tuiPayNo" order="BEFORE" resultType="String">
+			select TUI_PAY_NO 
+			from tuition_payment
+			where stu_no = #{stuNo}
+			and tui_no = #{tuiNo}
+		</selectKey>
+		insert into tuition_payment_detail(
+			TUI_PAY_DET_NO
+			,TUI_PAY_NO
+			,TUI_PAY_DET_AMOUNT
+			,TUI_PAY_DET_DATE
+		) values(
+			'TUI_PAY_DET_'||seq_tuition_payment_detail.nextval
+			,#{tuiPayNo}
+			,#{tuiPayAmount}
+			,sysdate
+		)
+	</insert>
+	
+	<select id="getTuitionDetail" parameterType="tuiPayVO" resultMap="tuiMap">
+		select
+			a.TUI_NO
+			,a.DEPT_NO
+			,(select d.dept_name 
+				from department d
+			   where d.dept_no = a.dept_no) dept_name
+			,a.TUI_PAYMENT
+			,a.COM_DET_B_NO
+			,(select d.com_det_name
+			    from common_code_detail d
+			   where d.com_det_no = a.COM_DET_B_NO) bank_name
+			,a.TUI_ACCOUNT
+			,a.TUI_SDATE
+			,a.TUI_EDATE
+			,a.YEAR
+			,a.SEMESTER
+			,b.TUI_PAY_NO
+			,b.STU_NO
+			,b.TUI_PAY_DATE
+			,b.TUI_PAY_AMOUNT
+			,b.TUI_PAY_YN
+			,b.TUI_PAY_DED
+			,b.COM_DET_Y_NO
+			,b.COM_DET_Y2_NO
+			,c.TUI_PAY_DET_NO
+			,c.TUI_PAY_DET_AMOUNT
+			,c.TUI_PAY_DET_DATE
+		from tuition a, tuition_payment b, tuition_payment_detail c
+		where a.tui_no = b.tui_no
+		and b.tui_pay_no = c.tui_pay_no
+		and b.stu_no = #{stuNo}	
+		and a.tui_no = #{tuiNo}	
+	</select>
+	
+	<select id="getTuitionDetailByTuiPayNo" parameterType="String" resultMap="tuiMap">
+		select
+			a.TUI_NO
+			,a.DEPT_NO
+			,(select d.dept_name 
+				from department d
+			   where d.dept_no = a.dept_no) dept_name
+			,a.TUI_PAYMENT
+			,a.COM_DET_B_NO
+			,(select d.com_det_name
+			    from common_code_detail d
+			   where d.com_det_no = a.COM_DET_B_NO) bank_name
+			,a.TUI_ACCOUNT
+			,a.TUI_SDATE
+			,a.TUI_EDATE
+			,a.YEAR
+			,a.SEMESTER
+			,b.TUI_PAY_NO
+			,b.STU_NO
+			,b.TUI_PAY_DATE
+			,b.TUI_PAY_AMOUNT
+			,b.TUI_PAY_YN
+			,b.TUI_PAY_DED
+			,b.COM_DET_Y_NO
+			,b.COM_DET_Y2_NO
+			,c.TUI_PAY_DET_NO
+			,c.TUI_PAY_DET_AMOUNT
+			,c.TUI_PAY_DET_DATE
+		from tuition a, tuition_payment b, tuition_payment_detail c
+		where a.tui_no = b.tui_no
+		and b.tui_pay_no = c.tui_pay_no
+		and b.tui_pay_no = #{tuiPayNo}	
+	</select>
+	
+	<!-- 증명서 납부 현황 조회를 위한 데이터 -->
+	<!-- 미납자 수 count -->
+	<select id="selectUnpayPeopleCount" resultType="int">
+		select count(s.STU_NO)
+	  from student s 
+	  left outer join tuition_payment b on s.stu_no = b.stu_no
+	   and (select c.year from tuition c where c.tui_no = b.tui_no) = 2024
+	   and (select c.semester from tuition c where c.tui_no = b.tui_no) = 1
+	 where stu_del_yn = 'N'
+	   and b.COM_DET_Y_NO is null
+	</select>
+	
+	<!-- 납부, 납부중 수 count -->
+	<select id="selectPayPeopleCount" resultType="int">
+		select count(TUI_PAY_NO)
+	from TUITION_PAYMENT
+	</select>
+	
+	<!-- 일시불수 count -->
+	<select id="selectFullPayCount" resultType="int">
+		select count(*)
+		  from tuition_payment
+         where com_det_y2_no = 'Y0202'
+	</select>
+	
+	<!-- 할부수 count -->
+	<select id="selectMonthPayCount" resultType="int">
+		select count(*)
+		  from tuition_payment
+         where com_det_y2_no = 'Y0201'
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

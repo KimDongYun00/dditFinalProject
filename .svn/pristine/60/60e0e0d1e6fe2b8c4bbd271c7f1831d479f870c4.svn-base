@@ -1,0 +1,16 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.UserVO;
+
+public interface ILoginMapper {
+
+	public UserVO loginCheck(UserVO userVO);
+
+	// 시큐리티 인증 시, UserDetailsService 객체 정보 안에서 User객체정보 만들때 사용하는 쿼리
+	public UserVO readByUserId(String username);
+	
+	// 데이터 넘기기 테스트용 교수ver
+	public ProfessorVO professorInfo(String userId);
+	
+}

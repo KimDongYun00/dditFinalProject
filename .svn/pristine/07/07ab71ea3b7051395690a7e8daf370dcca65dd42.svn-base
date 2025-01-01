@@ -1,0 +1,17 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FoodBoardVO;
+
+public interface FoodBoardMapper {
+
+	 public List<FoodBoardVO> foodList();
+
+	public FoodBoardVO detail(String foodNo);
+
+	public void incrementViewCount(String foodNo);
+
+	public void foodboardInsert(FoodBoardVO foodboardVO);
+
+}

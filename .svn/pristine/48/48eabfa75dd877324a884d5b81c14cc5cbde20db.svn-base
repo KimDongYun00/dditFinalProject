@@ -1,0 +1,16 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.LectureTimetableVO;
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IAdminLectureMapper {
+	public int selectLectureCount(PaginationInfoVO<LectureVO> pagingVO);
+	public List<LectureVO> getLectureList(PaginationInfoVO<LectureVO> pagingVO);
+	public void insertLecture(LectureVO lectureVO);
+	public void insertLectureTime(Map<String, String> map);
+	public List<LectureTimetableVO> getLectureTimeList(LectureVO lectureVO);
+}

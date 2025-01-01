@@ -1,0 +1,8 @@
+package kr.or.ddit.service.student.inter;
+
+import kr.or.ddit.vo.CourseVO;
+
+public interface IStuCourseService {
+	public void insertCourse(CourseVO courseVO);
+	public int hasCourseCart(CourseVO courseVO);
+}

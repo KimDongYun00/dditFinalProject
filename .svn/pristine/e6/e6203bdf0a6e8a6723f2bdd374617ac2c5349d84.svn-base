@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC 
+"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" 
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<!-- tiles 설정 -->
+<tiles-definitions>
+	<!-- main layout -->
+	<definition name="tiles-layout" template="/WEB-INF/views/tiles/index.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp" />
+		<put-attribute name="aside" value="/WEB-INF/views/tiles/aside.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/views/tiles/footer.jsp" />
+	</definition>
+	<!-- name의 */*은 body의 value에서 1과 2에 해당
+		controller에서 forwarding 시 return "1/2";
+	 -->
+	 
+<!-- 	 	 학생일때 tiles   	  -->
+	 <definition name="tiles-student" template="/WEB-INF/views/tiles1/index1.jsp">
+		<put-attribute name="menu" value="/WEB-INF/views/tiles1/menu.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles1/nav.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/tiles1/footer.jsp" />
+		
+		<put-attribute name="body" value="" />		
+	</definition>
+	 
+	<!-- 이런느낌으로 하는듯? --> 
+	<definition name="student/*/*" extends="tiles-student">
+		<put-attribute name="body" value="/WEB-INF/views/student/{1}/{2}.jsp" />
+	</definition>
+	
+	<!-- 	 	 교육자일때 tiles   	  -->
+	 <definition name="tiles-professor" template="/WEB-INF/views/tiles1/index1.jsp">
+		<put-attribute name="menu" value="/WEB-INF/views/tiles1/menu_pro.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles1/nav.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/tiles1/footer.jsp" />
+		<put-attribute name="body" value="" />		
+	</definition>
+		
+	<definition name="professor/*/*" extends="tiles-professor">
+		<put-attribute name="body" value="/WEB-INF/views/professor/{1}/{2}.jsp" />
+	</definition>
+	
+	<!-- aa -->
+	<!-- 	 	 관리자일때 tiles   	  -->
+	 <definition name="tiles-admin" template="/WEB-INF/views/tiles1/index1.jsp">
+		<put-attribute name="menu" value="/WEB-INF/views/tiles1/menu_admin.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles1/nav.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/tiles1/footer.jsp" />
+		<put-attribute name="body" value="" />		
+	</definition>
+	
+	<definition name="admin/*/*" extends="tiles-admin">
+		<put-attribute name="body" value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+	</definition>
+	
+	
+<!-- 	<definition name="common/*" extends="tiles-layout">
+		<put-attribute name="body" value="/WEB-INF/views/common/{1}.jsp" />
+	</definition>
+	 -->
+
+</tiles-definitions>
+

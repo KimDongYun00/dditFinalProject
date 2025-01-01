@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminCertificationMapper">
+	
+	 <!-- 
+	<sql id="certificationName">
+	    <if test="searchType != null  and !searchType.isEmpty()">
+	        and c.cer_name like '%' || #{searchType} || '%'
+	    </if>
+	</sql>
+	셀렉트바이용 검색 -->
+	
+	 <!-- 페이징 처리를 위해 행 count하기 -->
+	<select id="selectCertificationCount" parameterType="pagingVO" resultType="int">
+		  select count(c.cer_no)
+	        from certification c
+	        where 1=1
+	</select>
+
+
+	 <!-- 페이징 처리를 위한 selectCertificationList 쿼리 -->
+	<select id="selectCertificationList" parameterType="pagingVO" resultType="certificationVO">
+		 select
+        d.*
+   	 from (
+        select
+            a.*, row_number() over(order by a.cer_no) as rnum
+        from (
+            select
+                c.cer_no, c.cer_name, c.cer_content, c.file_group_no, c.cer_charge
+            from certification c
+            where 1=1
+            order by c.cer_no
+        ) a
+    ) d
+    	 <![CDATA[
+    where d.rnum >= #{startRow} and d.rnum <= #{endRow}
+	  	  ]]>
+	</select>
+
+
+	<!-- 증명서 발급 활성화/비활성화 처리 
+	<update id="updateCertificationStatus">
+	    update certification
+	    set status = #{status}
+	    where cer_no = #{cerno}
+	</update>
+	-->
+
+
+
+	<!-- 증명서 등록 -->
+	<insert id="insertCertification" parameterType="certificationVO">
+		<selectKey keyProperty="cerNo" resultType="String" order="BEFORE">
+			select 'CER_'||seq_certification.nextval from dual
+		</selectKey>
+		insert into certification(
+					cer_no
+				  , cer_name
+				  , cer_content
+				  , file_group_no
+				  , cer_charge
+				 ) values(
+					#{cerNo}
+				  , #{cerName}
+				  , #{cerContent}
+				  , null
+				  , #{cerCharge}
+				)      
+	</insert>
+
+	<update id="insertFileGroupNoToCertification" parameterType="certificationVO">
+		update certification
+		set 
+			file_group_no = #{fileGroupNo}
+		where cer_no = #{cerNo}
+	</update>
+
+	<!-- 증명서 발급 통계 현황을 위한 조회 -->
+	<select id="certificationStatistics" resultType="certificationVO">
+		select
+       		   cer_name
+   	  	  from certification c, certification_print cp
+         where c.cer_no = cp.cer_no
+	</select>
+	
+	<!-- 증명서 종류 상세보기 -->
+	<select id="certificationDetail" parameterType="String" resultType="certificationVO">
+		select
+				cer_no
+				, cer_name
+				, cer_content
+				, cer_charge
+		from certification
+		where cer_no = #{cerNo}
+	</select>
+	
+	<!-- 증명서 종류 수정 -->
+	<update id="certificationUpdate" parameterType="certificationVO">
+		update  certification
+   		   set
+	 			 cer_content = #{cerContent}
+    			, cer_charge = #{cerCharge}
+ 		 where cer_no = #{cerNo}
+	</update>
+	
+	<!-- 증명서 발급 현황 학과별로 -->
+	<select id="selectByDepartment" resultType="certificationPrintVO">
+		select 
+	    d.dept_name,
+	    count(cp.cer_pri_no)
+			from 
+			    certification_print cp
+			join 
+			    student s on cp.stu_no = s.stu_no
+			join 
+			    department d on s.dept_no = d.dept_no  
+			group by 
+			    d.dept_name
+	</select>
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

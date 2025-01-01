@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminLectureMapper">
+
+	<sql id="searchType01">
+		<if test="searchType != '99'">
+			
+		</if>
+	</sql>
+	
+	<select id="selectLectureCount" parameterType="pagingVO">
+		select count(lec_no)
+		from lecture
+		where 1=1
+		<include refid="searchType01"/>
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

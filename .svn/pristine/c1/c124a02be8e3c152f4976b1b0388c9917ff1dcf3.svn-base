@@ -1,0 +1,25 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ScholarshipVO;
+
+public interface IAdminScholarshipService {
+
+	List<ScholarshipVO> getScholarshipList();
+	
+	List<ScholarshipVO> getScholarshipRequestList();
+	
+	List<ScholarshipVO> getScholarshipRequestDetail(String schRecNo); // 장학 신청 내역 세부 조회
+	
+	List<ScholarshipVO> scholarshipDetail(String schNo); // 장학 종류 세부 조회
+
+	boolean scholarshipRequestsApprove(List<String> scholarshipIds);	// 미승인건 일괄 처리
+	
+	List<ScholarshipVO> getUnApproveScholarshipRequestList(String comDetCNo);
+	
+	boolean scholarshipRequestApprove(String schRecNo);	// 미승인건 개별 승인 처리
+	
+	boolean scholarshipRequestWait(String schRecNo);	// 미승인건 개별 반려 처리
+	
+}

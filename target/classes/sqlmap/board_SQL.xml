@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.NotificationMapper">
+
+
+	<!-- 페이지 처리 전 리스트 -->
+	<!-- <select id="list" resultType="kr.or.ddit.vo.BoardVO"> -->
+	<!-- SELECT bo_no, emp_no, bo_title, bo_content, bo_cnt, bo_date, file_group_no -->
+	<!-- FROM board -->
+	<!-- ORDER BY bo_no DESC -->
+	<!-- </select> -->
+
+	<!-- 페이지 -->
+	<select id="list" parameterType="hashMap"
+    resultType="kr.or.ddit.vo.BoardVO">
+    SELECT T.*
+    FROM (
+    SELECT row_number() over(ORDER BY bo_no
+    DESC) rnum, bo_no, emp_no, bo_title,
+    bo_content, bo_cnt, TO_CHAR(bo_date, 'YYYY-MM-DD') AS bo_date,
+    file_group_no
+    FROM board
+    WHERE 1=1
+    AND (bo_title LIKE '%' || #{keyword}
+    || '%' OR bo_content LIKE '%' ||
+    #{keyword} || '%')
+    ) T
+    WHERE T.rnum
+    BETWEEN (#{page} * #{itemsPerPage}) - (#{itemsPerPage} - 1)
+    AND
+    (#{page} * #{itemsPerPage})
+</select>
+
+	<!-- 페이지 -->
+	<select id="getBoardCount" parameterType="hashMap"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM board
+		WHERE 1=1
+		AND (bo_title LIKE '%' || #{keyword} || '%' OR bo_content LIKE '%' ||
+		#{keyword} || '%')
+	</select>
+
+	<select id="detail" parameterType="String"
+    resultType="kr.or.ddit.vo.BoardVO">
+    SELECT bo_no, emp_no, bo_title, bo_content, bo_cnt,
+    TO_CHAR(bo_date, 'YYYY-MM-DD') AS bo_date, file_group_no
+    FROM board
+    WHERE bo_no = #{boNo}
+</select>
+
+	<select id="search" parameterType="String"
+    resultType="kr.or.ddit.vo.BoardVO">
+    SELECT bo_no, emp_no, bo_title, bo_content, bo_cnt,
+    TO_CHAR(bo_date, 'YYYY-MM-DD') AS bo_date, file_group_no
+    FROM board
+    WHERE bo_title LIKE '%' || #{keyword}
+    || '%' OR bo_content LIKE '%' ||
+    #{keyword} || '%'
+</select>
+
+	<update id="incrementViewCount" parameterType="String">
+		UPDATE board
+		SET
+		bo_cnt = bo_cnt + 1
+		WHERE bo_no = #{boNo}
+	</update>
+
+	<select id="selectNotice" resultType="boardVO">
+    SELECT bo_title
+    FROM board
+    ORDER BY TO_CHAR(bo_date, 'YYYY-MM-DD') DESC 
+</select>
+
+
+
+
+
+
+</mapper>
+
+
+
+	
+

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ITuitionMapper">
+
+	<select id="getTuitionListByDeptNo" parameterType="String" resultType="tuitionVO">
+		select TUI_NO,DEPT_NO,TUI_PAYMENT,com_det_b_no
+		,(select com_det_name from common_code_detail where com_det_no = com_det_b_no) bankName
+		,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		from tuition
+		where dept_no = #{deptNo}
+	</select>
+	
+	<insert id="insertTuition" parameterType="tuitionVO">
+		insert into tuition (
+			TUI_NO,DEPT_NO,TUI_PAYMENT,COM_DET_B_NO,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		) values(
+			'TUI_'||seq_tuition.nextval, #{deptNo}, #{tuiPayment}, #{comDetBNo}, #{tuiAccount}
+			, #{tuiSdate}, #{tuiEdate}, #{year}, #{semester}
+		)
+	</insert>
+
+	<!-- 증명서 납부 현황 조회를 위한 데이터 -->
+	<select id="tuitionStatistics" resultType="tuitionVO">
+		select
+		       tui_pay_yn
+		  from tuition_payment     
+	</select>
+	
+	
+	
+	<select id="selectTuitionCount" parameterType="pagingVO" resultType="int">
+		select count(a.tui_no)
+		from tuition a
+		where 1=1
+		<if test="searchWord != ''">
+			and a.dept_no = (select b.dept_no 
+							   from department b 
+							  where b.dept_name = #{searchWord})
+		</if>
+		<if test="searchYear != 99">
+			and a.year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and a.semester = #{searchSemester}
+		</if>
+	</select>
+	
+	<select id="getTuitionList" parameterType="pagingVO" resultType="tuitionVO">
+		select 
+			a.TUI_NO
+			,a.DEPT_NO
+			,(select b.dept_name 
+				from department b 
+			   where b.dept_no = a.dept_no) dept_name
+			,a.TUI_PAYMENT
+			,a.COM_DET_B_NO
+			,(select b.com_det_name
+				from common_code_detail b
+			   where b.com_det_no = a.com_det_b_no) bankName
+			,a.TUI_ACCOUNT
+			,a.TUI_SDATE
+			,a.TUI_EDATE
+			,a.YEAR
+			,a.SEMESTER
+		from tuition a
+		where 1=1
+		<if test="searchWord != ''">
+			and a.dept_no = (select b.dept_no 
+							   from department b 
+							  where b.dept_name like '%'|| #{searchWord} ||'%')
+		</if>
+		<if test="searchYear != 99">
+			and a.year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and a.semester = #{searchSemester}
+		</if>
+	</select>
+	
+	<select id="getYearList" resultType="String">
+		select distinct(YEAR)
+		from tuition
+	</select>
+	
+	<insert id="insertTuition2" parameterType="tuitionVO">
+		insert into tuition (
+			TUI_NO,DEPT_NO,TUI_PAYMENT,COM_DET_B_NO,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		) values(
+			'TUI_'||seq_tuition.nextval, #{deptNo}, #{tuiPayment}, #{comDetBNo}, #{tuiAccount}
+			, #{tuiSdate}, #{tuiEdate}, #{year}, #{semester}
+		)
+	</insert>
+	
+	<update id="updateTuition" parameterType="tuitionVO">
+		update tuition 
+		set 
+			DEPT_NO = #{deptNo}
+			,TUI_PAYMENT = #{tuiPayment}
+			,COM_DET_B_NO = #{comDetBNo}
+			,TUI_ACCOUNT = #{tuiAccount}
+			,TUI_SDATE = #{tuiSdate}
+			,TUI_EDATE = #{tuiEdate}
+			,YEAR = #{year}
+			,SEMESTER = #{semester}
+		where tui_no = #{tuiNo}
+	</update>
+	
+	<delete id="deleteTuition" parameterType="tuitionVO">
+		delete from tuition
+		where tui_no = #{tuiNo}
+	</delete>
+	
+		
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

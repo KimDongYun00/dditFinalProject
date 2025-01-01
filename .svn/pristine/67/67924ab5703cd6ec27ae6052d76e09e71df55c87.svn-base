@@ -1,0 +1,75 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IAdminScholarshipMapper;
+import kr.or.ddit.service.admin.inter.IAdminScholarshipService;
+import kr.or.ddit.vo.ScholarshipVO;
+
+@Service
+public class AdminScholarshipServiceImpl implements IAdminScholarshipService {
+
+    @Inject
+    private IAdminScholarshipMapper scholarshipMapper;
+
+    // 장학 종류 관련------------
+    // 장학금 종류 리스트
+    @Override
+    public List<ScholarshipVO> getScholarshipList() {
+        return scholarshipMapper.getScholarshipList();
+    }
+
+    @Override
+    public int scholarshipInsert(ScholarshipVO scholarshipVO) {
+        return scholarshipMapper.scholarshipInsert(scholarshipVO);
+    }
+
+    @Override
+    public List<ScholarshipVO> scholarshipDetail(String schNo) {
+        return scholarshipMapper.scholarshipDetail(schNo);
+    }
+
+    @Override
+    public int deleteScholarship(String schNo) {
+        return scholarshipMapper.deleteScholarship(schNo);
+    }
+
+    //-----------------------------------------------------------------------
+    // 장학금 신청 관련
+    @Override
+    public List<ScholarshipVO> getScholarshipRequestDetail(String schRecNo) {
+        return scholarshipMapper.getScholarshipRequestDetail(schRecNo);
+    }
+
+    @Override
+    public boolean scholarshipRequestsApprove(List<String> scholarshipIds) {
+        return scholarshipMapper.scholarshipRequestsApprove(scholarshipIds);
+    }
+
+    @Override
+    public List<ScholarshipVO> getUnApproveScholarshipRequestList(String comDetCNo) {
+        return scholarshipMapper.getUnApproveScholarshipRequestList(comDetCNo);
+    }
+
+	@Override
+	public List<ScholarshipVO> getScholarshipRequestList() {
+		return scholarshipMapper.getScholarshipRequestList();
+	}
+
+	@Override
+	public boolean scholarshipRequestApprove(String schRecNo) {
+		return scholarshipMapper.scholarshipRequestApprove(schRecNo);
+	}
+
+	@Override
+	public boolean scholarshipRequestWait(String schRecNo, String rejContent) {
+		return scholarshipMapper.scholarshipRequestWait(schRecNo, rejContent);
+	}
+
+
+
+}

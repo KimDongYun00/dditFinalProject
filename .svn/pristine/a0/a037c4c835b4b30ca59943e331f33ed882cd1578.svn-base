@@ -1,0 +1,20 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class BoardVO {
+	private int boNo; 			// 공지사항 번호 
+	private String boTitle;		// 공지사항 제목
+	private String boContent;	// 공지사항 내용
+	private String boWriter;	// 공지사항 작성자
+	private String boDate;		// 공지사항 날짜
+	private int boHot;			// 공지사항 조회수
+	private int suggestion;		// 공지사항 추천수
+	
+	
+	
+	
+	
+
+}

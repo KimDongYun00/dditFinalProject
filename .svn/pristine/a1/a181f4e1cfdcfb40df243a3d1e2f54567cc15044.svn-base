@@ -1,0 +1,52 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<h4 class="py-3 mb-4">과목관리</h4>
+	<div class="row">
+		<div class="col-xl-12">
+			<div class="card mb-4 bg-white">
+				<h5 class="card-header">과목등록</h5>
+				<hr class="my-0">
+				<div class="card-body">
+					<form action="" method="post">
+						<div class="row mb-3">
+							<label class="col-sm-2 col-form-label" for="subName"><h5>과목명</h5></label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="subName" id="subName">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

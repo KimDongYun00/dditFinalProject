@@ -1,0 +1,46 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IAdminFacMapper;
+import kr.or.ddit.service.admin.inter.IAdminFacilityService;
+import kr.or.ddit.vo.BuildingVO;
+
+@Service
+public class AdminFacilityServiceImpl implements IAdminFacilityService {
+
+	@Inject
+	private IAdminFacMapper facMapper;
+	
+	@Override
+	public List<BuildingVO> getBuildingList() {
+		return facMapper.getBuildingList();
+	}
+
+	@Override
+	public List<BuildingVO> getLecRoomFacilityList() {
+		return facMapper.getLecRoomFacilityList();
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

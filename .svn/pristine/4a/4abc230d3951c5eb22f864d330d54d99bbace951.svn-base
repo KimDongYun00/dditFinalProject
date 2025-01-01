@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IScoreMapper">
+
+	<select id="getStudentScoreList" parameterType="String" resultType="map">
+		select 
+		    a.STU_NO
+			,(select b.dept_name from department b where b.dept_no = a.dept_no) dept_name
+			,STU_YEAR
+			,STU_NAME
+		    ,(select count(att_no) * 2
+		        from attendance b
+		       where b.stu_no = a.stu_no
+		         and com_det_a_no = 'A0101'
+		         and b.lec_no = 'LEC_63')
+		    +(select count(att_no) * 1
+		        from attendance b
+		       where b.stu_no = a.stu_no
+		         and com_det_a_no = 'A0103'
+		         and b.lec_no = 'LEC_63') att_Score
+		    ,(select sum(exam_sub_score)
+		        from exam_submit b
+		       where b.stu_no = a.stu_no
+		         and b.exam_que_no in (select c.exam_que_no
+		                                from exam_question c
+		                               where c.exam_no in (select d.exam_no
+		                                                    from exam d
+		                                                   where d.lec_no = 'LEC_63'
+		                                                     and com_det_h_no = 'H0101'))) mid_score
+		    ,(select sum(exam_sub_score)
+		        from exam_submit b
+		       where b.stu_no = a.stu_no
+		         and b.exam_que_no in (select c.exam_que_no
+		                                from exam_question c
+		                               where c.exam_no in (select d.exam_no
+		                                                    from exam d
+		                                                   where d.lec_no = 'LEC_63'
+		                                                     and com_det_h_no = 'H0102'))) last_score 
+		    ,(select sum(exam_sub_score)
+		        from exam_submit b
+		       where b.stu_no = a.stu_no
+		         and b.exam_que_no in (select c.exam_que_no
+		                                from exam_question c
+		                               where c.exam_no in (select d.exam_no
+		                                                    from exam d
+		                                                   where d.lec_no = 'LEC_63'
+		                                                     and com_det_h_no = 'H0103'))) etc_score
+		    ,(select sum(b.ass_sub_score)
+		        from assignment_submit b
+		       where b.stu_no = a.stu_no
+		         and b.ass_no in (select c.ass_no
+		                            from assignment c
+		                           where c.lec_no = 'LEC_63')) ass_score                                                    
+		from student a
+		where a.stu_no in (select z.stu_no from course z where z.lec_no = 'LEC_63')
+		order by a.stu_no asc
+	</select>
+	
+	<select id="getLectureScoreDetail" resultType="lectureVO" parameterType="String">
+		select 
+			LEC_NO
+			,LEC_NAME
+			,LEC_MID_RATE
+			,LEC_LAST_RATE
+			,LEC_ASS_RATE
+			,LEC_EXAM_RATE
+			,LEC_AD_RATE
+			,LEC_AT_RATE
+		from lecture
+		where lec_no = #{lecNo}
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

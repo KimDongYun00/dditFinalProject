@@ -1,0 +1,38 @@
+package kr.or.ddit.service.student.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.NotificationMapper;
+import kr.or.ddit.service.student.notificationService;
+import kr.or.ddit.vo.BoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class notificationServiceImpl implements notificationService {
+	
+	@Inject
+	private NotificationMapper mapper;
+
+	// 공지사항 조회
+	@Override
+	public BoardVO read(int boardNo) {
+		log.info("service read() 실행...!");
+		BoardVO board = mapper.read(boardNo);
+		return null;
+	}
+	
+	
+
+
+
+
+		
+		
+	
+	
+	
+	
+}

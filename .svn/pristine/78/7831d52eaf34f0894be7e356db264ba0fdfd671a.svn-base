@@ -1,0 +1,21 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping(value = "/student")
+public class StuScholarshipController {
+
+	// 장학 내역 조회 (본인이 받은 장학금)
+	
+	// 장학 종류 조회
+	
+	// 장학금 신청 () => scholarshp_receive 테이블에 반려사유값 null 또는 "" 또는 X 뭐 이런식으로 넣고 관리자 입장에서 반려처리할 때 반려사유값 UPDATE하는 걸로 수정해야 할ㄹ 듯?
+	
+	
+	
+}

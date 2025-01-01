@@ -1,0 +1,45 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.ScholarshipVO;
+
+public interface IAdminScholarshipMapper {
+
+	// 장학 종류 조회
+	List<ScholarshipVO> getScholarshipList();
+
+	// 장학금 종류 등록
+	int scholarshipInsert(ScholarshipVO scholarshipVO);
+
+	// 장학 종류 삭제
+	ScholarshipVO deleteScholarship(String schNo);
+
+	// 장학 종류 세부 조회
+	List<ScholarshipVO> scholarshipDetail(String schNo);
+
+	// 장학 신청 내역 조회
+	List<ScholarshipVO> getScholarshipRequestList();
+
+	// 장학 신청 내역 세부 조회
+	List<ScholarshipVO> getScholarshipRequestDetail(String schNo);
+
+	// 미승인 장학 신청 일괄 처리
+	boolean scholarshipRequestsApprove(List<String> scholarshipIds);
+
+	List<ScholarshipVO> getUnApproveScholarshipRequestList(String comDetCNo);
+
+	// 미승인 장학 신청 개별 승인 처리
+	int scholarshipRequestApprove(String schRecNo);
+
+	// 미승인 장학 신청 개별 반려 처리
+	int scholarshipRequestWait(String schRecNo, String rejContent);
+
+	// 장학 신청 내역 레코드 수 조회
+	int countScholarshipRequests(String status, String search);
+
+	int scholarshipRequestWait(Map<String, String> params);
+
+}

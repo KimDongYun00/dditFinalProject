@@ -1,0 +1,12 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.BuildingVO;
+import kr.or.ddit.vo.FacilityVO;
+
+public interface IAdminFacMapper {
+	List<BuildingVO> getBuildingList();
+	List<BuildingVO> getLecRoomFacilityList();
+	List<FacilityVO> getLecRoomFacilityListByBuiNo(String buiNo);
+}

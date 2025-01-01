@@ -1,0 +1,7 @@
+package kr.or.ddit.service.professor.impl;
+
+import kr.or.ddit.service.professor.IProMypageService;
+
+public class ProMypageServiceImpl implements IProMypageService {
+
+}

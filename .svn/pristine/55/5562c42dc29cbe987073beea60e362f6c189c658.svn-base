@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IDepartmentMapper">
+
+	<select id="getDepartmentsByColleageNo" parameterType="String" resultType="departmentVO">
+		select DEPT_NO,COL_NO
+       		, ((select bui_name from building b where b.bui_no = (select bui_no from facility f where f.fac_no = d.fac_no))||' '||(select fac_name from facility f where f.fac_no = d.fac_no)) fac_name
+       		, (select pro_name from professor p where p.pro_no = d.pro_no) pro_name
+       		,DEPT_NAME,DEPT_CALL,COM_DET_B_NO,DEPT_ACCOUNT
+  		from department d
+ 		where col_no = #{colNo}
+	</select>
+
+	<select id="getDepartmentByDeptNo" parameterType="String" resultType="departmentVO">
+		select DEPT_NO,COL_NO,FAC_NO,PRO_NO,DEPT_NAME,DEPT_CALL,COM_DET_B_NO,DEPT_ACCOUNT,DEPT_CONTENT
+		from department
+		where dept_no = #{deptNo}
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

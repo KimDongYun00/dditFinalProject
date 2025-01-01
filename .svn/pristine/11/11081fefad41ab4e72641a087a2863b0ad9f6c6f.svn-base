@@ -1,0 +1,60 @@
+package kr.or.ddit.service.student.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.FreeBoardMapper;
+import kr.or.ddit.service.student.inter.IFreeBoardService;
+import kr.or.ddit.vo.FreeBoardVO;
+import kr.or.ddit.vo.FreeCommentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class FreeBoardServiceImpl implements IFreeBoardService {
+
+	@Inject
+	private FreeBoardMapper mapper;
+
+	@Override
+	public List<FreeBoardVO> freeList() {
+		List<FreeBoardVO> list = mapper.freeList();
+		return list;
+	}
+
+	@Override
+	public FreeBoardVO detail(String freeNo) {
+		return mapper.detail(freeNo);
+	}
+
+	@Override
+	public void incrementViewCount(String freeNo) {
+		mapper.incrementViewCount(freeNo);
+	}
+
+	@Override
+	public List<FreeBoardVO> search(String keyword) {
+		return mapper.search(keyword);
+	}
+
+	@Override
+	public void freeboardInsert(FreeBoardVO freeboardVO) {
+		mapper.freeboardInsert(freeboardVO);
+
+	}
+
+	@Override
+	public void freecommentInsert(FreeCommentVO freeCommentVO) {
+		mapper.freecommentInsert(freeCommentVO);
+
+	}
+
+	@Override
+	public List<FreeCommentVO> getCommentsByFreeNo(String freeNo) {
+		return mapper.getCommentsByFreeNo(freeNo);
+	}
+
+}

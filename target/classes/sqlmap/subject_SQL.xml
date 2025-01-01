@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminSubjectMapper">
+	
+	<sql id="deptType">
+		<if test="searchType != '99'">
+			and dept_no = #{searchType}
+		</if>
+	</sql>
+	
+	<insert id="insertSubject" parameterType="subjectVO">
+		insert into subject(
+			SUB_NO,DEPT_NO,SUB_NAME,SUB_CONTENT,COM_DET_V_NO
+		) values(
+			'SUB_'||seq_subject.nextval, #{deptNo},#{subName},#{subContent},#{comDetVNo}
+		)
+	</insert>
+
+	<select id="selectSubjectCount" parameterType="pagingVO" resultType="int">
+		select count(sub_no)
+		from subject
+		where 1=1
+		and sub_del = 'N'
+		<include refid="deptType"/>
+	</select>
+	
+	<select id="getSubjectList" parameterType="pagingVO" resultType="subjectVO">
+		select
+            c.*
+        from(
+	        select
+				a.*, row_number() over(order by a.sub_no) AS rnum
+			from(select 
+					SUB_NO
+					,DEPT_NO
+					,(select dept_name from department d where d.dept_no = s.dept_no) dept_name
+					,SUB_NAME,COM_DET_V_NO
+				 from subject s
+				 where 1=1
+				 and sub_del = 'N'
+				 <include refid="deptType"/>
+			     order by SUB_NO )a
+	        )c
+        <![CDATA[
+			where c.rnum >= #{startRow} and c.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<update id="updateAvailable" parameterType="subjectVO">
+		update subject 
+		set com_det_v_no = #{comDetVNo}
+		where sub_no = #{subNo}
+	</update>
+	
+	<select id="getSubjectBySubNo" parameterType="String" resultType="subjectVO">
+		select 
+			SUB_NO,DEPT_NO
+			,(select dept_name from department d where d.dept_no = s.dept_no) dept_name
+			,SUB_NAME,SUB_CONTENT,COM_DET_V_NO,SUB_DEL
+		from subject s
+		where sub_no = #{subNo}
+	</select>
+	
+	<update id="subjectDelete" parameterType="String">
+		update subject
+		set
+			SUB_DEL = 'Y'
+		where SUB_NO = #{subNo}
+	</update>
+	
+	<update id="subjectUpdate" parameterType="subjectVO">
+		update subject
+		set
+			SUB_NAME = #{subName}
+			, sub_content = #{subContent}
+		where SUB_NO = #{subNo}
+	</update>
+	
+	<select id="searchSubject" parameterType="String" resultType="subjectVO">
+		select 
+			SUB_NO
+			,DEPT_NO
+			,(select dept_name from department d where d.dept_no = s.dept_no) dept_name
+			,SUB_NAME
+			,COM_DET_V_NO
+		from subject s
+		where sub_name like '%'||#{subName}||'%'
+		and sub_del = 'N'
+	</select>
+	
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ITuitionMapper">
+
+	<select id="getTuitionListByDeptNo" parameterType="String" resultType="tuitionVO">
+		select TUI_NO,DEPT_NO,TUI_PAYMENT,com_det_b_no
+		,(select com_det_name from common_code_detail where com_det_no = com_det_b_no) bankName
+		,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		from tuition
+		where dept_no = #{deptNo}
+	</select>
+	
+	<insert id="insertTuition" parameterType="tuitionVO">
+		insert into tuition (
+			TUI_NO,DEPT_NO,TUI_PAYMENT,COM_DET_B_NO,TUI_ACCOUNT,TUI_SDATE,TUI_EDATE,YEAR,SEMESTER
+		) values(
+			'TUI_'||seq_tuition.nextval, #{deptNo}, #{tuiPayment}, #{comDetBNo}, #{tuiAccount}
+			, #{tuiSdate}, #{tuiEdate}, #{year}, #{semester}
+		)
+	</insert>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

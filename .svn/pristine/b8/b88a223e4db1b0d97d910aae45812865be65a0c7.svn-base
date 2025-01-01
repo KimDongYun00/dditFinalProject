@@ -1,0 +1,11 @@
+package kr.or.ddit.service.student.facility;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FacilityVO;
+
+public interface IStuFacService {
+
+	public List<FacilityVO> selectList(String facTypeNo);
+
+}

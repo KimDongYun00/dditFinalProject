@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminLectureMapper">
+
+	<sql id="lectureSearchSql">
+		<if test="searchType == 1">
+			and lec_name like '%'||#{searchWord}||'%'
+		</if>
+		<if test="searchType == 2">
+			and b.pro_name like '%'||#{searchWord}||'%'
+		</if>
+		<if test="searchLecType != null and searchLecType != ''">
+			and COM_DET_L_NO = #{searchLecType}
+		</if>
+		<if test="searchConType != null and searchConType != ''">
+			and COM_DET_C_NO = #{searchConType}
+		</if>
+		<if test="searchScore != 99">
+			and lec_score = #{searchScore}
+		</if>
+		<if test="searchOnoff != null and searchOnoff != ''">
+			and lec_onoff = #{searchOnoff}
+		</if>
+		<if test="searchYear != 99">
+			and year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and semester = #{searchSemester}
+		</if>
+		<if test="searchAge != 99">
+			and lec_age = #{searchAge}
+		</if>
+	</sql>
+	
+	<sql id="courseSearchSql">
+		<if test="searchType == 1">
+			and lec_name like '%'||#{searchWord}||'%'
+		</if>
+		<if test="searchType == 2">
+			and b.pro_name like '%'||#{searchWord}||'%'
+		</if>
+		<choose>
+			<when test="searchLecType == 'L0101'">
+				and (COM_DET_L_NO = 'L0102' or COM_DET_L_NO = 'L0103')
+				and (select dept_no 
+					from subject c
+					where c.sub_no = a.sub_no) = #{searchDeptNo}
+			</when>
+			<when test="searchLecType == 'L0102' or searchLecType == 'L0103'">
+				and COM_DET_L_NO = #{searchLecType}
+				and (select dept_no 
+					from subject c
+					where c.sub_no = a.sub_no) = #{searchDeptNo}
+			</when>
+			<when test="searchLecType == 'L0201'">
+				and (COM_DET_L_NO = 'L0202' or COM_DET_L_NO = 'L0203')
+			</when>
+			<when test="searchLecType == 'L0202' or searchLecType == 'L0203'">
+				and COM_DET_L_NO = #{searchLecType}
+			</when>
+		</choose>
+		<if test="searchScore != 99">
+			and lec_score = #{searchScore}
+		</if>
+		<if test="searchOnoff != ''">
+			and lec_onoff = #{searchOnoff}
+		</if>
+		<if test="searchYear != 99">
+			and year = #{searchYear}
+		</if>
+		<if test="searchSemester != 99">
+			and semester = #{searchSemester}
+		</if>
+		<if test="searchAge != 99">
+			and lec_age = #{searchAge}
+		</if>
+	</sql>
+	
+	<sql id="proLecSql">
+		<if test="searchSemester != 99">
+			and semester = #{searchSemester}
+		</if>
+		<if test="searchYear != 99">
+			and year = #{searchYear}
+		</if>
+		<if test="searchConType != ''">
+			and COM_DET_C_NO = #{searchConType}
+		</if>
+	</sql>
+	
+	<select id="selectLectureCount" parameterType="pagingVO" resultType="int">
+		select count(a.lec_no)
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and lec_del = 'N'
+		<include refid="lectureSearchSql"/>
+	</select>
+	
+	<select id="getLectureList" parameterType="pagingVO" resultType="lectureVO">
+		select
+            c.*
+        from( 
+	        select
+				a.*, row_number() over(order by a.LEC_NO) AS rnum
+			from(select 
+					LEC_NO
+					,a.PRO_NO
+					,b.pro_name
+					,SUB_NO
+					,FAC_NO
+					,LEC_NAME
+					,LEC_MAX
+					,LEC_NOW
+					,LEC_ONOFF
+					,LEC_AGE
+					,LEC_SCORE
+					,COM_DET_L_NO
+					,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+					,COM_DET_C_NO
+					,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+					,YEAR
+					,SEMESTER
+				from lecture a, professor b
+				where 1=1
+				and a.pro_no = b.pro_no
+				and lec_del = 'N'
+				<include refid="lectureSearchSql"/>
+				order by a.LEC_NO desc
+				)a
+	        )c
+        <![CDATA[
+			where c.rnum >= #{startRow} and c.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<insert id="insertLecture" parameterType="lectureVO" useGeneratedKeys="true">
+		<selectKey keyProperty="lecNo" resultType="String" order="BEFORE">
+			select 'LEC_'||seq_lecture.nextval from dual
+		</selectKey>
+		insert into lecture(
+			LEC_NO
+			,PRO_NO
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_EXPLAIN
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,COM_DET_C_NO
+			,FILE_GROUP_NO
+			,YEAR
+			,SEMESTER
+			,LEC_MID_RATE
+			,LEC_LAST_RATE
+			,LEC_ASS_RATE
+			,LEC_EXAM_RATE
+			,LEC_AD_RATE
+			,LEC_AT_RATE
+		) values(
+			#{lecNo}
+			,#{proNo}
+			,#{subNo}
+			,#{facNo}
+			,#{lecName}
+			,#{lecExplain}
+			,#{lecMax}
+			,null
+			,#{lecOnoff}
+			,#{lecAge}
+			,#{lecScore}
+			,#{comDetLNo}
+			,'C0101'
+			,null
+			,#{year}
+			,#{semester}
+			,#{lecMidRate}
+			,#{lecLastRate}
+			,#{lecAssRate}
+			,#{lecExamRate}
+			,#{lecAdRate}
+			,#{lecAtRate}
+		)
+	</insert>
+	
+	<insert id="insertLectureTime" parameterType="map">
+		insert into LECTURE_TIMETABLE(
+			LEC_TT_NO
+			,LEC_NO
+			,COM_DET_W_NO
+			,COM_DET_T_NO
+		) values (
+			'LEC_TT_'||seq_LECTURE_TIMETABLE.nextval
+			,#{lecNo}
+			,#{day}
+			,(select com_det_no from common_code_detail where com_det_name = #{time})
+		)
+	</insert>
+	
+	<update id="insertFileGroupNoToLecture" parameterType="lectureVO">
+		update lecture
+		set 
+			file_group_no = #{fileGroupNo}
+		where lec_no = #{lecNo}
+	</update>
+	
+	<select id="getLectureTimeList" parameterType="lectureVO" resultType="lectureTimetableVO">
+		select 
+			LEC_TT_NO
+			,LEC_NO
+			,COM_DET_W_NO
+			,COM_DET_T_NO
+			,(select com_det_name from COMMON_CODE_DETAIL b where b.com_det_no = a.com_det_t_no) com_det_t_name
+		from LECTURE_TIMETABLE a 
+		where lec_no in (select lec_no 
+							from lecture 
+							where fac_no = #{facNo}
+							and year = ${year}
+							and semester = ${semester}
+							and lec_del = 'N')
+	</select>
+	
+	<select id="getLectureByLecNo" parameterType="String" resultType="lectureVO">
+		select 
+			LEC_NO
+			,a.PRO_NO
+			,b.pro_name
+			,SUB_NO
+			,(select sub_name from subject b where b.sub_no = a.sub_no) sub_name
+			,FAC_NO
+			,(select bui_name 
+				from building b 
+				where b.bui_no = (select c.bui_no 
+									from facility c 
+									where c.fac_no = a.fac_no)) bui_name
+			,(select b.fac_name from facility b where b.fac_no = a.fac_no) fac_name						
+			,LEC_NAME
+			,LEC_EXPLAIN
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+			,COM_DET_C_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+			,FILE_GROUP_NO
+			,YEAR
+			,SEMESTER
+			,LEC_MID_RATE
+			,LEC_LAST_RATE
+			,LEC_ASS_RATE
+			,LEC_EXAM_RATE
+			,LEC_AD_RATE
+			,LEC_AT_RATE
+			,REJ_CONTENT
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and lec_del = 'N'
+		and lec_no = #{lecNo}
+	</select>
+	
+	<select id="getLectureTime" parameterType="String" resultType="lectureTimetableVO">
+		select 
+			LEC_TT_NO
+			,LEC_NO
+			,COM_DET_W_NO
+			,COM_DET_T_NO
+			,replace((select com_det_name from COMMON_CODE_DETAIL b where b.com_det_no = a.com_det_t_no), ':', '_') com_det_t_name
+		from LECTURE_TIMETABLE a 
+		where lec_no = #{lecNo}
+	</select>
+	
+	<update id="lectureConfirm" parameterType="String">
+		update lecture
+		set 
+			COM_DET_C_NO = 'C0101',
+			rej_content = null
+		where lec_no = #{lecNo}	
+	</update>
+	
+	<update id="lectureReject" parameterType="map">
+		update lecture
+		set 
+			COM_DET_C_NO = 'C0103',
+			rej_content = #{rejContent}
+		where lec_no = #{lecNo}	
+	</update>
+	
+	<update id="lectureUnConfirm" parameterType="String">
+		update lecture
+		set 
+			COM_DET_C_NO = 'C0102',
+			rej_content = null
+		where lec_no = #{lecNo}	
+	</update>
+	
+	<update id="lectureDelete" parameterType="String">
+		update lecture
+		set 
+			lec_del = 'Y'
+		where lec_no = #{lecNo}
+	</update>
+	
+	<update id="updateLecture" parameterType="lectureVO">
+		update lecture
+		set
+			PRO_NO = #{proNo}
+			,SUB_NO = #{subNo}
+			,FAC_NO = #{facNo}
+			,LEC_NAME = #{lecName}
+			,LEC_EXPLAIN = #{lecExplain}
+			,LEC_MAX = #{lecMax}
+			,LEC_ONOFF = #{lecOnoff}
+			,LEC_AGE = #{lecAge}
+			,LEC_SCORE = #{lecScore}
+			,COM_DET_L_NO = #{comDetLNo}
+			,YEAR = #{year}
+			,SEMESTER = #{semester}
+			,LEC_MID_RATE = #{lecMidRate}
+			,LEC_LAST_RATE = #{lecLastRate}
+			,LEC_ASS_RATE = #{lecAssRate}
+			,LEC_EXAM_RATE = #{lecExamRate}
+			,LEC_AD_RATE = #{lecAdRate}
+			,LEC_AT_RATE = #{lecAtRate}
+		where lec_no = #{lecNo}	
+	</update>
+	
+	<delete id="deleteLectureTime" parameterType="lectureVO">
+		delete from LECTURE_TIMETABLE
+		where lec_no = #{lecNo}
+	</delete>
+	
+	<select id="selectCourseCount" parameterType="pagingVO" resultType="int">
+		select count(a.lec_no)
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and lec_del = 'N'
+		and a.com_det_c_no = 'C0101'
+		<include refid="courseSearchSql"/>
+	</select>
+	
+	<select id="getCourseList" parameterType="pagingVO" resultType="lectureVO">
+		select 
+			LEC_NO
+			,a.PRO_NO
+			,b.pro_name
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+			,COM_DET_C_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+			,YEAR
+			,SEMESTER
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and lec_del = 'N'
+		and a.com_det_c_no = 'C0101'
+		and a.lec_no not in (select c.lec_no from course_cart c where c.stu_no = #{searchStudent})
+		and a.lec_no not in (select c.lec_no from course c where c.stu_no = #{searchStudent})
+		<include refid="courseSearchSql"/>
+		order by a.LEC_NO desc
+	</select>
+	
+	<select id="getMyCourseCartList" parameterType="pagingVO" resultType="lectureVO">
+		select 
+			LEC_NO
+			,a.PRO_NO
+			,b.pro_name
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+			,COM_DET_C_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+			,YEAR
+			,SEMESTER
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and year = #{searchYear}
+		and semester = #{searchSemester}
+		and a.lec_no in (select c.lec_no from course_cart c where c.stu_no = #{searchStudent})
+	</select>
+	
+	<select id="getMyCourseList" parameterType="pagingVO" resultType="lectureVO">
+		select 
+			LEC_NO
+			,a.PRO_NO
+			,b.pro_name
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+			,COM_DET_C_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+			,YEAR
+			,SEMESTER
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and year = #{searchYear}
+		and semester = #{searchSemester}
+		and a.lec_no in (select c.lec_no from course c where c.stu_no = #{searchStudent})
+	</select>
+	
+	<insert id="reserveCourseCart" parameterType="courseVO">
+		insert into course_cart(
+			COU_CART_NO,LEC_NO,STU_NO
+		)values(
+			'COU_CART_'||seq_course_cart.nextval, #{lecNo}, #{stuNo}
+		)
+	</insert>
+	
+	<delete id="cancelCourseCart" parameterType="courseVO">
+		delete from course_cart
+		where 
+			LEC_NO = #{lecNo}
+			and STU_NO = #{stuNo}
+	</delete>
+	
+	<delete id="cancelCourse" parameterType="courseVO">
+		delete from course
+		where 
+			LEC_NO = #{lecNo}
+			and STU_NO = #{stuNo}
+	</delete>
+	
+	<select id="selectProLectureCount" parameterType="pagingVO" resultType="int">
+		select count(a.lec_no)
+		from lecture a, professor b
+		where 1=1
+		and a.pro_no = b.pro_no
+		and a.pro_no = #{searchWord}
+		and lec_del = 'N'
+		<include refid="proLecSql"/>
+	</select>
+	
+	<select id="getProLectureList" parameterType="pagingVO" resultType="lectureVO">
+		select
+            c.*
+        from( 
+	        select
+				a.*, row_number() over(order by a.LEC_NO) AS rnum
+			from(
+				select 
+					LEC_NO
+					,a.PRO_NO
+					,b.pro_name
+					,SUB_NO
+					,FAC_NO
+					,LEC_NAME
+					,LEC_MAX
+					,LEC_NOW
+					,LEC_ONOFF
+					,LEC_AGE
+					,LEC_SCORE
+					,COM_DET_L_NO
+					,(select com_det_name from common_code_detail where com_det_no = com_det_l_no) com_det_l_name
+					,COM_DET_C_NO
+					,(select com_det_name from common_code_detail where com_det_no = com_det_c_no) com_det_c_name
+					,YEAR
+					,SEMESTER
+				from lecture a, professor b
+				where 1=1
+				and a.pro_no = b.pro_no
+				and a.pro_no = #{searchWord}
+				and lec_del = 'N'
+				<include refid="proLecSql"/>
+				order by a.LEC_NO desc
+				)a
+	        )c
+        <![CDATA[
+			where c.rnum >= #{startRow} and c.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

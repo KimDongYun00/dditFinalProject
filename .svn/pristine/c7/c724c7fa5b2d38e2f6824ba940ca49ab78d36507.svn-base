@@ -1,0 +1,42 @@
+package kr.or.ddit.service.student.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.FreeBoardMapper;
+import kr.or.ddit.service.student.FreeBoardService;
+import kr.or.ddit.vo.FreeBoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class FreeBoardServiceImpl implements FreeBoardService {
+
+	@Inject
+	private FreeBoardMapper mapper;
+
+	@Override
+	public List<FreeBoardVO> freeList() {
+		List<FreeBoardVO> list = mapper.freeList();
+		return list;
+	}
+
+	@Override
+	public FreeBoardVO detail(String freeNo) {
+		return mapper.detail(freeNo);
+	}
+
+	@Override
+	public void incrementViewCount(String freeNo) {
+		mapper.incrementViewCount(freeNo);
+	}
+
+	@Override
+	public List<FreeBoardVO> search(String keyword) {
+		return mapper.search(keyword);
+	}
+
+}

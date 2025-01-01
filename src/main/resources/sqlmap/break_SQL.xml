@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.BreakMapper">
+
+	<!-- 페이징처리 헤더  -->
+	<sql id="pagingHeader">
+		select
+	           rn.*
+	       from( 
+	        select
+				tbl.*, row_number() over(order by tbl.bre_regdate desc) AS rnum
+			from(
+	</sql>
+	
+	<!-- 페이징처리 푸터 -->
+	<sql id="pagingFooter">
+		) tbl
+	        )rn
+        <![CDATA[
+			where rn.rnum >= #{startRow} and rn.rnum <= #{endRow}	
+		]]> 
+	</sql>	
+	
+	<!-- 학생이 자기가 신청한 학적 신청 내역 조회 -->
+	<select id="selectBreakList" parameterType="string" resultType="breakVO">
+		select bre_no
+		     , stu_no
+		     , bre_content
+		     , to_char(bre_regdate, 'yyyy-mm-dd') bre_regdate
+		     , com_det_c_no
+		     , com_det_m_no
+		     , year
+		     , semester
+		     , rej_content
+		  from BREAK
+		 where stu_no = #{username}    
+	</select>
+	<!-- 학적변경신청 -->
+	<insert id="insertBreak" parameterType="breakVO">
+		insert into break(
+						   bre_no
+					     , stu_no
+					     , bre_content
+					     , bre_regdate
+					     , com_det_c_no
+					     , com_det_m_no
+					     , year
+					     , semester
+				)
+		values(
+						   'BRE_'||lpad(seq_break.nextval, 4, '0')
+					     , #{stuNo}
+					     , #{breContent}
+					     , sysdate
+					     , 'C0102'
+					     , #{comDetMNo}
+					     , #{year}
+					     , #{semester}
+				)
+	</insert>
+	
+	<!-- 학적신청상세내역 -->
+	<select id="breakDetail" parameterType="string" resultType="breakVO">
+		select b.bre_no
+		     , b.stu_no
+		     , b.bre_content
+		     , to_char(b.bre_regdate, 'yyyy-mm-dd') bre_regdate
+		     , b.com_det_c_no
+		     , b.com_det_m_no
+		     , b.year
+		     , b.semester
+		     , b.rej_content
+		     , s.stu_name
+		     , s.dept_no
+		  from break b, student s
+		 where bre_no = #{breNo}
+		   and b.stu_no = s.stu_no 
+	</select>
+	
+	<delete id="deleteBreak" parameterType="string">
+		delete break
+		 where bre_no = #{breNo}
+	</delete>
+	
+	<update id="updateBreak" parameterType="breakVO">
+		update break
+		   set 
+		       bre_content = #{breContent}
+		     , com_det_M_no = #{comDetMNo}
+		     , year = #{year}
+		     , semester = #{semester}
+		 where bre_no = #{breNo}     
+	</update>
+	
+	<!-- 관리자 학적변경신청 테이블 -->
+	<select id="selEmpBreakList" parameterType="pagingVO" resultType="breakVO">
+	<include refid="pagingHeader"/>
+		select bre_no
+		     , b.stu_no
+		     , bre_content
+		     , bre_regdate
+		     , com_det_c_no
+		     , b.com_det_m_no
+		     , year
+		     , semester
+		     , rej_content
+		     , stu_name
+		     , dept_no
+  		  from break b, student s
+ 		 where b.stu_no = s.stu_no
+ 		 <if test="searchType != '' and searchType == 'C0101'">
+		   and com_det_c_no = 'C0101'
+		 </if>
+		 <if test="searchType != '' and searchType == 'C0102'">
+		   and com_det_c_no = 'C0102'
+		 </if>
+		 <if test="searchType != '' and searchType == 'C0103'">
+		   and com_det_c_no = 'C0103'
+		 </if>
+		 <if test="searchLecType != '99'">
+		   and dept_no = #{searchLecType}
+		 </if>
+		 <if test="searchScore != null and searchScore == 1">			
+		   and stu_name like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="searchScore != null and searchScore == 2">			
+	       and b.stu_no like '%'||#{searchWord}||'%'
+		 </if>
+	<include refid="pagingFooter"/>	 
+	</select>
+	
+	<select id="selEmpBreakCount" parameterType="pagingVO" resultType="int">
+		select count(bre_no)
+		  from break b, student s
+		 where b.stu_no = s.stu_no 
+ 		 <if test="searchType != '' and searchType == 'C0101'">
+		   and com_det_c_no = 'C0101'
+		 </if>
+		 <if test="searchType != '' and searchType == 'C0102'">
+		   and com_det_c_no = 'C0102'
+		 </if>
+		 <if test="searchType != '' and searchType == 'C0103'">
+		   and com_det_c_no = 'C0103'
+		 </if> 
+		 <if test="searchLecType != '99'">
+		   and dept_no = #{searchLecType}
+		 </if>	
+		 <if test="searchScore != null and searchScore == 1">			
+		   and s.stu_name like '%'||#{searchWord}||'%'
+		 </if>
+		 <if test="searchScore != null and searchScore == 2">			
+		   and b.stu_no like '%'||#{searchWord}||'%'
+		 </if>	 
+	</select>
+	
+	<!-- 학과검색 -->
+	<select id="selDepartment" resultType="departmentVO">
+		select dept_no, dept_name
+		  from department
+	</select>
+	
+	<!-- 학적 반려 처리 -->
+	<update id="rejectBreak" parameterType="breakVO">
+		update break
+		   set
+		       rej_content = #{rejContent}
+		     , com_det_c_no = 'C0103'
+		 where bre_no = #{breNo}      
+	</update>
+	
+	<!-- 학적 승인 처리 -->
+	<update id="approveBreak" parameterType="breakVO">
+		update break
+		   set 
+		       com_det_c_no = 'C0101'
+		     , rej_content = null  
+		 where bre_no = #{breNo}		
+	</update>
+	
+	<update id="updateStuBreak" parameterType="breakVO">
+		update student
+		   set 
+		       com_det_m_no = #{comDetMNo}
+		 where stu_no = #{stuNo}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

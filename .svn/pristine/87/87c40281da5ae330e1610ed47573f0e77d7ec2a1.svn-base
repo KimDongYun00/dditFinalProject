@@ -1,0 +1,19 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.LectureTimetableVO;
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IAdminLectureService {
+	public int selectLectureCount(PaginationInfoVO<LectureVO> pagingVO);
+	public List<LectureVO> getLectureList(PaginationInfoVO<LectureVO> pagingVO);
+	public void insertLecture(LectureVO lectureVO);
+	public void insertLectureTime(LectureVO lectureVO);
+	public List<LectureTimetableVO> getLectureTimeList(LectureVO lectureVO);
+	public LectureVO getLectureByLecNo(String lecNo);
+	public List<LectureTimetableVO> getLectureTime(String lecNo);
+	public void lectureConfirm(String lecNo);
+	public void lectureReject(String lecNo);
+}

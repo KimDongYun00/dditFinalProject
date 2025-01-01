@@ -1,0 +1,19 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.BreakVO;
+
+public interface BreakMapper {
+
+	public List<BreakVO> selectBreakList(String username);
+
+	public int insertBreak(BreakVO breakVO);
+
+	public BreakVO breakDetail(String breNo);
+
+	public int deleteBreak(String breNo);
+
+	public int updateBreak(BreakVO breakVO);
+	
+}

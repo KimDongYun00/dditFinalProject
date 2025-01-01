@@ -1,0 +1,112 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IAdminFacMapper;
+import kr.or.ddit.mapper.IFacilityMapper;
+import kr.or.ddit.service.admin.inter.IAdminFacilityService;
+import kr.or.ddit.vo.BuildingVO;
+import kr.or.ddit.vo.FacilityVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+@Service
+public class AdminFacilityServiceImpl implements IAdminFacilityService {
+
+	@Inject
+	private IAdminFacMapper facMapper;
+	
+	@Inject	
+	private IFacilityMapper mapper;
+	
+	@Override
+	public List<BuildingVO> getBuildingList() {
+		return facMapper.getBuildingList();
+	}
+
+	@Override
+	public List<BuildingVO> getLecRoomFacilityList() {
+		return facMapper.getLecRoomFacilityList();
+	}
+	@Override
+	public List<FacilityVO> selectFacility() {
+		
+		return mapper.selectFacility();
+	}
+
+	@Override 
+	public List<FacilityVO> selectFacilityType(String facTypeNo) {
+		
+		return mapper.selectFacilityType(facTypeNo);
+	}
+
+	@Override
+	public List<BuildingVO> selectBuildingList() {
+		
+		return mapper.selectBuildingList();
+	}
+
+	@Override
+	public FacilityVO facDetail(String facNo) {
+		
+		return mapper.facDetail(facNo);
+	}
+
+
+
+	@Override
+	public List<FacilityVO> getLecRoomFacilityListByBuiNo(String buiNo) {
+		return facMapper.getLecRoomFacilityListByBuiNo(buiNo);
+	}
+
+
+	@Override
+	public int insertFacility(FacilityVO facilityVO) {
+		
+		return mapper.facInsert(facilityVO);
+	}
+
+	@Override
+	public int updateFacility(FacilityVO facilityVO) {
+		
+		return mapper.facUpdate(facilityVO);
+	}
+
+	@Override
+	public int deleteFacility(String facNo) {
+		
+		return mapper.facDelete(facNo);
+	}
+
+	@Override
+	public int selectFacilityCount(PaginationInfoVO<FacilityVO> pagingVO) {
+		
+		return mapper.selectFacilityCount(pagingVO);
+	}
+
+	@Override
+	public List<FacilityVO> selectFacilityList(PaginationInfoVO<FacilityVO> pagingVO) {
+		
+		return mapper.selectFacilityList(pagingVO);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

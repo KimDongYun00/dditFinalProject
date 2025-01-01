@@ -1,0 +1,90 @@
+package kr.or.ddit.service.exam;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IExamMapper;
+import kr.or.ddit.vo.ExamQuestionSelectVO;
+import kr.or.ddit.vo.ExamQuestionVO;
+import kr.or.ddit.vo.ExamVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.StudentVO;
+
+@Service
+public class ExamServiceImpl implements IExamService {
+
+	
+	@Inject
+	private IExamMapper examMapper;
+	
+		
+	@Override
+	public void insertExam(ExamVO examVO) {
+		examMapper.insertExam(examVO);
+		if(examVO.getExamQueArr() == null) {
+			return;
+		}
+		for(ExamQuestionVO examQueVO : examVO.getExamQueArr()) {
+			examQueVO.setExamNo(examVO.getExamNo());
+			examMapper.insertExamQue(examQueVO);
+			if(examQueVO.getExamQueSelArr() == null) {
+				return;
+			}
+			for(ExamQuestionSelectVO examQueSelVO : examQueVO.getExamQueSelArr()) {
+				examQueSelVO.setExamQueNo(examQueVO.getExamQueNo());
+				examMapper.insertExamQueSel(examQueSelVO);
+			}
+		}
+	}
+
+
+	@Override
+	public List<ExamVO> getExamListByLecNo(PaginationInfoVO<ExamVO> pagingVO) {
+		return examMapper.getExamListByLecNo(pagingVO);
+	}
+
+
+	@Override
+	public ExamVO getExamDetail(String examNo) {
+		return examMapper.getExamDetail(examNo);
+	}
+
+
+	@Override
+	public List<StudentVO> getStudentExamList(String examNo) {
+		return examMapper.getStudentExamList(examNo);
+	}
+	
+	@Override
+	public List<String> getStudentExamSubmitList(String examNo) {
+		return examMapper.getStudentExamSubmitList(examNo);
+	}
+
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

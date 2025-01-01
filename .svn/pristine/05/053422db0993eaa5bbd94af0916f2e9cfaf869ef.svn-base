@@ -1,0 +1,18 @@
+package kr.or.ddit.service.student;
+
+import java.util.List;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface NotificationService {
+	
+	
+	public List<BoardVO> list();
+
+	public BoardVO detail(String boNo);
+
+	public List<BoardVO> search(String keyword);
+
+	public void incrementViewCount(String boNo);
+	
+}

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IEvaluateMapper">
+
+	
+	<select id="getEvaQueList" resultType="lecEvaQueVO">
+		select 
+			LEC_EVA_QUE_NO
+			,LEC_EVA_QUE_CONTENT
+		from LECTURE_EVALUATE_QUESTION
+	</select>
+	
+	<insert id="insertLecEvaScore" parameterType="lecEvaVO">
+		insert into lecture_evaluate(
+			COU_NO
+			,LEC_EVA_SCORE
+			,LEC_EVA_CONTENT
+			,LEC_EVA_QUE_NO
+		) values (
+			(select cou_no from course where lec_no = #{lecNo} and stu_no = #{stuNo})
+			,#{lecEvaScore}
+			,null
+			,#{lecEvaQueNo}
+		)
+	</insert>
+	
+	<insert id="insertLecEvaContent" parameterType="lecEvaVO">
+		insert into lecture_evaluate(
+			COU_NO
+			,LEC_EVA_SCORE
+			,LEC_EVA_CONTENT
+			,LEC_EVA_QUE_NO
+		) values (
+			(select cou_no from course where lec_no = #{lecNo} and stu_no = #{stuNo})
+			,null
+			,#{lecEvaContent}
+			,'LEC_EVA_QUE_0'
+		)
+	</insert>
+	
+	<select id="checkEvaluate" parameterType="lecEvaVO" resultType="int">
+		select count(a.cou_no)
+		from lecture_evaluate a
+		where a.cou_no = (select b.cou_no from course b where lec_no = #{lecNo} and stu_no = #{stuNo})
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

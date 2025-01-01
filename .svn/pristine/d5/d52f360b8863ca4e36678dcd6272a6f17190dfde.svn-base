@@ -1,0 +1,21 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/student")
+public class StuMypageController {
+
+	// 학생 로그인 초기화면
+	@RequestMapping(value = "/mypage.do", method = RequestMethod.GET)
+	public String mypage(Model model) {
+		// userId로 학생정보 불러와서 마이페이지에 뿌려주고
+		// 학사일정 
+		// 수강테이블을 불러와서 리스트를 출력하는데 맨처음은 강의테이블이랑 그리고 강의 시간표랑 (강의번호)로 조인을 해서 시간표 데이터를 가져옴 
+		return "student/mypage/mypage";
+	}
+	
+}

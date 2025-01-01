@@ -1,0 +1,104 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>맛집 게시판 목록</title>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4868d70e042c8af0b545ccc4222802a1"></script>
+<style>
+    #mapContainer {
+        width: 80%;
+        height: 500px;
+        margin: 0 auto;
+    }
+    #searchContainer {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+    <h2>맛집 게시판 목록</h2>
+
+    <div id="searchContainer">
+        <input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요">
+        <button onclick="searchPlaces()">검색</button>
+    </div>
+    
+    <div id="mapContainer"></div>
+    
+    <script>
+        var mapContainer = document.getElementById('mapContainer'),
+            mapOption = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 중심 좌표
+                level: 5
+            };
+
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        function searchPlaces() {
+            var keyword = document.getElementById('keyword').value;
+            if (!keyword.replace(/^\s+|\s+$/g, '')) {
+                alert('키워드를 입력해주세요!');
+                return false;
+            }
+
+            var ps = new kakao.maps.services.Places(); 
+            ps.keywordSearch(keyword, placesSearchCB); 
+        }
+
+        function placesSearchCB(data, status, pagination) {
+            if (status === kakao.maps.services.Status.OK) {
+                var bounds = new kakao.maps.LatLngBounds();
+                for (var i = 0; i < data.length; i++) {
+                    displayMarker(data[i]);    
+                    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+                }
+                map.setBounds(bounds);
+            } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                alert('검색 결과가 없습니다.');
+                return;
+            } else if (status === kakao.maps.services.Status.ERROR) {
+                alert('검색 중 오류가 발생했습니다.');
+                return;
+            }
+        }
+
+        function displayMarker(place) {
+            var marker = new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(place.y, place.x) 
+            });
+
+            kakao.maps.event.addListener(marker, 'click', function() {
+                var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+                infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+                infowindow.open(map, marker);
+            });
+        }
+    </script>
+    
+    <table border="1" style="width: 80%; margin: 20px auto;">
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>조회수</th>
+            <th>작성일</th> 
+        </tr>
+        <c:forEach var="foodboard" items="${foodboardList}">
+            <tr>
+                <td>${foodboard.food_no}</td>
+                <td><a href="${pageContext.request.contextPath}/student/foodDetail/${foodboard.food_no}">${foodboard.food_title}</a></td>
+                <td>${foodboard.food_writer}</td>
+                <td>${foodboard.food_cnt}</td>
+                <td>${foodboard.food_date}</td>
+            </tr>
+        </c:forEach>
+    </table>
+    <a href="${pageContext.request.contextPath}/student/foodWrite" style="display: block; text-align: center; margin-top: 20px;">새 맛집 등록</a>
+</body>
+</html>

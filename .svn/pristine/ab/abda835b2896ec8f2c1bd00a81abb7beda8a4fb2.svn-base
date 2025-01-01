@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.BreakMapper">
+	<!-- 학생이 자기가 신청한 학적 신청 내역 조회 -->
+	<select id="selectBreakList" parameterType="string" resultType="breakVO">
+		select bre_no
+		     , stu_no
+		     , bre_content
+		     , to_char(bre_regdate, 'yyyy-mm-dd') bre_regdate
+		     , com_det_c_no
+		     , com_det_m_no
+		     , year
+		     , semester
+		     , rej_content
+		  from BREAK
+		 where stu_no = #{username}    
+	</select>
+	<!-- 학적변경신청 -->
+	<insert id="insertBreak" parameterType="breakVO">
+		insert into break(
+						   bre_no
+					     , stu_no
+					     , bre_content
+					     , bre_regdate
+					     , com_det_c_no
+					     , com_det_m_no
+					     , year
+					     , semester
+				)
+		values(
+						   'BRE_'||lpad(seq_break.nextval, 4, '0')
+					     , #{stuNo}
+					     , #{breContent}
+					     , sysdate
+					     , 'C0102'
+					     , #{comDetMNo}
+					     , #{year}
+					     , #{semester}
+				)
+	</insert>
+	
+	<!-- 학적신청상세내역 -->
+	<select id="breakDetail" parameterType="string" resultType="breakVO">
+		select bre_no
+		     , stu_no
+		     , bre_content
+		     , to_char(bre_regdate, 'yyyy-mm-dd') bre_regdate
+		     , com_det_c_no
+		     , com_det_m_no
+		     , year
+		     , semester
+		     , rej_content
+		  from break
+		 where bre_no = #{breNo} 
+	</select>
+	
+	<delete id="deleteBreak" parameterType="string">
+		delete break
+		 where bre_no = #{breNo}
+	</delete>
+	
+	<update id="updateBreak" parameterType="breakVO">
+		update break
+		   set 
+		       bre_content = #{breContent}
+		     , com_det_M_no = #{comDetMNo}
+		     , year = #{year}
+		     , semester = #{semester}
+		 where bre_no = #{breNo}     
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

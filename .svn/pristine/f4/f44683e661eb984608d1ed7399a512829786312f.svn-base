@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminLectureMapper">
+
+	<sql id="searchType01">
+		<if test="searchType != '99'">
+			
+		</if>
+	</sql>
+	
+	<select id="selectLectureCount" parameterType="pagingVO">
+		select count(lec_no)
+		from lecture
+		where 1=1
+		<include refid="searchType01"/>
+	</select>
+	
+	<insert id="insertLecture" parameterType="lectureVO">
+		insert into lecture(
+			LEC_NO
+			,PRO_NO
+			,SUB_NO
+			,FAC_NO
+			,LEC_NAME
+			,LEC_EXPLAIN
+			,LEC_MAX
+			,LEC_NOW
+			,LEC_ONOFF
+			,LEC_AGE
+			,LEC_SCORE
+			,COM_DET_L_NO
+			,COM_DET_C_NO
+			,FILE_GROUP_NO
+			,YEAR
+			,SEMESTER
+			,LEC_MID_RATE
+			,LEC_LAST_RATE
+			,LEC_ASS_RATE
+			,LEC_EXAM_RATE
+			,LEC_AD_RATE
+			,LEC_AT_RATE
+		) values(
+			'LEC_'||seq_lecture.nextval
+			,#{proNo}
+			,#{subNo}
+			,#{facNo}
+			,#{lecName}
+			,#{lecExplain}
+			,#{lecMax}
+			,null
+			,#{lecOnoff}
+			,#{lecAge}
+			,#{lecScore}
+			,#{comDetLNo}
+			,'C0101'
+			,null
+			,#{year}
+			,#{semester}
+			,#{lecMidRate}
+			,#{lecLastRate}
+			,#{lecAssRate}
+			,#{lecExamRate}
+			,#{lecAdRate}
+			,#{lecAtRate}
+		)
+	</insert>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,160 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags"
+	prefix="sec"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Assignment Detail</title>
+<style type="text/css">
+#pagingArea {
+	display: flex;
+	justify-content: center;
+}
+
+
+</style>
+</head>
+<body>
+	<div class="content-wrapper">
+		<div class="container-xxl flex-grow-1 container-p-y">
+
+			<h2 class="fw-bold py-3 mb-4">홈 > 과제관리</h2>
+			<hr>
+			<div class="col-lg">
+				<div class="card">
+					<div class="card-body">
+						<h3>
+							<b>${assignmentVO.assTitle }</b>
+						</h3>
+						<div id="date">
+							<fmt:parseDate var="regdate" pattern="yyyy-MM-dd HH:mm:ss.SSS" value="${assignmentVO.assRegdate}" />
+							<fmt:formatDate var="regdate" pattern="yyyy-MM-dd" value="${regdate}" />
+							<span>등록일 : ${regdate}</span>
+							<fmt:parseDate var="edate" pattern="yyyy-MM-dd HH:mm:ss.SSS" value="${assignmentVO.assEdate}" />
+							<fmt:formatDate var="edate" pattern="yyyy-MM-dd HH:mm" value="${edate}"/>
+							<span>마감일시 : ${edate}</span>
+						</div>
+					</div>
+					
+					<hr class="m-0" />
+					<div class="card-body">
+						<h5>${assignmentVO.assContent }</h5>
+
+					</div>
+				</div>
+			</div>
+			<br>
+			<div class="container mt-5">
+			    <div class="row">
+			        <div class="col">
+			        	<input type="button" id="modifyBtn" value="수정" class="btn btn-primary">
+			        </div>
+			        <div class="col">
+			        	<input type="button" id="deleteBtn" value="삭제" class="btn btn-danger">
+			        	<form action="/professor/deleteAssignment.do" method="post" id="delForm">
+			        		<input type="hidden" name="assNo" value="${assignmentVO.assNo }" >
+			        		<input type="hidden" name="lecNo" value="${assignmentVO.lecNo }" >
+			        		<sec:csrfInput />
+			        	</form>
+			        </div>
+			    </div>
+			</div>
+			
+			<hr class="my-5" />
+
+			<div class="card">
+				<div class="table-responsive text-nowrap">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>학번</th>
+								<th>이름</th>
+								<th>내용</th>
+								<th>제출일시</th>
+								<th>파일</th>
+								<th>상태</th>
+								<th>점수</th>
+							</tr>
+						</thead>
+						<tbody class="table-border-bottom-0">
+							<c:set var="courseVO" value="${pagingVO.dataList}"/>
+							<c:forEach var="list" items="${courseVO}">
+							<tr>
+ 									    <td>${list.stuNo}</td>
+ 									    <td>${list.studentVO.stuName }</td>
+ 									    <td>
+ 									    	<c:if test="${empty list.studentVO.assignmentSubmitVOList}"> </c:if> 
+ 									    	<c:if test="${not empty list.studentVO.assignmentSubmitVOList}">${list.studentVO.assignmentSubmitVOList[0].assSubComment }</c:if>
+ 									    </td>
+ 									    <td>
+ 									    	<c:if test="${empty list.studentVO.assignmentSubmitVOList}"> </c:if> 
+ 									    	<c:if test="${not empty list.studentVO.assignmentSubmitVOList}">${list.studentVO.assignmentSubmitVOList[0].assSubDate }</c:if>
+ 									    </td>
+ 									    <td>
+ 									    	<c:if test="${empty list.studentVO.assignmentSubmitVOList}"> </c:if> 
+ 									    	<c:if test="${not empty list.studentVO.assignmentSubmitVOList}">${list.studentVO.assignmentSubmitVOList[0].fileGroupNo }</c:if>
+ 									    </td>
+ 									    <td>
+ 									    	<c:if test="${empty list.studentVO.assignmentSubmitVOList}"><font color="red">미제출 </font></c:if> 
+ 									    	<c:if test="${not empty list.studentVO.assignmentSubmitVOList}"><font color="green">제출완료 </font> </c:if>
+ 									    </td>
+ 									    <td>
+	 									    <div class="input-group input-group-merge">
+												<input type="text" name="assSubScore" value="${list.studentVO.assignmentSubmitVOList[0].assSubScore }">
+												<button type="button" class="btn btn-primary">저장</button>
+											</div>
+										</td>
+ 							</tr>		
+ 							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+				<div class="card-footer clearfix" id="pagingArea">
+					${pagingVO.pagingHTML }
+				</div>
+				<form id="pageInfo">
+					<input type="hidden" name="page" id="page"> 
+					<input type="hidden" name="lecNo" value="${param.lecNo }">
+					<input type="hidden" name="assNo" value="${param.assNo }">
+					<sec:csrfInput />
+				</form>
+				<!--/ Hoverable Table rows -->
+			</div>
+
+
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$(function() {
+		var pagingArea = $("#pagingArea");
+		var pageInfo = $("#pageInfo");
+		var modifyBtn = $("#modifyBtn");
+		var deleteBtn = $("#deleteBtn");
+		
+		modifyBtn.on("click", function(){
+			location.href="/professor/updateAssignment.do?lecNo=${param.lecNo}&assNo=${param.assNo}"
+		})
+		
+		deleteBtn.on("click", function(){
+			if(confirm("정말로 삭제하시겠습니까?")){
+		         delForm.submit();
+		     }
+		})
+		
+		pagingArea.on("click", "a", function(event) {
+			event.preventDefault();
+			var pageNo = $(this).data("page");
+			// 검색시 사용할 form 태그안에 넣어준다. 
+			// 검색시 사용할 form 태그를 활용해서 검색도하고 페이징 처리도 같이 진행함
+			pageInfo.find("#page").val(pageNo);
+			pageInfo.submit();
+		})
+
+	})
+</script>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IColleageMapper">
+
+	<select id="getColleageList" resultType="colleageVO">
+		select COL_NO,PRO_NO,COL_NAME,COL_CALL
+		from colleage
+	</select>
+	
+	<select id="getColleageByColleageNo" parameterType="String" resultType="colleageVO">
+		select COL_NO,PRO_NO,COL_NAME,COL_CALL
+		from colleage
+		where col_no = #{colNo}
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.ILoginMapper">
+
+	<resultMap type="userVO" id="userMap">
+		<id property="userNo" column="user_no"/>
+		<result property="userNo" column="user_no"/>
+		<result property="userPw" column="user_pw"/>
+		<result property="comDetUNo" column="com_det_u_no"/>
+		<association property="stuVO" resultMap="stuMap"/>
+		<association property="profVO" resultMap="profMap"/>
+		<association property="empVO" resultMap="empMap"/>
+		<collection property="userAuthList" resultMap="userAuthMap"/>
+	</resultMap>
+	
+	<resultMap type="empVO" id="empMap">
+		<id property="empNo" column="emp_no"/>
+		<result property="empNo" column="emp_no"/>
+		<result property="comDetDNo" column="com_det_d_no"/>
+		<result property="comDetPNo" column="com_det_p_no"/>
+		<result property="empName" column="emp_name"/>
+		<result property="comDetGNo" column="com_det_g_no"/>
+		<result property="empRegno" column="emp_regno"/>
+		<result property="empPostcode" column="emp_postcode"/>
+		<result property="empAdd1" column="emp_add1"/>
+		<result property="empAdd2" column="emp_add2"/>
+		<result property="empEmail" column="emp_email"/>
+		<result property="empImg" column="emp_img"/>
+		<result property="empIp" column="emp_ip"/>
+		<result property="enabled" column="enabled"/>
+		<result property="comDetBNo" column="com_det_b_no"/>	
+		<result property="empAccount" column="emp_account"/>	
+		<result property="empDelYn" column="emp_del_yn"/>	
+		<result property="empSdate" column="emp_sdate"/>	
+		<result property="empEdate" column="emp_edate"/>	
+		<result property="comDetMNo" column="com_det_m_no"/>	
+		<result property="empPhone" column="emp_phone"/>			
+	</resultMap>
+
+	<resultMap type="studentVO" id="stuMap">
+		<id property="stuNo" column="stu_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="deptNo" column="dept_no"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="stuYear" column="stu_year"/>
+		<result property="stuName" column="stu_name"/>
+		<result property="comDetGNo" column="com_det_g_no"/>
+		<result property="stuRegno" column="stu_regno"/>
+		<result property="stuPostcode" column="stu_postcode"/>
+		<result property="stuAdd1" column="stu_add1"/>
+		<result property="stuAdd2" column="stu_add2"/>
+		<result property="stuEmail" column="stu_email"/>
+		<result property="stuImg" column="stu_img"/>
+		<result property="stuIp" column="stu_ip"/>
+		<result property="comDetBNo" column="com_det_b_no"/>
+		<result property="stuAccount" column="stu_account"/>
+		<result property="stuDelYn" column="stu_del_yn"/>
+		<result property="stuSdate" column="stu_sdate"/>
+		<result property="stuEdate" column="stu_edate"/>
+		<result property="comDetMNo" column="com_det_m_no"/>
+		<result property="stuPhone" column="stu_phone"/>
+	</resultMap>
+	
+	<resultMap type="professorVO" id="profMap">
+		<id property="proNo" column="pro_no"/>
+		<result property="proNo" column="pro_no"/>
+		<result property="deptNo" column="dept_no"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="comDetPNo" column="com_det_p_no"/>
+		<result property="proName" column="pro_name"/>
+		<result property="comDetGNo" column="com_det_g_no"/>
+		<result property="proRegno" column="pro_regno"/>
+		<result property="proPostcode" column="pro_postcode"/>
+		<result property="proPhone" column="pro_phone"/>
+		<result property="proAdd1" column="pro_add1"/>
+		<result property="proAdd2" column="pro_add2"/>
+		<result property="proEmail" column="pro_email"/>
+		<result property="proIp" column="pro_ip"/>
+		<result property="comDetBNo" column="com_det_b_no"/>
+		<result property="proAccount" column="pro_account"/>
+		<result property="proDelYn" column="pro_del_yn"/>
+		<result property="proSdate" column="pro_sdate"/>
+		<result property="proEdate" column="pro_edate"/>
+		<result property="comDetMNo" column="com_det_m_no"/>
+		<result property="proImg" column="pro_img"/>
+	</resultMap>
+	
+	<resultMap type="userAuthVO" id="userAuthMap">
+		<result property="userNo" column="user_no"/>
+		<result property="userAuthNo" column="user_auth_no"/>
+	</resultMap>
+	
+	 <resultMap type="kr.or.ddit.vo.ProfessorVO" id="professorMap">
+        <id property="proNo" column="pro_no"/>
+        <result property="deptNo" column="dept_no"/>
+        <result property="comDetPNo" column="com_det_p_no"/>
+        <result property="proName" column="pro_name"/>
+        <result property="comDetGNo" column="com_det_g_no"/>
+        <result property="proRegno" column="pro_regno"/>
+        <result property="proPostcode" column="pro_postcode"/>
+        <result property="proAdd1" column="pro_add1"/>
+        <result property="proAdd2" column="pro_add2"/>
+        <result property="proEmail" column="pro_email"/>
+        <result property="proImg" column="pro_img"/>
+        <result property="proIp" column="pro_ip"/>
+        <result property="enabled" column="enabled"/>
+        <result property="comDetBNo" column="com_det_b_no"/>
+        <result property="proAccount" column="pro_account"/>
+        <result property="proDelYn" column="pro_del_yn"/>
+        <result property="proSdate" column="pro_sdate"/>
+        <result property="proEdate" column="pro_edate"/>
+        <result property="comDetMNo" column="com_det_m_no"/>
+    </resultMap>
+	
+
+    <select id="loginCheck" parameterType="kr.or.ddit.vo.UserVO" resultType="kr.or.ddit.vo.UserVO">
+        SELECT USER_NO, USER_PW, COM_DET_U_NO
+        FROM  USER
+        WHERE USER_NO = #{userNo} AND USER_PW = #{userPw}
+    </select>
+
+	<select id="selectUserAuth" parameterType="string" resultType="string">
+		select com_det_u_no
+		from "USER"
+		where user_no = #{userNo}
+	</select>
+
+	<!-- 로그인 -->
+	<select id="readByUserId" resultMap="userMap">
+		select 
+		     u.user_no, user_pw, com_det_u_no, user_auth_no
+		<if test="auth == 'U0101'">
+			,s.*
+			,(select dept_name from department d where d.dept_no = s.dept_no) dept_name
+		</if>
+		<if test="auth == 'U0102'">
+			,p.*
+			,(select dept_name from department d where d.dept_no = p.dept_no) dept_name
+		</if>
+		<if test="auth == 'U0103'">,e.*</if>
+		from "USER" u left outer join user_auth ua on(u.user_no = ua.user_no)
+			<if test="auth == 'U0101'">left outer join student s on(u.user_no = s.stu_no)</if>
+			<if test="auth == 'U0102'">left outer join professor p on(u.user_no = p.pro_no)</if>
+			<if test="auth == 'U0103'">left outer join employee e on(u.user_no = e.emp_no)</if>
+		where u.user_no = #{userNo}
+	</select>
+	
+	<!-- 교수 아이디로 교수 정보 꺼내오는 sql -->
+	<select id="professorInfo" parameterType="string" resultMap="professorMap">
+		select p.*
+		from professor p
+		join user u on p.pro_no = u.user_no
+		join common_code_detail ccd on u.com_det_u_no = ccd.com_det_no
+		where ccd.com_det_no = #{comDetUNo}
+		and u.user_no = #{userNo}
+	</select>
+	
+	<!-- 학생 아이디 찾기 -->
+	<select id="findIdByStudentDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join student s on u.user_no = s.stu_no
+		 where s.stu_name = #{userName}
+		   and substr(s.stu_regno, 1, 6) = #{userBirth} 
+		   and s.stu_email = #{userEmail}
+	</select>
+	
+	<!-- 교수 아이디 찾기 -->
+	<select id="findIdByProfessorDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join professor p on u.user_no = p.pro_no
+		 where p.pro_name = #{userName}
+		   and substr(p.pro_regno, 1, 6) = #{userBirth}
+		   and p.pro_email = #{userEmail}
+	</select>
+	
+	<!-- 관리자 아이디 찾기 -->
+	<select id="findIdByAdminDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join employee e on u.user_no = e.emp_no
+		 where e.emp_name = #{userName}
+		   and substr(e.emp_regno, 1, 6) = #{userBirth}
+		   and e.emp_email = #{userEmail}
+	</select>
+	
+	<!-- 학생 - 데이터 체크 -->
+	<select id="checkStudentDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join student s on u.user_no = s.stu_no
+		 where u.user_no = #{userId}
+		   and substr(s.stu_regno, 1, 6) = #{userBirth} 
+		   and s.stu_email = #{userEmail}
+	</select>
+	
+	<!-- 교수 - 데이터 체크 -->
+	<select id="checkProfessorDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join professor p on u.user_no = p.pro_no
+		 where u.user_no = #{userId}
+		   and substr(p.pro_regno, 1, 6) = #{userBirth} 
+		   and p.pro_email = #{userEmail}
+	</select>
+	
+	<!-- 관리자 - 데이터 체크 -->
+	<select id="checkAdminDetails" parameterType="map" resultType="String">
+		select u.user_no
+		  from "USER" u
+		  join employee e on u.user_no = e.emp_no
+		 where u.user_no = #{userId}
+		   and substr(e.emp_regno, 1, 6) = #{userBirth} 
+		   and e.emp_email = #{userEmail}
+	</select>
+	
+	
+	<!-- USER비밀번호 초기화 -->
+	<update id="resetPw" parameterType="map">
+		update "USER"
+		   set user_pw = #{newPassword}
+		 where user_no = #{userId}
+	</update>	
+	
+	<select id="selectNotice" resultType="kr.or.ddit.vo.BoardVO">
+		select *
+		  from board
+		 order by bo_date desc
+	</select>
+</mapper>

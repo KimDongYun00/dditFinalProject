@@ -1,0 +1,94 @@
+package kr.or.ddit.controller.common;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.common.IUserLoginService;
+import kr.or.ddit.vo.UserVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/common")
+public class CommonLoginController {
+
+	@Autowired
+	private IUserLoginService iUserLoginService;
+
+	// 메인페이지(테스트용)
+	@RequestMapping(value = "/home", method = RequestMethod.GET)
+	public String home() {
+		return "common/home";
+	}
+
+	// 로그인 페이지
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	public String loginPage() {
+		return "common/login";
+	}
+
+	// 로그인 처리
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public String login(@RequestParam("personalId") String personalId, @RequestParam("personalPw") String personalPw,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		// UserVO 객체 생성 및 설정
+		UserVO userVO = new UserVO();
+		userVO.setUserNo(personalId);
+		userVO.setUserPw(personalPw);
+
+		UserVO user = iUserLoginService.loginCheck(userVO);
+
+		if (user != null) {
+			// 로그인 성공 시 세션에 사용자 정보를 저장 + 역할에 따라 페이지 이동
+			HttpSession session = request.getSession();
+			session.setAttribute("user", user);
+
+			String role = user.getComDetUNo();
+			if ("U0101".equals(role)) {
+				return "redirect:/student/mypage.do"; // String goPage ="경로". return을 goPage로 해도됨
+			} else if ("U0102".equals(role)) {
+				return "redirect:/professor/mypage.do";
+			} else if ("U0103".equals(role)) {
+				return "redirect:/admin/main";
+			} else {
+				// 알 수 없는 역할
+				return "redirect:/common/login?error=role";
+			}
+		} else {
+			// 로그인 실패 시 에러 메시지와 함께 로그인 페이지로 리다이렉트
+			return "redirect:/common/login?error=invalid";
+		}
+	}
+
+	// 로그아웃 처리
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			session.invalidate();
+		}
+		return "redirect:/common/home";
+	}
+
+	// 아이디, 비밀번호 찾기 페이지 이동용
+	@RequestMapping(value = "/findIdPw", method = RequestMethod.GET)
+	public String findIdPw() {
+		return "common/findIdPw";
+	}
+
+	// 이름 꺼내오는 기능
+
+	// 아이디 찾기 기능
+
+	// 임시 비밀번호 발급 기능
+
+}

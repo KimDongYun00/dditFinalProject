@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.AdminFreeBoardMapper">
+	<!-- 페이지 -->
+	<select id="freeList" parameterType="hashMap"
+		resultType="kr.or.ddit.vo.FreeBoardVO">
+		SELECT T.*
+		FROM (
+		SELECT row_number() over(ORDER BY free_no
+		DESC) rnum, free_no, user_no,
+		free_title, free_writer, free_content,
+		free_cnt, TO_CHAR(free_date,
+		'YYYY-MM-DD') AS free_date
+		FROM freeboard
+		WHERE 1=1 and del_yn = 'N'
+		AND (free_title LIKE '%' || #{keyword} || '%' OR free_content
+		LIKE '%' ||
+		#{keyword} || '%')
+		) T
+		WHERE T.rnum BETWEEN (#{page} *
+		#{itemsPerPage}) - (#{itemsPerPage} - 1)
+		AND (#{page} *
+		#{itemsPerPage})
+	</select>
+
+	<!-- 페이지 -->
+	<select id="getFreeBoardCount" parameterType="hashMap"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM freeboard
+		WHERE 1=1
+		AND (free_title LIKE
+		'%' || #{keyword} || '%' OR free_content LIKE '%' ||
+		#{keyword} || '%')
+	</select>
+
+	<select id="detail" parameterType="String"
+		resultType="kr.or.ddit.vo.FreeBoardVO">
+		SELECT free_no, user_no, free_title, free_writer,
+		free_content, free_cnt,
+		TO_CHAR(free_date, 'YYYY-MM-DD') AS free_date
+		FROM freeboard
+		WHERE free_no = #{freeNo}
+	</select>
+
+	<update id="incrementViewCount" parameterType="String">
+		UPDATE freeboard
+		SET free_cnt = free_cnt + 1
+		WHERE free_no = #{freeNo}
+	</update>
+
+	<select id="search" parameterType="String"
+		resultType="kr.or.ddit.vo.FreeBoardVO">
+		SELECT free_no, user_no, free_title, free_writer,
+		free_content, free_cnt,
+		TO_CHAR(free_date, 'YYYY-MM-DD') AS free_date
+		FROM freeboard
+		WHERE free_title LIKE '%' || #{keyword} || '%' OR
+		free_content LIKE '%' ||
+		#{keyword} || '%'
+	</select>
+
+	<!-- 새 글 등록 -->
+	<insert id="freeboardInsert"
+		parameterType="kr.or.ddit.vo.FreeBoardVO">
+		INSERT INTO freeboard (free_no, user_no, free_title,
+		free_writer,
+		free_content, free_cnt, free_date)
+		VALUES ('FREE_' ||
+		seq_freeboard.nextval, #{userNo}, #{freeTitle},
+		#{freeWriter},
+		#{freeContent}, 0, sysdate)
+	</insert>
+
+	<insert id="freecommentInsert"
+		parameterType="kr.or.ddit.vo.FreeCommentVO">
+		INSERT INTO FREE_COMMENT (fc_no, free_no, user_no,
+		fc_content, fc_writer,
+		fc_date)
+		VALUES ('FREE_' ||
+		seq_freecomment.nextval, #{freeNo}, #{userNo},
+		#{fcContent}, '익명',
+		sysdate)
+	</insert>
+
+
+	<select id="getCommentsByFreeNo" parameterType="String"
+		resultType="kr.or.ddit.vo.FreeCommentVO">
+		SELECT fc_no, free_no, user_no, fc_content, fc_writer,
+		TO_CHAR(fc_date,
+		'YYYY-MM-DD') AS fc_date
+		FROM FREE_COMMENT
+		WHERE free_no
+		= #{freeNo}
+		ORDER BY fc_date DESC
+	</select>
+
+	<!-- 댓글 수정 -->
+	<update id="freeCommentUpdate"
+		parameterType="kr.or.ddit.vo.FreeCommentVO">
+		UPDATE FREE_COMMENT
+		SET fc_content = #{fcContent},
+		fc_date = sysdate
+		WHERE fc_no = #{fcNo} AND user_no = #{userNo}
+	</update>
+
+	<delete id="freeCommentDelete"
+		parameterType="kr.or.ddit.vo.FreeCommentVO">
+		DELETE FROM FREE_COMMENT
+		WHERE fc_no = #{fcNo} AND
+		user_no = #{userNo}
+	</delete>
+
+	<!-- 게시글 수정 -->
+	<update id="freeboardUpdate"
+		parameterType="kr.or.ddit.vo.FreeBoardVO">
+		UPDATE freeboard
+		SET free_title = #{freeTitle},
+		free_content = #{freeContent}, free_date =
+		sysdate
+		WHERE free_no =
+		#{freeNo} AND user_no = #{userNo}
+	</update>
+
+
+	<!-- 게시글 삭제 전에 댓글 삭제 -->
+	<delete id="deleteCommentsByFreeNo" parameterType="String">
+		DELETE FROM
+		FREE_COMMENT WHERE free_no = #{freeNo}
+	</delete>
+
+	<!-- 게시글 삭제 -->
+	<delete id="freeboardDelete" parameterType="String">
+		DELETE FROM freeboard
+		WHERE free_no = #{freeNo}
+	</delete>
+
+	<!-- 다중 게시글 삭제 전에 댓글 삭제 -->
+	<delete id="deleteCommentsByFreeNoList" parameterType="list">
+		DELETE FROM FREE_COMMENT WHERE free_no IN
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 다중 게시글 삭제 -->
+	<delete id="freeboardDeleteMultiple" parameterType="list">
+		DELETE FROM freeboard WHERE free_no IN
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 신고 글 숨기기 -->
+	<update id="hideFreeBoard" parameterType="String">
+		UPDATE freeboard
+		SET del_yn = 'Y'
+		WHERE free_no = #{freeNo}
+	</update>
+
+
+
+
+</mapper>
+
+

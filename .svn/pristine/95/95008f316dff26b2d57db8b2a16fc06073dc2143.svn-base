@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminCertificationMapper">
+	
+	 <!-- 
+	<sql id="certificationName">
+	    <if test="searchType != null  and !searchType.isEmpty()">
+	        and c.cer_name like '%' || #{searchType} || '%'
+	    </if>
+	</sql>
+	셀렉트바이용 검색 -->
+	
+	 <!-- 페이징 처리를 위해 행 count하기 -->
+	<select id="selectCertificationCount" parameterType="pagingVO" resultType="int">
+		  select count(c.cer_no)
+	        from certification c
+	        where 1=1
+	</select>
+
+
+	 <!-- 페이징 처리를 위한 selectCertificationList 쿼리 -->
+	<select id="selectCertificationList" parameterType="pagingVO" resultType="certificationVO">
+		 select
+        d.*
+   	 from (
+        select
+            a.*, row_number() over(order by a.cer_no) as rnum
+        from (
+            select
+                c.cer_no, c.cer_name, c.cer_content, c.file_group_no, c.cer_charge
+            from certification c
+            where 1=1
+            order by c.cer_no
+        ) a
+    ) d
+    	 <![CDATA[
+    where d.rnum >= #{startRow} and d.rnum <= #{endRow}
+	  	  ]]>
+	</select>
+
+
+	<!-- 증명서 발급 활성화/비활성화 처리 
+	<update id="updateCertificationStatus">
+	    update certification
+	    set status = #{status}
+	    where cer_no = #{cerno}
+	</update>
+	-->
+
+
+
+	<!-- 증명서 등록 -->
+	<insert id="insertCertification" parameterType="certificationVO">
+		<selectKey keyProperty="cerNo" resultType="String" order="BEFORE">
+			select 'CER_'||seq_certification.nextval from dual
+		</selectKey>
+		insert into certification(
+					cer_no
+				  , cer_name
+				  , cer_content
+				  , file_group_no
+				  , cer_charge
+				 ) values(
+					#{cerNo}
+				  , #{cerName}
+				  , #{cerContent}
+				  , null
+				  , #{cerCharge}
+				)      
+	</insert>
+
+	<update id="insertFileGroupNoToCertification" parameterType="certificationVO">
+		update certification
+		set 
+			file_group_no = #{fileGroupNo}
+		where cer_no = #{cerNo}
+	</update>
+
+
+
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

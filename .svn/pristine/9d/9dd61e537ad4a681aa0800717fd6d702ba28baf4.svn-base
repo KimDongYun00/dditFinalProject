@@ -1,0 +1,27 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.CertificationVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IAdminCertificationMapper {
+
+	
+	//증명서 --------------------------------------------------------------------------
+	// 페이징 처리를 위한 행 구하기
+	public int selectCertificationCount(PaginationInfoVO<CertificationVO> pagingVO);
+
+	// 증명서 종류 리스트
+	public List<CertificationVO> selectCertificationList(PaginationInfoVO<CertificationVO> pagingVO);
+
+	// 증명서 종류 등록
+	public int insertCertification(CertificationVO certificationVO);
+
+	// 증명서 그룹번호로 파일 업로드
+	public void insertFileGroupNoToCertification(CertificationVO certificationVO);
+
+	// 증명서 활성화/비활성화 처리
+	//public int updateCertificationStatus(String cerNo, boolean status);
+
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.AttendanceMapper">
+
+
+	<select id="checkAttData" parameterType="attendanceVO" resultType="int">
+		select count(att_no)
+		from attendance
+		where stu_no = #{stuNo}
+		and att_date = #{attDate}
+		and lec_no = #{lecNo}
+	</select>
+	
+	<update id="updateAttendance" parameterType="attendanceVO">
+		update attendance
+		set 
+			com_det_a_no = #{comDetANo}
+			,att_etc = #{attEtc}
+		where stu_no = #{stuNo}
+		and att_date = #{attDate}
+		and lec_no = #{lecNo}
+	</update>
+	
+	<insert id="insertAttendance" parameterType="attendanceVO" useGeneratedKeys="true">
+		<selectKey keyProperty="attNo" order="BEFORE" resultType="String">
+			select 'ATT_'||seq_attendance.nextval from dual
+		</selectKey>
+		insert into attendance(
+			ATT_NO,LEC_NO,STU_NO,ATT_DATE,COM_DET_A_NO,ATT_ETC
+		) values (
+			#{attNo}, #{lecNo}, #{stuNo}, #{attDate}, #{comDetANo}, #{attEtc}
+		)
+	</insert>
+
+
+
+
+
+
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

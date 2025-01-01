@@ -1,0 +1,12 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.CourseVO;
+import kr.or.ddit.vo.LectureVO;
+
+public interface ILectureListMapper {
+
+	public List<CourseVO> selectLectureList(String userNo);
+
+}

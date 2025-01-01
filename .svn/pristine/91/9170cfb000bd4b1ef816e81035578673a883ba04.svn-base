@@ -1,0 +1,38 @@
+package kr.or.ddit.service.student.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.FoodBoardMapper;
+import kr.or.ddit.service.student.inter.IFoodBoardService;
+import kr.or.ddit.vo.FoodBoardVO;
+
+@Service
+public class FoodBoardServiceImpl implements IFoodBoardService {
+	
+	@Inject
+	private FoodBoardMapper mapper;
+
+	@Override
+	public List<FoodBoardVO> foodList() {
+		return mapper.foodList();
+	}
+
+	@Override
+	public FoodBoardVO detail(String foodNo) {
+		return mapper.detail(foodNo);
+	}
+
+	@Override
+	public void incrementViewCount(String foodNo) {
+		mapper.incrementViewCount(foodNo);
+	}
+
+	@Override
+	public void foodboardInsert(FoodBoardVO foodboardVO) {
+		mapper.foodboardInsert(foodboardVO);
+	}
+}

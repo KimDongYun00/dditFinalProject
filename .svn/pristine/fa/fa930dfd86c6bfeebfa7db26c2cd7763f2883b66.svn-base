@@ -1,0 +1,32 @@
+package kr.or.ddit.service.professor.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IConsultingMapper;
+import kr.or.ddit.service.professor.inter.ProConsultingService;
+import kr.or.ddit.vo.ConsultingVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+@Service
+public class ProConsultingServiceImpl implements ProConsultingService {
+
+	@Inject
+	private IConsultingMapper mapper;
+	
+	@Override
+	public int proConsultingCount(PaginationInfoVO<ConsultingVO> pagingVO) {
+
+		return mapper.proConsultingCount(pagingVO);
+	}
+
+	@Override
+	public List<ConsultingVO> proConsultingList(PaginationInfoVO<ConsultingVO> pagingVO) {
+		
+		return mapper.proConsultingList(pagingVO);
+	}
+
+}

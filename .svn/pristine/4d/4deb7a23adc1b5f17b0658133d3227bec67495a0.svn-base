@@ -1,0 +1,12 @@
+package kr.or.ddit.score.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.StudentVO;
+
+public interface IScoreService {
+	public List<Map<String, Object>> getStudentScoreList(String lecNo);
+	public LectureVO getLectureScoreDetail(String lecNo);
+}

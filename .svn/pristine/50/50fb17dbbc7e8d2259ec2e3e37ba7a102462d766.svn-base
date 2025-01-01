@@ -1,0 +1,18 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class DepartmentVO {
+
+	private String deptNo;						// 학과번호
+	private String colNo;						// 단과대번호
+	private String facNo;						// 시설번호
+	private String proNo;						// 교번
+	private String deptName;					// 학과명
+	private String deptCall;					// 학과전화번호
+	private String comDetBNo;					// 공통코드_은행
+	private String deptAccount;					// 학과계좌
+}
+
+

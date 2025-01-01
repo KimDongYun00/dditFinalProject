@@ -1,0 +1,28 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/student")
+public class StudentTest {
+	
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String test(Model model) {
+		String msg = "test중입니다 ㅎㅎ";
+		model.addAttribute("msg", msg);
+		
+		return "student/Test";
+	}
+	
+	
+	@RequestMapping(value = "/test_edu", method = RequestMethod.GET)
+	public String test1(Model model) {
+		String msg = "test중입니다 ㅎㅎ";
+		model.addAttribute("msg", msg);
+		
+		return "professor/Test";
+	}
+}

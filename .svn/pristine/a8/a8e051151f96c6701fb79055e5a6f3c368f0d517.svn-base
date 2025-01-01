@@ -1,0 +1,266 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+/* #div1 { */
+/* 	margin: 50px 100px; */
+/* } */
+
+/* #div2 { */
+/* 	padding: 50px 200px; */
+/* } */
+
+#content {
+	font-size: 1.5em;
+}
+
+table {
+	border: 2px solid #d2d2d2;
+	border-collapse: collapse;
+	font-size: 0.9em;
+}
+
+th, td {
+	border: 1px solid #d2d2d2;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+th {
+	height: 5px;
+}
+
+td {
+	width: 75px;
+	height: 30px;
+}
+</style>
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
+</head>
+<body>
+	<div class="content-wrapper">
+		<div class="container-xxl flex-grow-1 container-p-y">
+			<div id="div1">
+				<div class="col-md-12">
+					<div class="card mb-4" id="div2">
+						<!-- 			<div class="card mb-4" style="padding: 50px 100px ;"> -->
+						<h3 class="card-header">Mypage</h3>
+						<!-- Account -->
+						<div class="container">
+							<div class="d-flex align-items-start align-items-sm-center gap-4">
+								<img src="${professor.proImg}" alt="user-avatar"
+									class="d-block rounded" height="250" width="250"
+									id="uploadedAvatar" />
+								<div class="col" style="padding-top: 180px;" id="content">
+									<span>${professor.proName }</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<span>${proDep.deptName }</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<span>${professor.proPhone }</span>
+								</div>
+							</div>
+
+							<input type="button" class="btn btn-primary me-2 mb-4"
+								style="float: right" id="modBtn" value="개인정보수정">
+						</div>
+						<hr class="my-0" />
+						<div class="card-body">
+							<div class="row">
+								<div class="mb-3 col-md-6">
+									<label for="firstName" class="form-label">시간표</label>
+									<table width=400 height="600" style="color: #121212">
+										<tr width=19%>
+											<th></th>
+											<th>월</th>
+											<th>화</th>
+											<th>수</th>
+											<th>목</th>
+											<th>금</th>
+										</tr>
+										<tr>
+											<th rowspan="2">9</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">10</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">11</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">12</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">1</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">2</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">3</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">4</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">5</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th rowspan="2">6</th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<th></th>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</table>
+								</div>
+								<div class="mb-3 col-md-6">
+									<div id="calendar"></div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded',function(){
+	var calendarEl = document.getElementById('calendar');
+	var calendar = new FullCalendar.Calendar(calendarEl,{
+		initialView : 'dayGridMonth'
+	});
+	calendar.render();
+});
+
+$(function(){
+	var modBtn = $("#modBtn");
+	
+	modBtn.on("click", function(){
+		location.href = "/professor/modify.do";
+	});
+});
+
+	
+</script>
+</html>

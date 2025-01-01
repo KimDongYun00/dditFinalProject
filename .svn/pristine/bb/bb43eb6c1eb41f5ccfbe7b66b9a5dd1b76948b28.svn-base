@@ -1,0 +1,5 @@
+package kr.or.ddit.team.service;
+
+public interface ITeamService {
+
+}

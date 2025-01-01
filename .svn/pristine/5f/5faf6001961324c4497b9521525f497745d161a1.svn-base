@@ -1,0 +1,61 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags"
+	prefix="sec"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- Content wrapper -->
+	<div class="content-wrapper">
+		<div class="container-xxl flex-grow-1 container-p-y">
+			<h3 class="fw-bold py-3 mb-4">강의 목록</h3>
+			<!-- Text alignment -->
+
+			<div class="row mb-5">
+				<c:choose>
+					<c:when test="${empty lectureList }">
+						<h3>강의가 존재하지 않습니다.</h3>
+					</c:when>
+					<c:otherwise>
+						<c:forEach items="${lectureList }" var="list">
+							<a href="/professor/lectureDetail.do?lecNo=${list.lecNo }">
+								<div class="col-md-6 col-lg-4">
+									<div class="card text-center mb-3">
+										<div class="card-body">
+											<h4 class="card-title">${list.lecName }</h4>
+											<p class="card-text">${list.year }년도${list.semester }학기</p>
+											<p class="card-text">수강학년 :${list.lecAge }학년</p>
+											<button id="noticeBtn"class="btn btn-primary">공지사항</button>
+											<button id="assBtn" class="btn btn-primary">과제등록</button>
+										</div>
+									</div>
+								</div>
+							</a>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
+
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+var noticeBtn = $("#noticeBtn");
+var assBtn = $("#assBtn");
+
+noticeBtn.on("click", function(){
+    event.preventDefault(); // 기본 링크 동작 방지
+	location.href = "/professor/lectureDetail/notice.do?lecNo=${list.lecNo }";
+})
+assBtn.on("click", function(event){
+      event.preventDefault();
+      location.href = "/professor/lectureDetail/assignment.do?lecNo=${list.lecNo }";
+});
+
+</script>
+</html>

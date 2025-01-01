@@ -1,0 +1,37 @@
+package kr.or.ddit.service.common.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IFileMapper;
+import kr.or.ddit.service.common.IFileService;
+import kr.or.ddit.vo.FileVO;
+
+@Service
+public class FileServiceImpl implements IFileService {
+
+	@Inject
+	private IFileMapper mapper;
+	
+	
+	@Override
+	public List<FileVO> getFileByFileGroupNo(String fileGroupNo) {
+		return mapper.getFileByFileGroupNo(fileGroupNo);
+	}
+
+
+	@Override
+	public FileVO getFileByFileNo(FileVO fileVO) {
+		return mapper.getFileByFileNo(fileVO);
+	}
+
+
+	@Override
+	public void increaseDownloadCount(FileVO fileVO) {
+		mapper.increaseDownloadCount(fileVO);
+	}
+
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.IProfessorMapper">
+	<!-- 교수테이블 해당교수정보-->
+	<select id="selectProfessor" parameterType="string" resultType="professorVO">
+		select  pro_no,dept_no,com_det_p_no,pro_name,com_det_g_no,pro_regno,pro_postcode,pro_add1,pro_add2,
+				pro_email,pro_img,pro_ip,enabled,com_det_b_no,pro_account,pro_del_yn,pro_sdate,pro_edate,
+				com_det_m_no,pro_phone
+		from professor
+		where pro_no = #{proNo}
+	</select>
+	<!-- 학과테이블 해당교수정보 -->
+	<select  id="selectProfessorDep" parameterType="string" resultType="departmentVO">
+		select dept_no,col_no,fac_no,pro_no,dept_name,dept_call,com_det_b_no,dept_account,dept_content
+		from department
+		where pro_no = #{proNo}
+	</select>
+	
+	<!-- 교수프로필 업데이트 -->
+	<update id="profileUpdate" parameterType="professorVO">
+		update professor
+		set pro_img= #{proImg},
+		    pro_postcode =#{proPostcode},
+		    pro_add1=#{proAdd1},
+		    pro_add2=#{proAdd2},
+		    pro_phone=#{proPhone},
+		    pro_email=#{proEmail},
+		    com_det_b_no=#{comDetBNo},
+		    pro_account=#{proAccount}
+		where pro_no=#{proNo}
+	</update>
+	
+	<!-- 담당 강의 목록 -->
+	<select id="lectureList" parameterType="string" resultType="lectureVO">
+		select lec_no,pro_no,sub_no,fac_no,lec_name,lec_explain,lec_max,lec_now,lec_onoff,lec_age,lec_score,com_det_l_no,com_det_c_no,file_group_no,year,semester,lec_mid_rate,lec_last_rate,lec_ass_rate,lec_exam_rate,lec_ad_rate,lec_at_rate
+		from lecture
+		where pro_no = #{proNo}
+	</select>
+	
+	<!-- 강의상세 페이지에서 보여질 강의 공지 게시판 -->
+	<select id="selectLectureNoticeCount" parameterType="pagingVO" resultType="int">
+		select count(*)
+		from lecture_notice
+	</select>
+	<select id="selectLectureNoticeList" parameterType="pagingVO" resultType="lectureNoticeVO">
+		select
+				b.*
+			from(
+				select
+					a.*, row_number() over (order by a.lec_not_no desc) rnum
+				from(
+					select
+						lec_not_no,lec_no,lec_not_title,lec_not_content,lec_not_date,lec_not_cnt
+					from lecture_notice
+					where 1=1
+					order by lec_not_no desc
+				)a
+			)b
+			<![CDATA[
+				where b.rnum >= 1 and b.rnum <= 5
+			]]>
+	</select>
+</mapper>

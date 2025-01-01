@@ -1,0 +1,23 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class ConsultingVO {
+	private String con_no;
+	private String stu_no;
+	private String pro_no;
+	private String con_title;
+	private String con_content;
+	private String con_regdate;
+	private String con_date;
+	private String con_onoff;
+	private String com_det_d_no;
+	private String com_det_t_no;
+	private String com_det_n_no;
+	private String rej_content;
+	
+	//조인을 위해 임시로 넣는 데이터.. 학생이름, 교수 이름
+	private String stuName;	// 학생
+	private String proName;	// 교수
+}

@@ -1,0 +1,29 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import kr.or.ddit.vo.BuildingVO;
+import kr.or.ddit.vo.FacilityVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IAdminFacilityService {
+	List<BuildingVO> getBuildingList();
+	List<BuildingVO> getLecRoomFacilityList();
+	public List<FacilityVO> selectFacility();
+	public List<FacilityVO> selectFacilityType(String facTypeNo);
+	public List<BuildingVO> selectBuildingList();
+	public FacilityVO facDetail(String facNo);
+	List<FacilityVO> getLecRoomFacilityListByBuiNo(String string);
+
+	public int insertFacility(FacilityVO facilityVO, HttpServletRequest req);
+	
+	public int updateFacility(FacilityVO facilityVO, HttpServletRequest req);
+	public int deleteFacility(String facNo);
+	int selectFacilityCount(PaginationInfoVO<FacilityVO> pagingVO);
+	List<FacilityVO> selectFacilityList(PaginationInfoVO<FacilityVO> pagingVO);
+	List<FacilityVO> getFacilityListByMap(Map<String, String> map);
+	List<BuildingVO> getFacilityListByTypeNo(String typeNo);
+}

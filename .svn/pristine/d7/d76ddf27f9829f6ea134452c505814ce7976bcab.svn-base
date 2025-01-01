@@ -1,0 +1,45 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IScholarshipMapper;
+import kr.or.ddit.service.admin.inter.IAdminScholarshipService;
+import kr.or.ddit.vo.ScholarshipVO;
+
+@Service
+public class AdminScholarshipServiceImpl implements IAdminScholarshipService {
+
+	@Inject
+	private IScholarshipMapper scholarshipMapper;
+	
+	
+	@Override
+	public List<ScholarshipVO> getScholarshipList() {
+		return scholarshipMapper.getScholarshipList();
+	}
+
+	@Override
+	public List<ScholarshipVO> getScholarshipRequestList() {
+		return scholarshipMapper.getScholarshipRequestList();
+	}
+
+	@Override
+	public List<ScholarshipVO> getScholarshipRequestDetail(String schRecNo) {
+		return scholarshipMapper.getScholarshipRequestDetail(schRecNo);
+	}
+
+	@Override
+	public List<ScholarshipVO> scholarshipRequestsApprove(String comDetCNo) {
+		return scholarshipMapper.scholarshipRequestsApprove(comDetCNo);
+	}
+
+	@Override
+	public List<ScholarshipVO> selectUnApproveScholarshipRequestList(String comDetCNo) {
+		return scholarshipMapper.selectUnApproveScholarshipRequestList(comDetCNo);
+	}
+
+}

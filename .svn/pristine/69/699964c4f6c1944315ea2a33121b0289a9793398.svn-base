@@ -1,0 +1,15 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ScholarshipVO;
+
+public interface IAdminScholarshipService {
+
+	List<ScholarshipVO> getScholarshipList();
+	List<ScholarshipVO> getScholarshipRequestList();
+	List<ScholarshipVO> getScholarshipRequestDetail(String schRecNo);
+	List<ScholarshipVO> scholarshipRequestsApprove(String comDetCNo);
+	List<ScholarshipVO> selectUnApproveScholarshipRequestList(String comDetCNo);
+	
+}

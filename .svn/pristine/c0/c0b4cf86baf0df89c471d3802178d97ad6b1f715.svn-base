@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.NotificationMapper">
+
+		<select id="read" resultType="notificationboardVO">
+			select FC_NO, FREE_NO, USER_NO, FC_CONTENT, FC_WRITER, FC_DATE
+			from FREE_COMMENT
+		</select>
+		
+</mapper>
+
+

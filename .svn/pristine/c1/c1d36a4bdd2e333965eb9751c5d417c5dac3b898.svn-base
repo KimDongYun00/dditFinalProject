@@ -1,0 +1,10 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.BuildingVO;
+
+public interface IAdminFacilityService {
+	List<BuildingVO> getBuildingList();
+	List<BuildingVO> getLecRoomFacilityList();
+}

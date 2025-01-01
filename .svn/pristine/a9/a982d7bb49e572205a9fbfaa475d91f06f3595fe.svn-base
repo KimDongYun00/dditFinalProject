@@ -1,0 +1,17 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class AssignmentSubmitVO {
+	private String assSubNo;
+	private String assNo;
+	private String stuNo;
+	private String assSubComment;
+	private int assSubScore;
+	private String assSubDate;
+	private String fileGroupNo;
+	private String lecNo;
+	
+	private StudentVO studentVO; // 교수 Mapper에서 조인하기 위해 만들어둠
+}

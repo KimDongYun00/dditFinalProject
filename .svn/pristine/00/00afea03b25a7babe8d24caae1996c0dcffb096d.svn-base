@@ -1,0 +1,100 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>처리 현황 통계</title>
+    <style>
+        #statusChart {
+            max-width: 400px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="card mb-4 bg-white">
+                    <h5 class="card-header">처리 현황 통계</h5>
+                    <div class="card-body">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card mb-4 bg-white">
+                    <h5 class="card-header">장학금 신청 종류 통계</h5>
+                    <div class="card-body">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 차트 데이터 설정
+        var approvedCount = ${approvedCount};        // 승인
+        var unApprovedCount = ${unApprovedCount};    // 미승인
+        var rejectedCount = ${rejectedCount};        // 반려
+
+        // Chart.js 차트 생성
+        var ctx = document.getElementById('statusChart').getContext('2d');
+        var statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['승인완료', '미승인', '반려'],
+                datasets: [{
+                    data: [approvedCount, unApprovedCount, rejectedCount],
+                    backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: '장학금 신청 처리 현황'
+                    }
+                }
+            }
+        });
+        
+        
+        // Chart.js 차트 생성
+        var ctx = document.getElementById('typeChart').getContext('2d');
+        var typeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['승인완료', '미승인', '반려'],
+                datasets: [{
+                    data: [approvedCount, unApprovedCount, rejectedCount],
+                    backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: '장학금 신청 처리 현황'
+                    }
+                }
+            }
+        });
+        
+        
+        
+        
+        
+    </script>
+</body>
+</html>

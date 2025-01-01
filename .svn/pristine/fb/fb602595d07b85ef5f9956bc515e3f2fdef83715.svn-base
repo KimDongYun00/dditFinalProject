@@ -1,0 +1,17 @@
+package kr.or.ddit.service.student.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ConsultingVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IStuConsultingService {
+
+	public int stuConsultingCount(PaginationInfoVO<ConsultingVO> pagingVO);
+
+	public List<ConsultingVO> stuConsultingList(PaginationInfoVO<ConsultingVO> pagingVO);
+
+	public ConsultingVO stuconsultingDetail(String conNo);
+
+	
+}

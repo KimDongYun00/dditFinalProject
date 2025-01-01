@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IStuCertificationMapper">
+	 
+	<!-- 페이징 처리를 위해 행 count하기 -->
+	<select id="selectCertificationCount" parameterType="pagingVO" resultType="int">
+		  select count(c.cer_no)
+	        from certification c
+	        where 1=1
+	</select>
+
+
+	<!-- 페이징 처리를 위한 selectCertificationList 쿼리 -->
+	<select id="selectCertificationList" parameterType="pagingVO" resultType="certificationVO">
+		 select
+        d.*
+   	 from (
+        select
+            a.*, row_number() over(order by a.cer_no) as rnum
+        from (
+            select
+                c.cer_no, c.cer_name, c.cer_content, c.file_group_no, c.cer_charge
+            from certification c
+            where 1=1
+            order by c.cer_no
+        ) a
+    ) d
+    	 <![CDATA[
+    where d.rnum >= #{startRow} and d.rnum <= #{endRow}
+	  	  ]]>
+	</select>
+
+	<!-- 본인이 발급받은 증명서 내역을 조회 -->
+	<select id="myCertificationList" parameterType="String" resultType="certificationVO">
+		select
+    			c.cer_name
+    			,c.cer_content
+    			, to_char(cp.cer_pri_date, 'YYYY/MM/DD') as cer_pri_date
+    			,cp.stu_no
+    			,cp.cer_pri_no
+                , c.cer_charge
+		from 
+    			certification c
+		join 
+   				certification_print cp on c.cer_no = cp.cer_no
+		where 
+    			cp.stu_no = #{stuNo}
+	 order by 
+    			cp.cer_pri_date asc
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

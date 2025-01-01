@@ -1,0 +1,54 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.IAdminLectureMapper;
+import kr.or.ddit.service.admin.inter.IAdminLectureService;
+import kr.or.ddit.vo.LectureVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+@Service
+public class AdminLectureServiceImpl implements IAdminLectureService {
+
+	@Inject
+	private IAdminLectureMapper lecMapper;
+
+	@Override
+	public int selectLectureCount(PaginationInfoVO<LectureVO> pagingVO) {
+		return lecMapper.selectLectureCount(pagingVO);
+	}
+
+	@Override
+	public List<LectureVO> getLectureList(PaginationInfoVO<LectureVO> pagingVO) {
+		return lecMapper.getLectureList(pagingVO);
+	}
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

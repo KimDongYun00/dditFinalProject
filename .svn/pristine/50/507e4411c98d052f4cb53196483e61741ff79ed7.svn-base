@@ -1,0 +1,193 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<meta name="_csrf" content="${_csrf.token}">
+<meta name="_csrf_header" content="${_csrf.headerName}">
+<title>재학 증명서</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+.certificate {
+    margin: 50px auto;
+    width: 600px;
+    padding: 40px;
+    background-color: white;
+    border: 1px solid #ddd;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+
+.body {
+    margin-top: 20px;
+}
+
+.field {
+    margin-bottom: 10px;
+}
+
+.field-label {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+}
+
+.field-value {
+    display: inline-block;
+    width: calc(100% - 110px);
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.timestamp {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    margin-top: 20px;
+}
+
+.seal {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.seal img {
+    width: 100px;
+    height: 100px;
+}
+
+.pdf-button {
+    text-align: center;
+    margin-top: 50px;
+}
+
+</style>
+<h1 style="text-align: center;">미리 보기</h1>
+<div class="certificate">
+    <p>발급 번호 : 제 ${cerNo}</p>
+
+    <div class="header">
+        <h1>재 학 증 명 서</h1>
+    </div>
+    <br>
+    <div class="body">
+        <div class="field">
+            <span class="field-label">성명</span>
+            <span class="field-value">${student.stuName}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">학번</span>
+            <span class="field-value">${student.stuNo}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">학년</span>
+            <span class="field-value">${student.stuYear}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">주민등록번호</span>
+            <span class="field-value">${student.stuRegno}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">입학일</span>
+            <span class="field-value">${student.stuSdate}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">학과</span>
+            <span class="field-value">${student.deptName}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">용도</span>
+            <span class="field-value">재학증명</span>
+        </div>
+        <div class="field">
+            <span class="field-label">발급번호</span>
+            <span class="field-value">${cerNo}</span>
+        </div>
+        <div class="timestamp">
+            발급일자: ${currentDate}
+        </div>
+        <div class="seal">
+            <img src="${pageContext.request.contextPath}/resources/img/seal.png" alt="학교 직인">
+        </div>
+    </div>
+    <div class="footer">
+        <h5>위 사람은 현재까지 제 ${student.stuYear }학년에 재학하고 있음을 증명합니다.</h5>
+        <p>${currentDate}</p>
+        <h4>대덕대학교 총장 송중호</h4>
+    </div>
+</div>
+
+<div class="pdf-button">
+    <button id="btn_pdf" data-cer-no="${cerNo}">PDF로 보기</button>
+</div>
+
+<script>
+    let jsPDF = jspdf.jsPDF;
+    $("#btn_pdf").on("click", function() {
+        // CSRF 토큰 설정
+        var csrfHeaderName = $("meta[name='_csrf_header']").attr("content");
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+
+        var cerNo = $(this).data("cer-no");
+
+        // 서버에 증명서 발급 요청
+        $.ajax({
+            type: "POST",
+            url: "/student/printCertification",
+            data: { cerNo: cerNo },  // 데이터를 JSON 문자열로 보내지 않고 객체로 보냅니다.
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeaderName, csrfToken);
+            },
+            success: function(response) {
+                if (response === "success") {
+                    // 서버 응답이 성공일 경우 PDF 생성 및 새 탭에서 열기
+                    html2canvas($('.certificate')[0]).then(function(canvas) {
+                        var imgData = canvas.toDataURL('image/png');
+                        var imgWidth = 190;
+                        var pageHeight = 297;
+                        var imgHeight = parseInt(canvas.height * imgWidth / canvas.width); 
+                        var heightLeft = imgHeight;
+                        var margin = 10; 
+                        var doc = new jsPDF('p', 'mm', 'a4');
+                        var position = 10;
+
+                        doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            doc.addPage();
+                            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+
+                        // PDF를 Blob으로 변환
+                        var pdfBlob = doc.output('blob');
+
+                        // Blob URL 생성
+                        var pdfUrl = URL.createObjectURL(pdfBlob);
+
+                        // 새 창에서 PDF 보기
+                        window.open(pdfUrl);
+                    });
+                } else {
+                    alert("증명서 발급에 실패했습니다.");
+                }
+            },
+            error: function() {
+                alert("증명서 발급 요청 중 오류가 발생했습니다.");
+            }
+        });
+    });
+</script>

@@ -1,0 +1,76 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+
+<!-- 달력 모달창 -->
+<form action="/acdemic/insert" method="post" id="modalForm">
+<div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">학사일정등록</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          id="xButton"         
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col mb-3">
+            <label for="title" class="form-label">학사일정</label>
+            <input
+              type="text"
+              id="acaTitle"
+              class="form-control"
+              placeholder="캘린더에 표시될 내용을 입력해주세요."
+            />
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col mb-0">
+            <label for="sdate" class="form-label">시작일자</label>
+            <input
+              type="datetime-local"
+              id="acaSdate"
+              class="form-control"
+              placeholder="xxxx@xxx.xx"
+            />
+          </div>
+          <div class="col mb-0">
+            <label for="edate" class="form-label">끝난일자</label>
+            <input
+              type="datetime-local"
+              id="acaEdate"              
+              class="form-control"
+              placeholder="DD / MM / YY"
+            />
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col mb-0">
+          	<label for="acaContent" class="form-label">내용</label>
+          	<textarea rows="6" class="form-control" name="acaContent" id="acaContent"></textarea>
+          </div>
+        </div>
+        <div class="row mt-3">
+        	<div class="col mb-0">
+	        	<label for="acaColor" class="form-label">일정 배경색을 골라주세요 </label>
+	        	<input type="color" class="" id="acaColor" name="acaColor" value="#C2B4D6">
+        	</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"  id="closeBtn">
+          Close
+        </button>
+        <button type="button" class="btn btn-outline-primary" id="insertBtn">등록</button>
+        <button type="button" class="btn btn-info" id="modifyBtn" style="display:none;">수정</button>
+        <button type="button" class="btn btn-danger" id="deleteBtn" style="display:none;">삭제</button>        
+      </div>
+    </div>
+  </div>
+</div>

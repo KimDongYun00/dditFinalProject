@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IGraReqMapper">
+
+	<select id="getGraReqListByDeptNo" parameterType="String" resultType="graReqVO">
+		select GRA_REQ_NO,DEPT_NO,GRA_REQ_TOTAL,GRA_REQ_MC,GRA_REQ_LAC,GRA_REQ_VOL,YEAR,SEMESTER
+		from GRADUATION_REQUEST
+		where DEPT_NO = #{deptNo}
+		order by YEAR desc, semester desc
+	</select>
+	
+	<insert id="insertGraReq" parameterType="graReqVO">
+		insert into GRADUATION_REQUEST (
+			GRA_REQ_NO,DEPT_NO,GRA_REQ_TOTAL,GRA_REQ_MC,GRA_REQ_LAC,GRA_REQ_VOL,YEAR,SEMESTER
+		) values(
+			'GRA_REQ_'||seq_GRADUATION_REQUEST.nextval, #{deptNo}, #{graReqTotal}, #{graReqMc}
+			, #{graReqLac}, #{graReqVol}, #{year}, #{semester}
+		) 
+	</insert>
+	
+	<select id="getStuGraReq" parameterType="String" resultType="graReqVO">
+		select 
+		    GRA_REQ_TOTAL,GRA_REQ_MC,GRA_REQ_LAC,GRA_REQ_VOL
+		from graduation_request a
+		where a.dept_no = (select b.dept_no
+		                     from student b
+		                    where b.stu_no = #{stuNo}) 
+		and a.year = substr((select stu_no
+		                       from student
+		                      where stu_no = #{stuNo}), 0, 4)
+		and a.semester = 1
+	</select>
+	
+	<select id="getStuGraReqScore" parameterType="String" resultType="map">
+		select 
+		    nvl((select sum(a.lec_score)
+		        from lecture a
+		       where a.lec_no in (select b.lec_no
+		                           from course b
+		                          where b.stu_no = #{stuNo})), 0) L0000 
+		    ,nvl((select sum(a.lec_score)
+		        from lecture a
+		       where a.com_det_l_no like 'L01%'
+		         and a.lec_no in (select b.lec_no
+		                           from course b
+		                          where b.stu_no = #{stuNo})), 0) L0101                           
+		    ,nvl((select sum(a.lec_score)
+		        from lecture a
+		       where a.com_det_l_no like 'L02%'
+		         and a.lec_no in (select b.lec_no
+		                           from course b
+		                          where b.stu_no = #{stuNo})), 0) L0201    
+		    ,nvl((select sum(a.vol_time)
+		        from volunteer a
+		       where a.stu_no = #{stuNo} 
+		         and a.COM_DET_C_NO = 'C0101'), 0) vol
+		from dual
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

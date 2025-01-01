@@ -1,0 +1,14 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.StudentVO;
+
+public interface IAdminMemberMapper {
+	public List<ProfessorVO> searchProfessor(String proName);
+
+	public List<StudentVO> selectStuList();
+
+	public StudentVO stuDetail(String stuNo);
+}

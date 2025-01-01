@@ -1,0 +1,259 @@
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>맛집 게시글 > 상세보기</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4868d70e042c8af0b545ccc4222802a1&libraries=services"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        .content-header {
+            background-color: #f4f6f9;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .content-wrapper {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: ;
+            color: #fff;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .card-body {
+            background-color: #fff;
+            padding: 20px;
+        }
+
+        .card-footer {
+            background-color: #f4f6f9;
+            border-top: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-group p {
+            margin-bottom: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .btn-primary, .btn-success, .btn-danger {
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover, .btn-success:hover, .btn-danger:hover {
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        function initMap() {
+            var mapX = "${foodboard.foodMapx}";
+            var mapY = "${foodboard.foodMapy}";
+
+            var mapContainer = document.getElementById('map'),
+                mapOption = {
+                    center: new kakao.maps.LatLng(mapY, mapX),
+                    level: 3
+                };
+
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+
+            var markerPosition = new kakao.maps.LatLng(mapY, mapX);
+
+            var marker = new kakao.maps.Marker({
+                position: markerPosition
+            });
+
+            marker.setMap(map);
+
+            kakao.maps.event.addListener(marker, 'click', function() {
+                var geocoder = new kakao.maps.services.Geocoder();
+
+                geocoder.coord2Address(markerPosition.getLng(), markerPosition.getLat(), function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        var address = result[0].address.address_name;
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: '<div style="padding:5px;">' + address + '</div>'
+                        });
+                        infowindow.open(map, marker);
+                    }
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            initMap();
+        });
+
+        function deleteFoodPost(foodNo) {
+            if (confirm('게시글을 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/student/foodBoardDelete/' + foodNo,
+                    type: 'POST',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-CSRF-TOKEN", $("meta[name='_csrf']").attr("content"));
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            window.location.href = '${pageContext.request.contextPath}/student/foodList';
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(request, status, error) {
+                        alert('게시글 삭제에 실패했습니다.');
+                    }
+                });
+            }
+        }
+
+        function enableEditMode() {
+            $('#foodTitleLabel').hide();
+            $('#foodContentLabel').hide();
+            $('#foodTitleInput').show();
+            $('#foodContentInput').show();
+            $('#editButton').hide();
+            $('#saveButton').show();
+        }
+
+        function updateFoodPost() {
+            var foodNo = $('#foodNo').val();
+            var foodTitle = $('#foodTitleInput').val();
+            var foodContent = $('#foodContentInput').val();
+            
+            let data = {
+                 foodNo: foodNo,
+                 foodTitle: foodTitle,
+                 foodContent: foodContent
+             };
+
+            $.ajax({
+                url:'${pageContext.request.contextPath}/student/foodBoardUpdate',
+                contentType:"application/json;charset=utf-8",
+                type:'POST',
+                data:JSON.stringify(data),
+                beforeSend:function(xhr){
+					xhr.setRequestHeader("${_csrf.headerName}","${_csrf.token}");
+				},
+                success:function(response) {
+                    if (response.status === "success") {
+                        alert(response.message);
+                        window.location.href = '${pageContext.request.contextPath}/student/foodList';
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(request, status, error) {
+                    alert('게시글 수정에 실패했습니다.');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h3>맛집 게시글 > 상세보기</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-dark card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">게시글 상세정보</h3>
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" id="foodNo" value="${foodboard.foodNo}">
+                            <div class="form-group">
+                                <label for="foodTitle">제목</label>
+                                <label id="foodTitleLabel">${foodboard.foodTitle}</label>
+                                <input type="text" class="form-control" id="foodTitleInput" value="${foodboard.foodTitle}" style="display: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="foodWriter">작성자</label>
+                                <p>${foodboard.foodWriter}</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="foodContent">내용</label>
+                                <label id="foodContentLabel">${foodboard.foodContent}</label>
+                                <textarea class="form-control" id="foodContentInput" rows="5" style="display: none;">${foodboard.foodContent}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="recommendCount">추천수</label>
+                                <p>${foodboard.foodCnt}</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="foodDate">작성일</label>
+                                <p>${foodboard.foodDate}</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="foodMapx">X 좌표</label>
+                                <p>${foodboard.foodMapx}</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="foodMapy">Y 좌표</label>
+                                <p>${foodboard.foodMapy}</p>
+                            </div>
+                            <div id="map"></div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <a href="${pageContext.request.contextPath}/student/foodList" class="btn btn-secondary">목록으로</a>
+                                </div>
+                                <div class="col-sm-6 text-right">
+                                    <button id="editButton" class="btn btn-primary" onclick="enableEditMode()">수정</button>
+                                    <button id="saveButton" class="btn btn-success" style="display: none;" onclick="updateFoodPost()">저장</button>
+                                    <button class="btn btn-danger" onclick="deleteFoodPost('${foodboard.foodNo}')">삭제</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

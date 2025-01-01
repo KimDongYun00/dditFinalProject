@@ -1,0 +1,19 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class FacilityVO {
+
+	private String facNo;
+	private String facTypeNo;
+	private String buiNo;
+	private String facName;
+	private int facMax;
+	private String facImg;
+	private String facYn;
+	
+	// 건물명
+	private String buiName;
+	
+}

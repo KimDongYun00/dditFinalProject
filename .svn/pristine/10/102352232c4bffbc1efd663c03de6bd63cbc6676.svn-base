@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.FoodBoardMapper">
+
+    <select id="foodList" resultType="kr.or.ddit.vo.FoodBoardVO">
+        SELECT food_no, user_no, food_title, food_writer, food_content, food_cnt,
+        food_date, food_map_x, food_map_y
+        FROM foodboard
+    </select>
+
+    <select id="detail" parameterType="String" resultType="kr.or.ddit.vo.FoodBoardVO">
+        SELECT food_no, user_no, food_title, food_writer, food_content, food_cnt,
+        food_date, food_map_x, food_map_y
+        FROM foodboard
+        WHERE food_no = #{foodNo}
+    </select>
+
+    <update id="incrementViewCount" parameterType="String">
+        UPDATE foodboard
+        SET food_cnt = food_cnt + 1
+        WHERE food_no = #{foodNo}
+    </update>
+
+    <insert id="foodboardInsert" parameterType="kr.or.ddit.vo.FoodBoardVO">
+        INSERT INTO foodboard (food_no, user_no, food_title, food_writer, food_content, food_cnt, food_date, food_map_x, food_map_y)
+        VALUES (seq_foodboard.nextval, #{user_no}, #{food_title}, #{food_writer}, #{food_content}, 0, sysdate, #{food_map_x}, #{food_map_y})
+    </insert>
+
+</mapper>

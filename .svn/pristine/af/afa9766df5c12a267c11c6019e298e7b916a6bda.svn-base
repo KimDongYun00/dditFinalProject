@@ -1,0 +1,181 @@
+package kr.or.ddit.service.admin.impl;
+
+import java.io.File;
+import java.util.List;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.or.ddit.mapper.IAdminMemberMapper;
+import kr.or.ddit.service.admin.inter.IAdminMemberService;
+import kr.or.ddit.vo.CommonVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.StudentVO;
+
+@Service
+public class AdminMemberServiceImpl implements IAdminMemberService {
+	
+	@Inject
+	private IAdminMemberMapper memMapper;
+	
+	@Override
+	public List<ProfessorVO> searchProfessor(String proName) {
+		return memMapper.searchProfessor(proName);
+	}
+
+
+
+	@Override
+	public StudentVO stuDetail(String stuNo) {
+		
+		return memMapper.stuDetail(stuNo);
+	}
+
+	@Override
+	public List<CommonVO> stuMList(String comNo) {
+		
+		return memMapper.stuMList(comNo);
+	}
+
+	@Override
+	public int stuUpdate(StudentVO stuVO, HttpServletRequest req) {
+		String uploadPath = "";
+		uploadPath = req.getServletContext().getRealPath("/resources/stuImg");
+		
+		File file = new File(uploadPath);
+		
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		String stuImg = ""; // 시설이미지 경로
+		
+		try {
+			MultipartFile stuImgFile = stuVO.getImgFile();
+			
+			if(stuImgFile.getOriginalFilename() != null && !stuImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString(); // UUID 파일명 만들기
+				fileName += "_" + stuImgFile.getOriginalFilename();
+				
+				uploadPath += "/" + fileName;
+				
+				stuImgFile.transferTo(new File(uploadPath));
+				
+				stuImg = "/resources/stuImg/" + fileName;
+			}
+			
+			stuVO.setStuImg(stuImg);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		return memMapper.stuUpdate(stuVO);
+	}
+
+	
+	// 학생 페이징처리 위한 카운터
+	@Override
+	public int stuCount(PaginationInfoVO<StudentVO> pagingVO) {
+		
+		return memMapper.stuCount(pagingVO);
+	}
+
+	// 학생 페이징 처리를 위한 리스트
+	@Override
+	public List<StudentVO> stuList(PaginationInfoVO<StudentVO> pagingVO) {
+		
+		return memMapper.stuList(pagingVO);
+	}
+
+
+	// 교수 페이징 처리를 위한 카운터
+	@Override
+	public int proCount(PaginationInfoVO<ProfessorVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return memMapper.proCount(pagingVO);
+	}
+
+
+	// 교수 페이징 처리를 위한 리스트
+	@Override
+	public List<ProfessorVO> proList(PaginationInfoVO<ProfessorVO> pagingVO) {
+		// TODO Auto-generated method stub
+		return memMapper.proList(pagingVO);
+	}
+
+
+	// 교수 상세보기 데이터
+	@Override
+	public ProfessorVO proDetail(String proNo) {
+		// TODO Auto-generated method stub
+		return memMapper.proDetail(proNo);
+	}
+
+
+
+	@Override
+	public int proUpdate(ProfessorVO proVO, HttpServletRequest req) {
+		String uploadPath = "";
+		uploadPath = req.getServletContext().getRealPath("/resources/proImg");
+		
+		File file = new File(uploadPath);
+		
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		String proImg = ""; // 시설이미지 경로
+		
+		try {
+			MultipartFile proImgFile = proVO.getProFile();
+			
+			if(proImgFile.getOriginalFilename() != null && !proImgFile.getOriginalFilename().equals("")) {
+				String fileName = UUID.randomUUID().toString(); // UUID 파일명 만들기
+				fileName += "_" + proImgFile.getOriginalFilename();
+				
+				uploadPath += "/" + fileName;
+				
+				proImgFile.transferTo(new File(uploadPath));
+				
+				proImg = "/resources/proImg/" + fileName;
+			}
+			
+			proVO.setProImg(proImg);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		return memMapper.proUpdate(proVO);
+	}
+
+
+
+	@Override
+	public int proIdCheck(String proID) {
+		// TODO Auto-generated method stub
+		return memMapper.proIdCheck(proID);
+	}
+
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

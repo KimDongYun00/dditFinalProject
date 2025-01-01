@@ -1,0 +1,94 @@
+package kr.or.ddit.academic.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.academic.service.AcademicService;
+import kr.or.ddit.vo.AcademicCalendarVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/academic")
+public class AcademicController {
+	@Inject	
+	private AcademicService service;
+	
+	@RequestMapping("/main")
+	public String academicMain() {
+		
+		return "sum/academic/academicCalendar";
+	}
+	
+	@RequestMapping(value="/insert", method = RequestMethod.POST)
+	public ResponseEntity<String> academicInsert(@RequestBody AcademicCalendarVO acaVO){
+		ResponseEntity<String> entity = null;
+		log.info("acaVO ==================> "+acaVO);
+		int cnt = service.acaInsert(acaVO);
+		if(cnt > 0) {
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		} else {
+			entity = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	@ResponseBody
+	@RequestMapping(value="/acaList", method = RequestMethod.GET)
+	public ResponseEntity<List<AcademicCalendarVO>> academicList(){
+		ResponseEntity<List<AcademicCalendarVO>> entity = null;
+		List<AcademicCalendarVO> acaList = service.acaList();
+		if(acaList != null) {
+			entity = new ResponseEntity<List<AcademicCalendarVO>>(acaList, HttpStatus.OK);
+		} else {
+			entity = new ResponseEntity<List<AcademicCalendarVO>>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	@ResponseBody
+	@RequestMapping(value="/acaRead", method=RequestMethod.GET)
+	public ResponseEntity<AcademicCalendarVO> acaRead(String acaNo){
+		ResponseEntity<AcademicCalendarVO> entity = null;
+		AcademicCalendarVO acaVO = service.acaRead(acaNo);
+		if(acaVO != null) {
+			entity = new ResponseEntity<AcademicCalendarVO>(acaVO, HttpStatus.OK);
+		} else {
+			entity = new ResponseEntity<AcademicCalendarVO>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@RequestMapping(value="/modify", method = RequestMethod.POST)
+	public ResponseEntity<String> academicModify(@RequestBody AcademicCalendarVO acaVO){
+		ResponseEntity<String> entity = null;
+		int cnt = service.acaModify(acaVO);
+		if(cnt > 0) {
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		} else {
+			entity = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@RequestMapping(value="/delete", method = RequestMethod.POST)
+	public ResponseEntity<String> academicDelete(String acaNo){
+		ResponseEntity<String> entity = null;
+		int cnt = service.acaDelete(acaNo);
+		if(cnt > 0) {
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		} else {
+			entity = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	
+}

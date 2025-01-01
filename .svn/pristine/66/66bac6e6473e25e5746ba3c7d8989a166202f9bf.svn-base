@@ -1,0 +1,191 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<meta id="_csrf" name="_csrf" content="${_csrf.token}">
+<meta id="_csrf_header" name="_csrf_header"
+	content="${_csrf.headerName}">
+<style>
+.container-xxl {
+	margin: auto;
+	width: 80%;
+	padding: 20px;
+}
+
+.card {
+	margin: auto;
+	width: 100%;
+	padding: 20px;
+}
+
+.card-header {
+	font-size: 24px;
+	text-align: center;
+}
+
+.table-responsive {
+	overflow-x: auto;
+}
+
+.table-hover th, .table-hover td {
+	text-align: center;
+}
+
+.btn-register, .btn-primary, .btn-outline-primary, .btn-outline-danger {
+	display: block;
+	margin: 20px 0;
+	width: 150px;
+	float: right;
+}
+
+.form-select {
+	margin-bottom: 20px;
+}
+
+.filter-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.filter-item {
+	display: flex;
+	align-items: center;
+	margin-right: 10px;
+}
+
+.input-group-text {
+	height: 38px;
+}
+</style>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<div class="row">
+		<div class="col-xl-12">
+			<div class="filter-container">
+				<div class="filter-item">
+					<select class="form-select" id="typeSelect" style="width: 150px;">
+						<option value="전체">전체</option>
+						<option value="선차감">선차감</option>
+						<option value="후지급">후지급</option>
+					</select>
+					<button type="button" id="insertBtn" class="btn btn-primary">장학
+						종류 등록</button>
+				</div>
+				<div class="filter-item">
+					<div class="input-group input-group-merge">
+						<span class="input-group-text" id="basic-addon-search31"><i
+							class="bx bx-search"></i></span> <input type="text" class="form-control"
+							placeholder="장학금명 검색" aria-label="Search..."
+							aria-describedby="basic-addon-search31" id="searchName" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-12">
+			<div class="card mb-4 bg-white">
+				<h5 class="card-header">장학금 종류</h5>
+				<hr class="my-0">
+				<div class="table-responsive text-nowrap">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>장학금번호</th>
+								<th>장학금명</th>
+								<th>장학종류</th>
+								<th>장학금액</th>
+								<th>상세보기</th>
+								<th>삭제</th>
+							</tr>
+						</thead>
+						<tbody class="table-border-bottom-0" id="scholarshipTable">
+							<c:forEach var="scholarship" items="${scholarshipList}">
+								<tr>
+									<td>${scholarship.schNo}</td>
+									<td>${scholarship.schName}</td>
+									<td>${scholarship.schType}</td>
+									<td>${scholarship.schAmount}원</td>
+									<td><a class='btn btn-outline-primary detailBtn'
+										href='/admin/scholarshipDetail?schNo=${scholarship.schNo}'>상세보기</a>
+									</td>
+									<td><a class='btn btn-danger deleteBtn'
+										data-scholarship-id="${scholarship.schNo}"><font
+											style="color: white">삭제</font></a></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    // 필터링 기능
+    $("#typeSelect").change(function() {
+        filterRows($("#typeSelect").val(), $("#searchName").val());
+    });
+
+    
+    // 검색 기능
+    $("#searchName").on("keyup", function(){
+        filterRows($("#typeSelect").val(), $(this).val());
+    });
+
+    function filterRows(typeFilter, searchFilter) {
+        $("#scholarshipTable tr").each(function() {
+            var row = $(this);
+            var type = row.find("td:eq(2)").text().trim();
+            var name = row.find("td:eq(1)").text().trim().toLowerCase();
+            
+            var showRow = (typeFilter === "전체" || type === typeFilter) && 
+                          (searchFilter === "" || name.includes(searchFilter.toLowerCase()));
+            
+            if (showRow) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
+    }
+
+ // 삭제 버튼 이벤트
+    $(".deleteBtn").click(function() {
+        var scholarshipId = $(this).data("scholarship-id");
+        if(confirm("해당 장학금을 삭제하시겠습니까?")) {
+            $.ajax({
+                url: "/admin/deleteScholarship",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ schNo: scholarshipId }),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), $("meta[name='_csrf']").attr("content"));
+                },
+                success: function(response) {
+                    if(response === "success") {
+                        alert("해당 장학금이 삭제되었습니다.");
+                        location.reload();
+                    } else {
+                        alert("장학금 삭제 중 오류가 발생했습니다.");
+                    }
+                },
+                error: function() {
+                    alert("장학금 삭제 중 오류가 발생했습니다.");
+                }
+            });
+        }
+    });
+
+    
+    // 등록 버튼 이벤트
+    $("#insertBtn").click(function(){
+		location.href="/admin/scholarshipInsertForm";    	
+    });
+    
+});
+</script>

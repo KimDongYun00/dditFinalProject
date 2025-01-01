@@ -1,0 +1,17 @@
+package kr.or.ddit.vo;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString  // 디버깅 편하겡
+public class SkSampleVO {
+	private String skname;
+	private List<MultipartFile> skfile;
+}

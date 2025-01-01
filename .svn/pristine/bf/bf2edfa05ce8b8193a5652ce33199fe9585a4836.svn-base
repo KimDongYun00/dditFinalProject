@@ -1,0 +1,28 @@
+package kr.or.ddit.controller.common;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/common")
+public class CommonLoginController {
+		//로그인 페이지
+		@RequestMapping(value = "/login", method = RequestMethod.GET)
+		public String login() {
+			return "common/login";
+		}
+		
+		//메인페이지(테스트용)
+		@RequestMapping(value = "/home", method = RequestMethod.GET)
+		public String home() {
+			return "common/home";
+		}
+		
+		//아이디, 비밀번호 찾기
+		@RequestMapping(value = "/findIdPw", method = RequestMethod.GET)
+		public String findIdPw() {
+			return "common/findIdPw";
+		}
+		
+}

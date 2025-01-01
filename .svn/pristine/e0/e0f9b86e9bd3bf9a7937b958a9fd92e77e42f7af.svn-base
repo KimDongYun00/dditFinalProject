@@ -1,0 +1,137 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta id="_csrf" name="_csrf" content="${_csrf.token}">
+    <meta id="_csrf_header" content="${_csrf.headerName}">
+    <title>성적 증명서</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            width: 210mm;
+            height: 297mm;
+            border: 1px solid #000;
+            padding: 20mm;
+            box-sizing: border-box;
+        }
+        .header {
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .info {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .info th, .info td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .info th {
+            width: 20%;
+        }
+        .grades {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .grades th, .grades td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            font-size: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+        .average {
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>성적 증명서</h1>
+        </div>
+        <table class="info">
+            <tr>
+                <th>성명</th>
+                <td>${student.stuName}</td>
+                <th>학번</th>
+                <td>${student.stuNo}</td>
+            </tr>
+            <tr>
+                <th>전공</th>
+                <td>${student.deptName}</td>
+                <th>입학일</th>
+                <td>${student.stuSdate}</td>
+            </tr>
+            <tr>
+                <th>성별</th>
+                <td>
+                    <c:choose>
+                        <c:when test="${student.comDetGNo == 'G0101'}">남성</c:when>
+                        <c:otherwise>여성</c:otherwise>
+                    </c:choose>
+                </td>
+                <th>생년월일</th>
+                <td>${student.stuRegno}</td>
+            </tr>
+        </table>
+        <table class="grades">
+            <thead>
+                <tr>
+                    <th>학년도</th>
+                    <th>학기</th>
+                    <th>과목명</th>
+                    <th>강의명</th>
+                    <th>강의 구분</th>
+                    <th>학년</th>
+                    <th>인정 학점</th>
+                    <th>성적</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="grade" items="${gradeList}">
+                    <tr>
+                        <td>${grade.year}</td>
+                        <td>${grade.semester}</td>
+                        <td>${grade.subName}</td>
+                        <td>${grade.lecName}</td>
+                        <td>${grade.comDetName}</td>
+                        <td>${grade.lecAge}</td>
+                        <td>${grade.lecScore}</td>
+                        <td>${grade.couScore}</td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+        <div class="average">
+            <p>평균 학점: 
+                <c:choose>
+                    <c:when test="${not empty gradeList}">
+                        ${averageScore}
+                    </c:when>
+                    <c:otherwise>
+                        0.0
+                    </c:otherwise>
+                </c:choose>
+            </p>
+        </div>
+        <div class="footer">
+            <p>대덕대학교 총장 송중호</p>
+        </div>
+    </div>
+</body>
+</html>

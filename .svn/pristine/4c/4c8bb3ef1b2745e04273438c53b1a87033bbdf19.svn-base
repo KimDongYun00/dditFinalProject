@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ILectureListMapper">
+	
+	<!-- 수강중인 강의 리스트 -->
+	<select id="selectLectureList" parameterType="string" resultType="courseVO">
+		select c.cou_no,
+				c.lec_no,
+				c.stu_no,
+				c.cou_last,
+				c.cou_middle,
+				c.cou_assignment,
+				c.cou_exam,
+				c.cou_attendance,
+				c.cou_attitude,
+				c.cou_total,
+				c.cou_score,
+				c.cou_yn,
+				l.lec_name,
+				l.year,
+				l.semester,
+				l.lec_age
+		from course c, lecture l
+		where stu_no = #{stuNo}
+		and c.lec_no = l.lec_no
+		and l.lec_del = 'N'
+		and l.year = (select YS_YEAR
+					  from year_semester
+					 where ys_sdate = (select max(ys_sdate) from year_semester))
+		and l.semester = (select YS_SEMESTER
+					      from year_semester
+					     where ys_sdate = (select max(ys_sdate) from year_semester))
+	</select>
+	<!-- 해당 강의 정보 -->
+	<select id="selectLecture" parameterType="string" resultType="lectureVO">
+		select *
+		from lecture 
+		where lec_no = #{lecNo}
+	</select>
+	<!-- 강의상세 페이지에서 보여질 게시판  -->
+	<select id="selectLectureNotice" parameterType="string" resultType="lectureNoticeVO">
+       select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.lec_not_no desc) rnum
+			from(
+					select * 
+	                 from lecture_notice 
+	                 where  lec_no=#{lecNo}
+	                order by lec_not_no desc 
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= 1 and b.rnum <= 5
+		]]>
+	</select>
+	
+	<select id="selectAssignment" parameterType="string" resultType="assignmentVO">
+	    select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.ass_no desc) rnum
+			from(
+				 select * 
+	                 from assignment 
+	                 where  lec_no=#{lecNo}
+	                order by ass_no desc 
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= 1 and b.rnum <= 5
+		]]>
+	      
+	</select>
+	<select id="selectExam" parameterType="string" resultType="examVO">
+	   select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.exam_no desc) rnum
+			from(
+					select * 
+	                 from exam 
+	                 where  lec_no=#{lecNo}
+	                order by exam_no desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= 1 and b.rnum <= 5
+		]]>
+	</select>
+	<select id="selectLecData" parameterType="string" resultType="map">
+	   select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.lec_data_no desc) rnum
+			from(
+					select * 
+	                 from lecture_data 
+	                 where lec_no=#{lecNo}
+	                order by lec_data_no desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= 1 and b.rnum <= 5
+		]]>
+	</select>
+	<!-- 강의상세 페이지에서 보여질 게시판 끝  -->
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

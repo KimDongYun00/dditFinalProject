@@ -1,0 +1,16 @@
+package kr.or.ddit.service.student.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.FoodBoardVO;
+
+public interface IFoodBoardService {
+
+    public List<FoodBoardVO> foodList();
+
+    public FoodBoardVO detail(String foodNo);
+
+    public void incrementViewCount(String foodNo);
+
+    public void foodboardInsert(FoodBoardVO foodboardVO);
+}

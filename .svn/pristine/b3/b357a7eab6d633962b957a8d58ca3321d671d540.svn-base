@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IFileMapper">
+
+	
+	<select id="getFileGroupNo" resultType="String">
+		select 'FILE_GROUP_'||seq_FILE.nextval
+		from dual
+	</select>
+	
+	<insert id="insertLecFile" parameterType="fileVO">
+		insert into "FILE"(
+			FILE_GROUP_NO
+			,FILE_NO
+			,FILE_NAME
+			,FILE_SAVE_NAME
+			,FILE_SIZE
+			,FILE_FANCYSIZE
+			,FILE_MIME
+			,FILE_SAVEPATH
+			,FILE_DOWNCOUNT
+		) values(
+			#{fileGroupNo}
+			,#{fileNo}
+			,#{fileName}
+			,#{fileSaveName}
+			,#{fileSize}
+			,#{fileFancysize}
+			,#{fileMime}
+			,#{fileSavepath}
+			,0
+		)
+	</insert>
+	
+	<select id="getFileByFileGroupNo" parameterType="String" resultType="fileVO">
+		select 
+			FILE_GROUP_NO
+			,FILE_NO
+			,FILE_NAME
+			,FILE_SAVE_NAME
+			,FILE_SIZE
+			,FILE_FANCYSIZE
+			,FILE_MIME
+			,FILE_SAVEPATH
+			,FILE_DOWNCOUNT
+		from "FILE"
+		where file_group_no = #{fileGroupNo}
+	</select>
+	
+	<select id="getFileByFileNo" parameterType="fileVO" resultType="fileVO">
+		select 
+			FILE_GROUP_NO
+			,FILE_NO
+			,FILE_NAME
+			,FILE_SAVE_NAME
+			,FILE_SIZE
+			,FILE_FANCYSIZE
+			,FILE_MIME
+			,FILE_SAVEPATH
+			,FILE_DOWNCOUNT
+		from "FILE"
+		where file_group_no = #{fileGroupNo}
+		and file_no = #{fileNo}
+	</select>
+	
+	<update id="increaseDownloadCount" parameterType="fileVO">
+		update "FILE"
+		set 
+			FILE_DOWNCOUNT = FILE_DOWNCOUNT + 1
+		where file_group_no = #{fileGroupNo}
+		and file_no = #{fileNo}	
+	</update>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

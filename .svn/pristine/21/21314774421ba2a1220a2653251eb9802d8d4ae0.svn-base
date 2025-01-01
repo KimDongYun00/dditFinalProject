@@ -1,0 +1,24 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class VolunteerVO {
+
+	private String volNo;
+	private String stuNo;
+	private String volName;
+	private String volContent;
+	private int volTime;
+	private String volRegdate;
+	private String volSdate;
+	private String volEdate;
+	private String comDetCNo;
+	private String fileGroupNo;
+	private String rejContent;
+	
+	// 학생이름 사용하려고 가져옴
+	private String stuName;
+	// 학과이름
+	private String deptName;
+}

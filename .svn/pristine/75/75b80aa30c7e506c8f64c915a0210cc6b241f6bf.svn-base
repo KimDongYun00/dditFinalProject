@@ -1,0 +1,9 @@
+package kr.or.ddit.service.admin.inter;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ProfessorVO;
+
+public interface IAdminMemberService {
+	public List<ProfessorVO> searchProfessor(String proName);
+}

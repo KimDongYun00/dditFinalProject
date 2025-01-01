@@ -1,0 +1,10 @@
+package kr.or.ddit.mapper;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface NotificationMapper {
+	
+	// 공지사항 조회
+	public BoardVO read(int boardNo);
+
+}

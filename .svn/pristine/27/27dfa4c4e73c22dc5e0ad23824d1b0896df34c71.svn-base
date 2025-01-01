@@ -1,0 +1,26 @@
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+    	<div class="row justify-content-center">
+	      <div class="col-md-6"> 
+	        <div class="card">
+	          <div class="card-body">
+	            <h4 class="mb-2 text-center">학생 일괄 등록</h4>
+	            <form id="uploadForm" action="${pageContext.request.contextPath}/admin/stuInsertAll" method="post" enctype="multipart/form-data">
+	              <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	              <div class="mb-3">
+	                <label for="file" class="form-label">엑셀 파일 선택</label>
+	                <input type="file" class="form-control" id="file" name="file"/>
+	              </div>
+	              <button type="submit" class="btn btn-primary d-grid w-100">업로드</button>
+	            </form>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </div> 
+

@@ -1,0 +1,19 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ExamQuestionSelectVO;
+import kr.or.ddit.vo.ExamQuestionVO;
+import kr.or.ddit.vo.ExamVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.StudentVO;
+
+public interface IExamMapper {
+	public void insertExam(ExamVO examVO);
+	public void insertExamQue(ExamQuestionVO examQueVO);
+	public void insertExamQueSel(ExamQuestionSelectVO examQueSelVO);
+	public List<ExamVO> getExamListByLecNo(PaginationInfoVO<ExamVO> pagingVO);
+	public ExamVO getExamDetail(String examNo);
+	public List<StudentVO> getStudentExamList(String examNo);
+	public List<String> getStudentExamSubmitList(String examNo);
+}

@@ -1,0 +1,21 @@
+package kr.or.ddit.controller.student;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/student")
+public class StuConsultionController {
+
+	// 내 상담내역 띄우기
+	@RequestMapping(value="/consultionList", method = RequestMethod.GET)
+	public String consultingMine() {
+		log.info("consultingMine 실행...!");
+		
+		return "student/consultion/mine";
+	}
+}

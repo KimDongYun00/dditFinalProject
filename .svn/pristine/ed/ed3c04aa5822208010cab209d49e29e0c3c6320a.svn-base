@@ -1,0 +1,24 @@
+package kr.or.ddit.service.admin.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.service.admin.inter.IAdminDepartmentService;
+
+@Service
+public class AdminDepartmentServiceImpl implements IAdminDepartmentService {
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

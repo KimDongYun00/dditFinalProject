@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ICommonMapper">
+	
+	<!-- 은행조회 -->
+	<select id="getBankList" resultType="commonVO">
+		select COM_DET_NO,COM_NO,COM_DET_NAME,COM_NAME,COM_DET_EXPLAIN,COM_YN
+		from COMMON_CODE_DETAIL
+		where COM_NO = 'B01'
+	</select>
+
+	<!-- 공통코드조회 파라미터로 C01, M01, ...을 넣는다 -->
+	<select id="getComDetailList" parameterType="String" resultType="commonVO">
+		select 
+			COM_DET_NO
+			,COM_NO
+			,COM_DET_NAME
+			,COM_NAME
+			,COM_DET_EXPLAIN
+			,COM_YN
+		from COMMON_CODE_DETAIL
+		where COM_NO = #{comNo}
+		and com_yn = 'Y'
+	</select>
+
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

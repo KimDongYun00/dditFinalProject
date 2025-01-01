@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminMemberMapper">
+
+	<sql id="stuType">
+		<if test="searchType != '' and searchType == 'stuNo'">
+			and (s.stu_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'stuName'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'stuDept'">
+			and (d.dept_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<sql id="proType">
+		<if test="searchType != '' and searchType == 'proNo'">
+			and (p.pro_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'proName'">
+			and (p.pro_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'proDept'">
+			and (d.dept_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	
+	
+	<select id="searchProfessor" parameterType="String" resultType="professorVO">
+		select 
+			PRO_NO
+			, (select dept_name from department d where d.dept_No = p.dept_No) dept_name
+			, PRO_NAME, PRO_PHONE
+		from PROFESSOR p
+		where pro_name like '%'||#{proName}||'%'
+	</select>
+
+	<!-- 학생 상세보기 -->
+	<select id="stuDetail" resultType="studentVO" parameterType="string">
+		select stu_no
+		     , stu_name
+		     , stu_email
+		     , s.dept_no
+		     , stu_phone
+		     , com_det_m_no
+		     , d.dept_name
+		     , com_det_g_no
+		     , stu_add1
+		     , stu_add2
+		     , stu_postcode
+		     , s.com_det_b_no
+		     , s.stu_account
+		     , s.stu_img
+		     , s.stu_year
+		  from student s, department d
+		 where s.dept_no = d.dept_no
+		   and stu_no = #{stuNo}
+	</select>
+	
+	<!-- 재적상태 셀렉트바 -->
+	<select id="stuMList" resultType = "commonVO" parameterType="string">
+		select COM_DET_NO, COM_NO, COM_DET_NAME
+          from COMMON_CODE_DETAIL
+         where com_no = #{comNo}	
+	</select>
+	
+	<!-- 학생개인정보 업데이트 -->
+	<update id="stuUpdate" parameterType="studentVO">
+		update student
+		   set 
+			   stu_img = #{stuImg}
+			 , dept_no = #{deptNo}
+			 , stu_email = #{stuEmail}
+			 , stu_phone = #{stuPhone}
+			 , stu_postcode = #{stuPostcode}
+			 , stu_add1 = #{stuAdd1}
+			 , stu_add2 = #{stuAdd2}
+			 , com_det_b_no = #{comDetBNo}
+			 , com_det_m_no = #{comDetMNo}
+			 , stu_account = #{stuAccount}   
+	     where stu_no = #{stuNo}
+	</update>
+	
+	<select id="stuCount" resultType="int" parameterType="pagingVO">
+	  select count(stu_no)
+		from student s, department d	
+	   where 1=1
+		 and s.dept_no = d.dept_no	
+		<include refid="stuType"/>
+	</select>
+	
+	<!-- 학생리스트 -->
+	<select id="stuList" parameterType="pagingVO" resultType="studentVO">
+		select
+     	 	   b.*  
+  		  from          
+	      (select
+	            a.*, row_number() over(order by a.stu_no) AS rnum
+	        from(select stu_no, stu_name, stu_email, s.stu_year, s.dept_no, stu_phone, com_det_m_no, d.dept_name, com_det_g_no
+	               from student s, department d
+	              where s.dept_no = d.dept_no
+	              <include refid="stuType"/>
+	              )a
+	              		)b
+	         <![CDATA[
+				where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+	</select>
+	
+	<!-- 교수 row num -->
+	<select id="proCount" resultType="int" parameterType="pagingVO">
+	  select count(p.pro_no)
+		from professor p, department d	
+		where 1=1
+        and p.dept_no = d.dept_no	
+		<include refid="proType"/>
+	</select>
+	
+	<!-- 교수리스트 -->
+	<select id="proList" parameterType="pagingVO" resultType="professorVO">
+		select
+		       b.*  
+		  from  
+		      (select
+		            a.*, row_number() over(order by a.pro_no) AS rnum
+		        from
+				     (select p.pro_no, p.pro_name, p.com_det_g_no, p.pro_phone, p.com_det_m_no, p.com_det_p_no, p.dept_no, d.dept_name
+				        from professor p,  department d
+				       where p.dept_no = d.dept_no
+				       <include refid="proType"/>
+				       )a
+		      		 )b
+		    <![CDATA[
+					where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+	</select>
+	
+	<select id="proDetail" resultType="professorVO" parameterType="string">
+		select p.pro_no
+		     , p.pro_name
+		     , p.pro_email
+		     , p.dept_no
+		     , pro_phone
+		     , p.com_det_m_no
+		     , d.dept_name
+		     , p.com_det_g_no
+		     , p.pro_add1
+		     , p.pro_add2
+		     , p.pro_postcode
+		     , p.com_det_b_no
+		     , p.pro_account
+		     , p.pro_img
+		  from professor p, department d
+		 where p.dept_no = d.dept_no
+		   and p.pro_no = #{proNo}
+	</select>
+	
+	<update id="proUpdate" parameterType="professorVO">
+		update professor
+		   set 
+		       pro_no = #{proNo}
+			 , pro_img = #{proImg}
+			 , dept_no = #{deptNo}
+			 , pro_email = #{proEmail}
+			 , pro_phone = #{proPhone}
+			 , pro_postcode = #{proPostcode}
+			 , pro_add1 = #{proAdd1}
+			 , pro_add2 = #{proAdd2}
+			 , com_det_b_no = #{comDetBNo}
+			 , com_det_m_no = #{comDetMNo}
+			 , pro_account = #{proAccount}   
+	     where pro_no = #{proNo}
+	</update>
+	
+	<select id="proIdCheck" parameterType="string" resultType="int">
+		select count(pro_no)
+		  from professor
+	 	 where pro_no=#{proNo} 
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

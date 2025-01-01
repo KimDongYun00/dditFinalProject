@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.IProfessorMapper">
+	<!-- 교수테이블 해당교수정보-->
+	<select id="selectProfessor" parameterType="string" resultType="professorVO">
+		select  pro_no,dept_no,com_det_p_no,pro_name,com_det_g_no,pro_regno,pro_postcode,pro_add1,pro_add2,
+				pro_email,pro_img,pro_ip,enabled,com_det_b_no,pro_account,pro_del_yn,pro_sdate,pro_edate,
+				com_det_m_no,pro_phone
+		from professor
+		where pro_no = #{proNo}
+	</select>
+	<!-- 학과테이블 해당교수정보 -->
+	<select  id="selectProfessorDep" parameterType="string" resultType="departmentVO">
+		select dept_no,col_no,fac_no,pro_no,dept_name,dept_call,com_det_b_no,dept_account,dept_content
+		from department
+		where pro_no = #{proNo}
+	</select>
+	
+	<!-- 교수프로필 업데이트 -->
+	<update id="profileUpdate" parameterType="professorVO">
+		update professor
+		set pro_img= #{proImg},
+		    pro_postcode =#{proPostcode},
+		    pro_add1=#{proAdd1},
+		    pro_add2=#{proAdd2},
+		    pro_phone=#{proPhone},
+		    pro_email=#{proEmail},
+		    com_det_b_no=#{comDetBNo},
+		    pro_account=#{proAccount}
+		where pro_no=#{proNo}
+	</update>
+</mapper>

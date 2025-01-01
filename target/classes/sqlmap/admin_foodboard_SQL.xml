@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.AdminFoodBoardMapper">
+
+	<!-- 목록 조회 -->
+	<select id="foodList" parameterType="hashMap" resultType="kr.or.ddit.vo.FoodBoardVO">
+    select T.*
+		from
+		(
+		SELECT row_number() over(ORDER BY food_no DESC) rnum, food_no, user_no,
+		food_title, food_writer, food_content, food_cnt, TO_CHAR(food_date, 'YYYY-MM-DD') AS food_date, food_map_x, food_map_y 
+		, (select count(*)  from board_recommand b where f.food_no = b.board_pk_no) recommend_count
+		FROM foodboard f
+		WHERE 1 = 1
+		AND (FOOD_TITLE LIKE '%' || #{keyword} || '%' OR FOOD_CONTENT LIKE '%' ||
+		#{keyword} || '%')
+		) T
+		WHERE T.RNUM BETWEEN (#{page} * #{itemsPerPage})
+		- (#{itemsPerPage} - 1) AND (#{page} * #{itemsPerPage})
+</select>
+
+
+	<!-- 전체 행 개수 조회 -->
+	<select id="getFoodBoardCount" resultType="int">
+		SELECT COUNT(*) FROM foodboard
+		WHERE 1 = 1
+		AND (FOOD_TITLE LIKE '%' || #{keyword} || '%' OR FOOD_CONTENT
+		LIKE '%' || #{keyword} || '%')
+	</select>
+
+	<select id="detail" parameterType="String" resultType="kr.or.ddit.vo.FoodBoardVO">
+		SELECT food_no, user_no, food_title, food_writer, food_content, food_cnt AS
+		recommend_count,
+		TO_CHAR(food_date, 'YYYY-MM-DD') AS food_date, food_map_x, food_map_y
+		FROM foodboard
+		WHERE food_no = #{foodNo}
+</select>
+
+	<!-- 등록 -->
+	<insert id="foodboardInsert" parameterType="kr.or.ddit.vo.FoodBoardVO">
+		INSERT INTO foodboard (food_no, user_no, food_title, food_writer,
+		food_content, food_cnt, food_date, food_mapx, food_mapy)
+		VALUES (seq_foodboard.nextval, #{userNo}, #{foodTitle},
+		<if test="foodWriter != null">#{foodWriter}</if>
+		<if test="foodWriter == null">null</if>
+		,
+		#{foodContent}, 0, sysdate, #{foodMapx}, #{foodMapy})
+	</insert>
+
+	<!-- 검색 -->
+	<select id="searchFood" parameterType="String" resultType="kr.or.ddit.vo.FoodBoardVO">
+		SELECT food_no, user_no, food_title, food_writer, food_content, food_cnt AS
+		recommend_count,
+		TO_CHAR(food_date, 'YYYY-MM-DD') AS food_date, food_mapx, food_mapy
+		FROM foodboard
+		WHERE food_title LIKE '%' || #{keyword} || '%'
+		OR food_content LIKE '%' || #{keyword} || '%'
+</select>
+
+	<!-- 수정 -->
+	<update id="foodBoardUpdate" parameterType="kr.or.ddit.vo.FoodBoardVO">
+		UPDATE foodboard
+		SET food_title = #{foodTitle},
+		food_content = #{foodContent}
+		WHERE food_no = #{foodNo}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="foodBoardDelete" parameterType="kr.or.ddit.vo.FoodBoardVO">
+		DELETE FROM foodboard
+		WHERE food_no = #{foodNo} AND user_no = #{userNo}
+	</delete>
+
+	<!-- 추천 여부 체크 -->
+	<select id="checkIfAlreadyRecommended" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM board_recommand
+		WHERE board_pk_no = #{foodNo} AND user_no = #{userNo}
+	</select>
+
+	<!-- 추천 등록 -->
+	<insert id="insertRecommendation" parameterType="map">
+		INSERT INTO board_recommand (bo_rec_no, user_no, board_pk_no)
+		VALUES (seq_board_recommand.nextval, #{userNo}, #{foodNo})
+	</insert>
+
+	<!-- 추천 수 조회 -->
+	<select id="getRecommendCount" resultType="int">
+		SELECT count(*)
+		FROM board_recommand
+		WHERE BOARD_PK_NO = #{foodNo}
+	</select>
+	
+	
+	
+	
+</mapper>

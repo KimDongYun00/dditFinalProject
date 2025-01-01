@@ -1,0 +1,18 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.CertificationVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+
+public interface IStuCertificationMapper {
+
+	public int selectCertificationCount(PaginationInfoVO<CertificationVO> pagingVO);
+
+	// 증명서 리스트
+	public List<CertificationVO> selectCertificationList(PaginationInfoVO<CertificationVO> pagingVO);
+
+	// 내가 발급받은 증명서 내역 조회
+	public List<CertificationVO> myCertificationList(String stuNo);
+
+}

@@ -1,0 +1,10 @@
+package kr.or.ddit.service.common;
+
+import kr.or.ddit.vo.UserVO;
+
+public interface IUserLoginService {
+
+	public UserVO loginCheck(UserVO userVO);
+
+	
+}

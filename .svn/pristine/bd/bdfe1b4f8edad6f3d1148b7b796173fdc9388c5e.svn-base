@@ -1,0 +1,15 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class ExamVO {
+	private String examNo;
+	private String lecNo;
+	private String comDetHNo;
+	private String examName;
+	private String examContent;
+	private String examDate;
+	private int examLimit;
+	private String examRegdate;
+}

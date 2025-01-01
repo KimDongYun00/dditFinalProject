@@ -1,0 +1,203 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <meta name="_csrf" content="${_csrf.token}">
+    <meta name="_csrf_header" content="${_csrf.headerName}">
+    <title>장학 신청 목록</title>
+    <style>
+        .container-xxl {
+            margin: auto;
+            width: 80%;
+            padding: 20px;
+        }
+        .card-header {
+            font-size: 24px;
+            text-align: center;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table-hover th, .table-hover td {
+            text-align: center;
+        }
+        .btn-register {
+            display: block;
+            margin: 20px 0;
+            margin-left: 77%;
+            width: 150px;
+            float: right;
+        }
+        .form-select, .form-control {
+            margin-bottom: 20px;
+            height: 38px;
+            padding: 6px 12px;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        .input-group-text {
+            height: 38px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="filter-container">
+                <div class="filter-item">
+                    <select class="form-select" id="statusSelect" style="width: 150px;">
+                        <option value="전체">전체</option>
+                        <option value="승인완료">승인완료</option>
+                        <option value="미승인">미승인</option>
+                        <option value="반려">반려</option>
+                    </select>
+                    
+                </div>
+                <div class="filter-item">
+                    <div class="input-group input-group-merge">
+                        <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
+                        <input type="text" class="form-control" placeholder="학번 검색" aria-label="Search..." aria-describedby="basic-addon-search31" id="searchId" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            <div class="card mb-4 bg-white">
+                <h5 class="card-header">장학 신청 목록</h5>
+                <hr class="my-0">
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>장학금 번호</th>
+                                <th>장학금이름</th>
+                                <th>학생아이디</th>
+                                <th>처리 현황</th>
+                                <th>상세보기</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="tbody">
+                            <c:forEach var="scholarshipRequest" items="${scholarshipRequestList}">
+                                <tr>
+                                    <td><input type="checkbox" name="scholarshipRequest" value="${scholarshipRequest.schRecNo}"></td>
+                                    <td>${scholarshipRequest.schRecNo}</td>
+                                    <td>${scholarshipRequest.schName}</td>
+                                    <td>${scholarshipRequest.stuNo}</td>
+                                    <td><c:choose>
+                                            <c:when test="${scholarshipRequest.comDetCNo == 'C02'}"><font style="color:green;">승인완료</font></c:when>
+                                            <c:when test="${scholarshipRequest.comDetCNo == 'C03'}"><font style="color:red;">미승인</font></c:when>
+                                            <c:when test="${scholarshipRequest.comDetCNo == 'C04'}"><font style="color:blue;">반려</font></c:when>
+                                            <c:otherwise>알 수 없음</c:otherwise>
+                                        </c:choose></td>
+                                    <td>
+                                        <a class='btn btn-outline-primary detailBtn' href='/admin/scholarshipRequestDetail?schRecNo=${scholarshipRequest.schRecNo}'>상세보기</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    // 일괄 선택 기능
+    $("#selectAll").click(function() {
+        var allChecked = $(this).prop('checked');
+        $("input[name='scholarshipRequest']").prop('checked', allChecked);
+    });
+
+    // 필터링 기능
+    $("#statusSelect").change(function() {
+        var filterValue = $(this).val();
+        filterRows(filterValue, $("#searchId").val());
+    });
+
+    // 검색 기능
+    $("#searchId").on("keyup", function(){
+        var searchValue = $(this).val().toLowerCase();
+        filterRows($("#statusSelect").val(), searchValue);
+    });
+
+    function filterRows(statusFilter, searchFilter) {
+        $("tbody tr").each(function() {
+            var row = $(this);
+            var status = row.find("td:eq(4)").text().trim();
+            var studentId = row.find("td:eq(3)").text().trim().toLowerCase();
+            
+            var showRow = (statusFilter === "전체" || status === statusFilter) && 
+                          (searchFilter === "" || studentId.includes(searchFilter));
+            
+            if (showRow) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
+
+        // 조회 기준이 바뀌면 일괄 선택이 취소되게끔
+        $("input[name='scholarshipRequest']").prop('checked', false);
+        $("#selectAll").prop('checked', false);
+
+        // "미승인" 필터가 선택된 경우에만 일괄 승인 처리 버튼 표시
+        if (statusFilter === '미승인') {
+            var html = "<button class='btn btn-primary' id='approveSelectedBtn'>일괄 승인처리</button>";
+            $("#allApproveBtn").html(html);
+
+            // 선택 항목 승인 처리 이벤트
+            $("#approveSelectedBtn").click(function() {
+                var selectedIds = [];
+                $("input[name='scholarshipRequest']:checked").each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    alert("승인할 항목을 선택해주세요.");
+                    return;
+                }
+                
+                if (confirm("선택된 항목들을 일괄 승인처리할까요?")) {
+                    $.ajax({
+                        url: "/admin/scholarshipRequestsApprove",
+                        type: "POST",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                        contentType: "application/json;charset=utf-8",
+                        data: JSON.stringify(selectedIds),
+                        success: function(response) {
+                            alert("선택된 항목들이 승인되었습니다.");
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            alert("승인 중 오류가 발생했습니다.");
+                        }
+                    });
+                }
+            });
+        } else {
+            $("#allApproveBtn").html('');
+        }
+    }
+
+    // 페이지 로드 시 초기 필터링 적용
+    filterRows($("#statusSelect").val(), $("#searchId").val());
+});
+</script>

@@ -1,0 +1,84 @@
+package kr.or.ddit.tuition.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ITuitionMapper;
+import kr.or.ddit.vo.PaginationInfoVO;
+import kr.or.ddit.vo.TuitionPaymentVO;
+import kr.or.ddit.vo.TuitionVO;
+
+@Service
+public class TuitionServiceImpl implements ITuitionService {
+
+	@Inject
+	private ITuitionMapper tuiMapper;
+	
+	@Override
+	public int selectTuitionCount(PaginationInfoVO<TuitionVO> pagingVO) {
+		return tuiMapper.selectTuitionCount(pagingVO);
+	}
+
+	@Override
+	public List<TuitionVO> getTuitionList(PaginationInfoVO<TuitionVO> pagingVO) {
+		return tuiMapper.getTuitionList(pagingVO);
+	}
+
+	@Override
+	public List<String> getYearList() {
+		return tuiMapper.getYearList();
+	}
+
+	@Override
+	public int insertTuition(TuitionVO tuiVO) {
+		return tuiMapper.insertTuition2(tuiVO);
+	}
+
+	@Override
+	public int updateTuition(TuitionVO tuiVO) {
+		return tuiMapper.updateTuition(tuiVO);
+	}
+
+	@Override
+	public int deleteTuition(TuitionVO tuiVO) {
+		return tuiMapper.deleteTuition(tuiVO);
+	}
+
+	@Override
+	public TuitionVO getTuitionByStuNo(String stuNo) {
+		return tuiMapper.getTuitionByStuNo(stuNo);
+	}
+
+	@Override
+	public List<TuitionVO> getTuiPayListByStuNo(String stuNo) {
+		return tuiMapper.getTuiPayListByStuNo(stuNo);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminMemberMapper">
+
+	
+	<select id="searchProfessor" parameterType="String" resultType="professorVO">
+		select 
+			PRO_NO
+			, (select dept_name from department d where d.dept_No = p.dept_No) dept_name
+			, PRO_NAME, PRO_PHONE
+		from PROFESSOR p
+		where pro_name like '%'||#{proName}||'%'
+	</select>
+	
+	<select id="selectStuList" resultType="studentVO">
+		select STU_NO, STU_NAME, STU_EMAIL, s.DEPT_NO, STU_PHONE, COM_DET_M_NO, d.DEPT_NAME, COM_DET_G_NO
+		from student s, department d
+		where s.dept_no = d.dept_no
+	</select>
+	
+	<select id="stuDetail" resultType="studentVO">
+		select STU_NO, STU_NAME, STU_EMAIL, s.DEPT_NO, STU_PHONE, COM_DET_M_NO, d.DEPT_NAME, COM_DET_G_NO, stu_add1, stu_add2
+		from student s, department d
+		where s.dept_no = d.dept_no
+		and stu_no = #{stuNo}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

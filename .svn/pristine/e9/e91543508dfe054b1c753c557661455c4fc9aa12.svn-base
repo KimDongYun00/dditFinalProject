@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IConsultingMapper">
+
+	<!-- 관리자용 동적 쿼리 -->
+	<sql id="consultingSearch">
+		<if test="searchType != null and searchType == 'student'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'professor'">
+			and (p.pro_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<!-- 교수용 search sql 지도학생 아직 구현안함-->
+	<sql id="consultingPro">
+<!-- 		<if test="searchType != null and searchType ==1"> -->
+			
+<!-- 		</if> -->
+<!-- 		<if test="searchType != null and searchType ==2"> -->
+			
+<!-- 		</if> -->
+		<if test="searchLecType != null and searchLecType == 1">
+			and (c.stu_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchLecType != null and searchLecType == 2">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		
+	</sql>
+
+	<!-- 현재 관리자용 상담 게시글 수 -->
+	<select id="selectConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		  from CONSULTING c, student s, professor p			
+		 where c.stu_no = s.stu_no
+		   and c.pro_no = p.pro_no	
+		<include refid="consultingSearch"/>	
+	</select>
+	
+	<!-- 관리자 상담 리스트 -->
+	<select id="selectConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+						c.CON_NO
+					  , c.STU_NO
+					  , c.PRO_NO
+					  , c.CON_TITLE
+					  , c.CON_CONTENT
+					  , to_char(c.CON_REGDATE, 'yyyy/mm/dd') con_regdate
+					  , to_char(c.CON_DATE, 'yyyy/mm/dd') con_date
+					  , c.CON_ONOFF
+					  , c.COM_DET_S_NO
+					  , c.COM_DET_N_NO
+	                  , s.stu_name
+	                  , p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 <include refid="consultingSearch"/>	
+			     )a
+              )b
+        <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+	<!-- 관리자 상담 상세보기 -->
+	<select id="selectConsultingDetail" resultType="consultingVO" parameterType="string">
+		 select c.CON_NO
+			  , c.STU_NO
+			  , c.PRO_NO
+			  , c.CON_TITLE
+			  , c.CON_CONTENT
+			  , to_char(c.CON_REGDATE, 'yyyy/mm/dd') con_regdate
+			  , to_char(c.CON_DATE, 'yyyy/mm/dd') con_date
+			  , c.CON_ONOFF
+			  , c.COM_DET_S_NO
+			  , c.COM_DET_N_NO
+              , s.stu_name
+              , p.pro_name
+		 from CONSULTING c, STUDENT s, PROFESSOR p
+		where c.stu_no = s.stu_no
+		  and c.pro_no = p.pro_no
+		  and con_no = #{conNo} 
+	</select>
+	
+	<!-- 관리자가 상담 상태 수정하는 쿼리 -->
+	<update id="updateConsulting" parameterType="consultingVO">
+		update consulting
+		   set 
+		       com_det_s_no = #{comDetSNo}
+		 where con_no = #{conNo}	
+	</update>
+	
+	<!-- 관리자가 상담 상태 삭제하는 쿼리 -->
+	<delete id="deleteConsulting" parameterType="string">
+		delete consulting
+		 where con_no = #{conNo}
+	</delete>
+	
+	<!-- 교수용 상담 목록 -->
+	<select id="proConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+						c.CON_NO
+					  , c.STU_NO
+					  , c.PRO_NO
+					  , c.CON_TITLE
+					  , c.CON_CONTENT
+					  , to_char(c.CON_REGDATE, 'yyyy/mm/dd') con_regdate
+					  , to_char(c.CON_DATE, 'yyyy/mm/dd') con_date
+					  , c.CON_ONOFF
+					  , c.COM_DET_S_NO
+					  , c.COM_DET_N_NO
+	                  , s.stu_name
+	                  , p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 and c.pro_no = #{lecNo}
+				 <include refid="consultingPro"/>	
+			     )a
+              )b
+	</select>
+	
+	<!-- 페이징처리를 위한 카운트 -->
+	<select id="proConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		  from CONSULTING c, student s, professor p			
+		 where c.stu_no = s.stu_no
+		   and c.pro_no = p.pro_no	
+		   and c.pro_no = #{lecNo}
+		   <include refid="consultingPro"/>		   
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

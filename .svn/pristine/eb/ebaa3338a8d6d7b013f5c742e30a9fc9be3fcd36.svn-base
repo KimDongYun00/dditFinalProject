@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.IProfessorMapper">
+	<sql id="studentSearch">
+		<if test="searchType != null and searchType == 'stuNo'">
+			and (s.stu_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'stuName'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+	
+	<!-- 수강학생 조회  map-->
+	<resultMap type="courseVO" id="courseMap">
+		<id property="couNo" column="cou_no"/>
+		<result property="lecNo" column="lec_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="couLast" column="cou_last"/>
+		<result property="couMiddle" column="cou_middle"/>
+		<result property="couAssignment" column="cou_assignment"/>
+		<result property="couExam" column="cou_exam"/>
+		<result property="couAttendance" column="cou_attendance"/>
+		<result property="couAttitude" column="cou_attitude"/>
+		<result property="couTotal" column="cou_total"/>
+		<result property="couScore" column="cou_score"/>
+		<result property="couYn" column="cou_yn"/>
+		<association property="studentVO" resultMap="studentMap"/>
+	</resultMap>
+
+
+	<resultMap type="assignmentSubmitVO" id="assignmentSubmitMap">
+		<id property="stuNo" column="stu_no"/>
+		<result property="assSubNo" column="ass_sub_no"/>
+		<result property="assNo" column="ass_no"/>
+		<result property="stuNo" column="stu_no"/>
+		<result property="assSubComment" column="ass_sub_comment"/>
+		<result property="assSubScore" column="ass_sub_score"/>
+		<result property="assSubDate" column="ass_sub_date"/>
+		<result property="fileGroupNo" column="file_group_no"/>
+		<association property="studentVO" resultMap="studentMap"/>
+	</resultMap>
+	
+	<resultMap type="studentVO" id="studentMap">
+		<result property="stuNo" column="stu_no"/>	
+		<result property="deptNo" column="dept_no"/>	
+		<result property="stuYear" column="stu_year"/>	
+		<result property="stuName" column="stu_name"/>	
+		<result property="comDetGNo" column="com_det_g_no"/>	
+		<result property="stuRegno" column="stu_regno"/>	
+		<result property="stuPostcode" column="stu_postcode"/>	
+		<result property="stuAdd1" column="stu_add1"/>	
+		<result property="stuAdd2" column="stu_add2"/>	
+		<result property="stuEmail" column="stu_email"/>	
+		<result property="stuImg" column="stu_img"/>	
+		<result property="stuIp" column="stu_ip"/>	
+		<result property="enabled" column="enabled"/>	
+		<result property="comDetBNo" column="com_det_b_no"/>	
+		<result property="stuAccount" column="stu_account"/>	
+		<result property="stuDelYn" column="stu_delyn"/>	
+		<result property="stuSdate" column="stu_sdate"/>	
+		<result property="stuEdate" column="stu_edate"/>	
+		<result property="comDetMNo" column="com_det_m_no"/>	
+		<result property="stuPhone" column="stu_phone"/>	
+		<association property="departmentVO" resultMap="departmentMap"/>
+	</resultMap>
+	
+	<resultMap type="departmentVO" id="departmentMap">
+		<result property="deptName" column="dept_name"/>
+	</resultMap>
+	
+	
+	<!-- 교수테이블 해당교수정보-->
+	<select id="selectProfessor" parameterType="string" resultType="professorVO">
+		select  pro_no,dept_no,com_det_p_no,pro_name,com_det_g_no,pro_regno,pro_postcode,pro_add1,pro_add2,
+				pro_email,pro_img,pro_ip,enabled,com_det_b_no,pro_account,pro_del_yn,pro_sdate,pro_edate,
+				com_det_m_no,pro_phone
+		from professor
+		where pro_no = #{proNo}
+	</select>
+	
+	<!-- 학과테이블 해당교수정보 -->
+	<select  id="selectProfessorDep" parameterType="string" resultType="departmentVO">
+		select dept_no,col_no,fac_no,pro_no,dept_name,dept_call,com_det_b_no,dept_account,dept_content
+		from department
+		where pro_no = #{proNo}
+	</select>
+	
+	<!-- 교수프로필 업데이트 -->
+	<update id="profileUpdate" parameterType="professorVO">
+		update professor
+		set pro_img= #{proImg},
+		    pro_postcode =#{proPostcode},
+		    pro_add1=#{proAdd1},
+		    pro_add2=#{proAdd2},
+		    pro_phone=#{proPhone},
+		    pro_email=#{proEmail},
+		    com_det_b_no=#{comDetBNo},
+		    pro_account=#{proAccount}
+		where pro_no=#{proNo}
+	</update>
+	
+	<!-- 담당 강의 목록 -->
+	<select id="lectureList" parameterType="string" resultType="lectureVO">
+		select lec_no,pro_no,sub_no,fac_no,lec_name,lec_explain,lec_max,lec_now,lec_onoff,lec_age,lec_score,com_det_l_no,com_det_c_no,file_group_no,year,semester,lec_mid_rate,lec_last_rate,lec_ass_rate,lec_exam_rate,lec_ad_rate,lec_at_rate
+		from lecture
+		where pro_no = #{proNo}
+	</select>
+
+	<!-- 해당 강의 정보 -->
+	<select id="selectLecture" parameterType="string" resultType="lectureVO">
+		select *
+		from lecture 
+		where lec_no = #{lecNo}
+	</select>
+	
+	<!-- 해당 강의 참여자 수 -->
+	<select id="selectStudentCount" parameterType="pagingVO" resultType="int" >
+		select count(*) 
+ 		from course c, student s, department d
+		where 1=1
+		  and c.stu_no = s.stu_no 
+	   	  and s.dept_no = d.dept_no
+		  and c.lec_no = #{lecNo}
+		<include refid="studentSearch"/>
+	</select>
+	
+	<!-- 해당 강의 참여자 목록 (페이징)-->
+	<select id="selectStudentList" parameterType="pagingVO" resultMap="courseMap">
+	select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.stu_no desc) rnum
+			from(
+				select
+					c.cou_no,
+                    c.lec_no,
+                    c.stu_no,
+                    c.cou_last,
+                    c.cou_middle,
+                    c.cou_assignment,
+                    c.cou_exam,
+                    c.cou_attendance,
+                    c.cou_attitude,
+                    c.cou_total,
+                    c.cou_score,
+                    c.cou_yn,
+                    s.stu_name,
+                    s.stu_year,
+                    d.dept_name
+				from course c, student s, department d
+				where 1=1
+				  and c.stu_no = s.stu_no 
+			   	  and s.dept_no = d.dept_no
+                  and c.lec_no = #{lecNo}
+				<include refid="studentSearch"/>
+				order by c.stu_no desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	<!-- 강의상세 페이지에서 보여질 게시판  -->
+	<select id="selectLectureNotice" parameterType="string" resultType="lectureNoticeVO">
+			select a.* 
+        from ( select * 
+                 from lecture_notice 
+                 where  lec_no=#{lecNo}
+                order by lec_not_no desc )a
+      <![CDATA[ 
+       where rownum <= 5 
+      ]]>
+	</select>
+	
+	<select id="selectAssignment" parameterType="string" resultType="assignmentVO">
+		select a.* 
+	        from ( select * 
+	                 from assignment 
+	                 where  lec_no=#{lecNo}
+	                order by ass_no desc )a
+	      <![CDATA[ 
+	       where rownum <= 5 
+	      ]]>
+	</select>
+	<select id="selectExam" parameterType="string" resultType="examVO">
+		select a.* 
+	        from ( select * 
+	                 from exam 
+	                 where  lec_no=#{lecNo}
+	                order by exam_no desc )a
+	      <![CDATA[ 
+	       where rownum <= 5 
+	      ]]>
+	</select>
+	<!-- 강의상세 페이지에서 보여질 게시판 끝  -->
+	
+	<!-- 과제 게시판 전체 글갯수 -->
+	<select id="selectAssignmentCount" parameterType="pagingVO" resultType="int">
+		select count(ass_no)
+		from assignment
+	</select>
+	
+	<!-- 과제목록조회 (페이징처리)-->
+	<select id="selectAssignmentList" parameterType="pagingVO" resultType="assignmentVO">
+		select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.ass_no desc) rnum
+			from(
+				select
+					ass_no,
+					lec_no,
+					ass_title,
+					ass_content,
+					ass_edate,
+					ass_regdate
+				from assignment
+				where lec_no=#{lecNo}
+				order by ass_no desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+		
+	</select>
+	
+	<!-- 과제 상세보기 -->
+	<select id="selectAssignmentDetail" parameterType="string" resultType="assignmentVO">
+		select *
+		from assignment
+		where ass_no = #{assNo}
+	</select>
+	
+	<!-- 학생이 제출한 과제 목록 갯수 -->
+	<select id="selectAssignmentSubmitCount" resultType="int">
+		select count(*)
+	    from assignment_submit
+	    where ass_no = #{assNo}
+	</select>
+	
+	<!-- 자바에서 처리하기 위한 과제 목록 -->
+	<select id="selectASList" parameterType="string" resultType="assignmentSubmitVO">
+		select *
+		from assignment_submit
+		where ass_no = #{assNo}
+	</select>
+	
+	<!-- 학생이 제출한 과제 목록 -->
+	<select id="selectAssignmentSubmitList" parameterType="pagingVO" resultMap="assignmentSubmitMap">
+			select
+			b.*
+		from(
+			select 
+				a.*, row_number() over (order by a.ass_no desc) rnum
+			from(
+				select 
+                    a.ass_sub_no,
+                    a.ass_no,
+                    a.stu_no,
+                    a.ass_sub_comment,
+                    a.ass_sub_score,
+                    a.ass_sub_date,
+                    a.file_group_no,
+                    b.stu_name
+                from assignment_submit a, student b
+                where a.stu_no = b.stu_no
+                and ass_no=#{assNo}
+				order by ass_no desc
+			) a
+		) bb 
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	
+	<!-- 과제 등록 -->
+	<insert id="insertAssignment" parameterType="assignmentVO" useGeneratedKeys="true">
+		<selectKey keyProperty="assNo" resultType="string" order="BEFORE">
+			select 'ASS_'|| to_char(sysdate,'yyyy')|| LPAD(seq_assignment.nextval, 4, '0') from dual
+		</selectKey>
+		insert into Assignment
+		values(#{assNo},#{lecNo},#{assTitle},#{assContent}, TO_DATE(#{assEdate}, 'YYYY-MM-DD"T"HH24:MI'),sysdate)
+	</insert>
+	
+	<!-- 과제 수정 -->
+	<update id="updateAssignment" parameterType="assignmentVO">
+		update assignment
+			set
+				ass_title = #{assTitle},
+				ass_content = #{assContent},
+				ass_edate = TO_DATE(#{assEdate}, 'YYYY-MM-DD"T"HH24:MI')
+		where ass_no = #{assNo}
+	</update>
+	
+	<!-- 과제 삭제 -->
+	<delete id="deleteAssignment" parameterType="string">
+		delete 
+		from assignment
+		where ass_no = #{assNo}
+	</delete>
+	
+	<select id="selStuAss" parameterType="map" resultType="assignmentSubmitVO">
+	     select * 
+	           from ASSIGNMENT_SUBMIT
+         where 
+               stu_no = #{stuNo} 
+               and ass_no = #{assNo}
+	</select>
+</mapper>

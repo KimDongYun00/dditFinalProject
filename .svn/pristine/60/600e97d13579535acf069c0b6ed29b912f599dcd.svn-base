@@ -1,0 +1,13 @@
+package kr.or.ddit.vo;
+
+import lombok.Data;
+
+@Data
+public class AssignmentVO {
+	private String assNo;
+	private String lecNo;
+	private String assTitle;
+	private String assContent;
+	private String assEdate;
+	private String assRegdate;
+}

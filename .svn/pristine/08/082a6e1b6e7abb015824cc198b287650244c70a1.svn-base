@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminMemberMapper">
+
+	<sql id="stuType">
+		<if test="searchType != '' and searchType == 'stuNo'">
+			and (s.stu_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'stuName'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'stuDept'">
+			and (d.dept_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<sql id="proType">
+		<if test="searchType != '' and searchType == 'proNo'">
+			and (p.pro_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'proName'">
+			and (p.pro_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'proDept'">
+			and (d.dept_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<sql id="empType">
+		<if test="searchType != '' and searchType == 'empNo'">
+			and (emp_no like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != '' and searchType == 'empName'">
+			and (emp_name like '%'||#{searchWord}||'%')
+		</if>	
+	</sql>
+	
+	
+	
+	<select id="searchProfessor" parameterType="String" resultType="professorVO">
+		select 
+			PRO_NO
+			, (select dept_name from department d where d.dept_No = p.dept_No) dept_name
+			, PRO_NAME, PRO_PHONE
+		from PROFESSOR p
+		where pro_name like '%'||#{proName}||'%'
+	</select>
+
+	<!-- 학생 상세보기 -->
+	<select id="stuDetail" resultType="studentVO" parameterType="string">
+		select stu_no
+		     , stu_name
+		     , stu_email
+		     , s.dept_no
+		     , stu_phone
+		     , com_det_m_no
+		     , d.dept_name
+		     , com_det_g_no
+		     , stu_add1
+		     , stu_add2
+		     , stu_postcode
+		     , s.com_det_b_no
+		     , s.stu_account
+		     , s.stu_img
+		     , s.stu_year
+		  from student s, department d
+		 where s.dept_no = d.dept_no
+		   and stu_no = #{stuNo}
+	</select>
+	
+	<!-- 공통코드 데이터 가져오기 -->
+	<select id="commonList" resultType = "commonVO" parameterType="string">
+		select COM_DET_NO, COM_NO, COM_DET_NAME
+          from COMMON_CODE_DETAIL
+         where com_no = #{comNo}	
+	</select>
+	
+	<!-- 학생개인정보 업데이트 -->
+	<update id="stuUpdate" parameterType="studentVO">
+		update student
+		   set 
+			   stu_img = #{stuImg}
+			 , dept_no = #{deptNo}
+			 , stu_email = #{stuEmail}
+			 , stu_phone = #{stuPhone}
+			 , stu_postcode = #{stuPostcode}
+			 , stu_add1 = #{stuAdd1}
+			 , stu_add2 = #{stuAdd2}
+			 , com_det_b_no = #{comDetBNo}
+			 , com_det_m_no = #{comDetMNo}
+			 , stu_account = #{stuAccount}   
+	     where stu_no = #{stuNo}
+	</update>
+	
+	<select id="stuCount" resultType="int" parameterType="pagingVO">
+	  select count(stu_no)
+		from student s, department d	
+	   where 1=1
+		 and s.dept_no = d.dept_no	
+		<include refid="stuType"/>
+	</select>
+	
+	<!-- 학생리스트 -->
+	<select id="stuList" parameterType="pagingVO" resultType="studentVO">
+		select
+     	 	   b.*  
+  		  from          
+	      (select
+	            a.*, row_number() over(order by a.stu_no) AS rnum
+	        from(select stu_no, stu_name, stu_email, s.stu_year, s.dept_no, stu_phone, com_det_m_no, d.dept_name, com_det_g_no
+	               from student s, department d
+	              where s.dept_no = d.dept_no
+	                and s.stu_del_yn = 'N'
+	              <include refid="stuType"/>
+	              )a
+	              		)b
+	         <![CDATA[
+				where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+	</select>
+	
+	<!-- 학생 삭제 -->
+	<update id="stuDelete" parameterType="string">
+		update student
+		   set 
+		       stu_del_yn = 'Y'
+		 where stu_no = #{stuNo}      
+	</update>
+	<!-- 등록 쿼리들 -->
+	<!-- 학생 등록 -->
+	<insert id="stuInsert" parameterType="studentVO">
+		insert into student(stu_no, dept_no, stu_year, stu_name, com_det_g_no, stu_regno, stu_postcode, stu_add1, stu_add2, stu_email,  
+		                    enabled, com_det_b_no, stu_account, stu_del_yn, stu_sdate, com_det_m_no, stu_phone)
+		values (#{stuNo}, #{deptNo}, #{stuYear}, #{stuName}, #{comDetGNo}, #{stuRegno}, #{stuPostcode}, #{stuAdd1}, #{stuAdd2}, #{stuEmail},		
+		         #{enabled}, #{comDetBNo}, #{stuAccount}, #{stuDelYn}, #{stuSdate}, #{comDetMNo}, #{stuPhone})		 
+	</insert>
+	
+	<!-- 학생유저등록 -->
+	<insert id="memInsert" parameterType="userVO" useGeneratedKeys="true">
+		<selectKey keyProperty="userNo" resultType="string" order="BEFORE">
+			select to_char(sysdate, 'yyyy')||lpad(seq_student.nextval, 4, '0') as userNo from dual
+		</selectKey>
+		insert into "USER"
+		values (#{userNo}, #{userPw}, #{comDetUNo})
+	</insert>
+	
+	<!-- 학생 유저 권한 등록 -->
+	<insert id="memAuthInsert" parameterType="string">
+		insert into user_auth
+		values ('ROLE_STUDENT', #{userNo})
+	</insert>
+
+	<!-- 교수유저등록 -->
+	<insert id="memProInsert" parameterType="userVO" useGeneratedKeys="true">		
+		insert into "USER"
+		values (#{userNo}, #{userPw}, #{comDetUNo})
+	</insert>
+
+	<!-- 교수 유저 권한 등록 -->
+	<insert id="memProAuthInsert" parameterType="string">
+		insert into user_auth
+		values ('ROLE_PROFESSOR', #{userNo})
+	</insert>	
+	
+	<!-- 교수 등록 -->
+	<insert id="proInsert" parameterType="professorVO">
+		insert into professor(pro_no, dept_no, com_det_p_no, pro_name, com_det_g_no, pro_regno, pro_postcode, pro_add1, pro_add2, pro_email,
+		                      enabled, com_det_b_no, pro_account, pro_del_yn, pro_sdate, com_det_m_no, pro_phone)
+		              values (#{proNo}, #{deptNo}, #{comDetPNo}, #{proName}, #{comDetGNo}, #{proRegno}, #{proPostcode}, #{proAdd1}, #{proAdd2}, #{proEmail},
+		                      #{enabled}, #{comDetBNo}, #{proAccount}, #{proDelYn}, #{proSdate}, #{comDetMNo}, #{proPhone})        
+		
+	</insert>
+
+	<!-- 직원유저등록 -->
+	<insert id="memEmpInsert" parameterType="userVO" useGeneratedKeys="true">		
+		insert into "USER"
+		values (#{userNo}, #{userPw}, #{comDetUNo})
+	</insert>
+
+	<!-- 직원 유저 권한 등록 -->
+	<insert id="memEmpAuthInsert" parameterType="string">
+		insert into user_auth
+		values ('ROLE_ADMIN', #{userNo})
+	</insert>	
+	
+	<!-- 직원 등록 -->
+	<insert id="empInsert" parameterType="empVO">
+		insert into employee (emp_no, com_det_d_no, com_det_p_no, emp_name, com_det_g_no, emp_regno, emp_postcode, emp_add1, emp_add2, emp_email, 
+		                      enabled, com_det_b_no, emp_account, emp_del_yn, emp_sdate, com_det_m_no, emp_phone )        
+		              values (#{empNo}, #{comDetDNo}, #{comDetPNo}, #{empName}, #{comDetGNo}, #{empRegno}, #{empPostcode}, #{empAdd1}, #{empAdd2}, #{empEmail},
+		                      #{enabled}, #{comDetBNo}, #{empAccount}, #{empDelYn}, #{empSdate}, #{comDetMNo}, #{empPhone} )
+	</insert>
+	
+	
+	<!-- 등록쿼리 끝 -->
+	
+	<!-- 교수 row num -->
+	<select id="proCount" resultType="int" parameterType="pagingVO">
+	  select count(p.pro_no)
+		from professor p, department d	
+		where 1=1
+        and p.dept_no = d.dept_no	
+		<include refid="proType"/>
+	</select>
+	
+	<!-- 교수리스트 -->
+	<select id="proList" parameterType="pagingVO" resultType="professorVO">
+		select
+		       b.*  
+		  from  
+		      (select
+		            a.*, row_number() over(order by a.pro_no) AS rnum
+		        from
+				     (select p.pro_no, p.pro_name, p.com_det_g_no, p.pro_phone, p.com_det_m_no, p.com_det_p_no, p.dept_no, d.dept_name
+				        from professor p,  department d
+				       where p.dept_no = d.dept_no
+				       and p.pro_del_yn = 'N'
+				       <include refid="proType"/>
+				       )a
+		      		 )b
+		    <![CDATA[
+					where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+	</select>
+	
+	<!-- 교수 상세 정보 -->
+	<select id="proDetail" resultType="professorVO" parameterType="string">
+		select p.pro_no
+		     , p.pro_name
+		     , p.pro_email
+		     , p.dept_no
+		     , pro_phone
+		     , p.com_det_m_no
+		     , d.dept_name
+		     , p.com_det_g_no
+		     , p.pro_add1
+		     , p.pro_add2
+		     , p.pro_postcode
+		     , p.com_det_b_no
+		     , p.pro_account
+		     , p.pro_img
+		  from professor p, department d
+		 where p.dept_no = d.dept_no
+		   
+		   and p.pro_no = #{proNo}
+	</select>
+	
+	<!-- 교수 정보 수정 -->
+	<update id="proUpdate" parameterType="professorVO">
+		update professor
+		   set 
+		       pro_no = #{proNo}
+			 , pro_img = #{proImg}
+			 , dept_no = #{deptNo}
+			 , pro_email = #{proEmail}
+			 , pro_phone = #{proPhone}
+			 , pro_postcode = #{proPostcode}
+			 , pro_add1 = #{proAdd1}
+			 , pro_add2 = #{proAdd2}
+			 , com_det_b_no = #{comDetBNo}
+			 , com_det_m_no = #{comDetMNo}
+			 , pro_account = #{proAccount}   
+	     where pro_no = #{proNo}
+	</update>
+	
+	<select id="proIdCheck" parameterType="string" resultType="int">
+		select count(user_no)
+		  from "USER"
+	 	 where user_no=#{proNo} 
+	</select>
+	
+	<update id="proDelete" parameterType="string">
+		update professor
+		   set 
+		       pro_del_yn = 'Y'
+		 where pro_no = #{proNo}     
+	</update>
+	
+	
+	
+	<!-- 관리자 row num -->
+	<select id="empCount" resultType="int" parameterType="pagingVO">
+	  select count(emp_no)
+		from employee
+		where 1=1        
+		<include refid="empType"/>
+	</select>
+	
+	<!-- 관리자 페이징 처리-->
+	<select id="empList" resultType="empVO" parameterType="pagingVO">
+		select 
+       		   b.*
+          from     
+		       (select
+		                a.*, row_number() over(order by a.emp_no) As rnum
+		        from 
+		             (select emp_no, com_det_d_no, com_det_p_no, com_det_g_no, emp_name, emp_phone, com_det_b_no, com_det_m_no, emp_sdate
+		              from employee
+		              where emp_del_yn = 'N'
+		              <include refid="empType"/>
+		              )a
+		        )b
+		    <![CDATA[
+					where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+			]]>
+	</select>
+	
+	<!-- 직원 상세정보 -->
+	<select id="empDetail" resultType="empVO" parameterType="string">
+		select emp_no
+		     , emp_name
+		     , emp_email
+		     , com_det_D_no
+		     , emp_phone
+		     , com_det_m_no		     
+		     , com_det_g_no
+		     , emp_add1
+		     , emp_add2
+		     , emp_postcode
+		     , com_det_b_no
+		     , emp_account
+		     , emp_img
+		  from employee   
+		 where emp_no = #{empNo}  
+	</select>
+	
+	<!-- 직원 정보 수정 -->
+	<update id="empUpdate" parameterType="empVO">
+		update employee
+		   set
+		       com_det_D_no = #{comDetDNo}
+		     , emp_email = #{empEmail}
+		     , emp_phone = #{empPhone}
+		     , emp_postcode = #{empPostcode}
+		     , emp_add1 = #{empAdd1}
+		     , emp_add2 = #{empAdd2}
+		     , com_det_m_no = #{comDetMNo}
+		     , com_det_b_no = #{comDetBNo}
+		     , emp_account = #{empAccount}
+		     , emp_img = #{empImg}
+		 where emp_no = #{empNo}      
+	</update>
+	
+	<!-- 직원 삭제 -->
+	<update id="empDelete" parameterType="string">
+		update employee
+		   set
+		       emp_del_yn = 'Y'
+		 where emp_no = #{empNo}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

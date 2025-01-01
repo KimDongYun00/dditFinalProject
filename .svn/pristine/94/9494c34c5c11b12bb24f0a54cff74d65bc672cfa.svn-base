@@ -1,0 +1,31 @@
+package kr.or.ddit.service.student.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.VolunteerMapper;
+import kr.or.ddit.service.student.inter.StudentVolunteerService;
+import kr.or.ddit.vo.VolunteerVO;
+
+@Service
+public class StudentVolunteerServiceImpl implements StudentVolunteerService {
+
+	@Inject	
+	private VolunteerMapper mapper;
+	
+	@Override
+	public List<VolunteerVO> selectVolunteer(String stuNo) {
+		
+		return mapper.selectVolunteer(stuNo);
+	}
+
+	@Override
+	public int insertVolunteeR(VolunteerVO volunteerVO) {
+		
+		return mapper.insertVolunteer(volunteerVO);
+	}
+
+}

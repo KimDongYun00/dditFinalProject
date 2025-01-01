@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IStuCertificationMapper">
+	 
+	<!-- 페이징 처리를 위해 행 count하기 -->
+	<select id="selectCertificationCount" parameterType="pagingVO" resultType="int">
+		  select count(c.cer_no)
+	        from certification c
+	        where 1=1
+	</select>
+
+
+	<!-- 페이징 처리를 위한 selectCertificationList 쿼리 -->
+	<select id="selectCertificationList" parameterType="pagingVO" resultType="certificationVO">
+		 select
+        d.*
+   	 from (
+        select
+            a.*, row_number() over(order by a.cer_no) as rnum
+        from (
+            select
+                c.cer_no, c.cer_name, c.cer_content, c.file_group_no, c.cer_charge
+            from certification c
+            where 1=1
+            order by c.cer_no
+        ) a
+    ) d
+    	 <![CDATA[
+    where d.rnum >= #{startRow} and d.rnum <= #{endRow}
+	  	  ]]>
+	</select>
+
+	<!-- 본인이 발급받은 증명서 내역을 조회 -->
+	<select id="myCertificationList" parameterType="String" resultType="certificationVO">
+	    select
+	        rownum as rnum,  -- 각 행에 대해 인덱스 값을 가져옴
+	        c.cer_name,
+	        c.cer_content,
+	        to_char(cp.cer_pri_date, 'YYYY-mm-DD') as cer_pri_date,
+	        cp.stu_no,
+	        cp.cer_pri_no,
+	        c.cer_charge
+	    from 
+	        certification c
+	    join 
+	        certification_print cp on c.cer_no = cp.cer_no
+	    where 
+	        cp.stu_no = #{stuNo}
+	    order by 
+	        rnum asc
+</select>
+	
+	<!-- 재학 증명서를 위한 재학 정보 조회 -->
+	<select id="enrollmentInfo" parameterType="string" resultType="studentVO">
+	    select 
+	         s.stu_no
+	        , d.dept_name
+	        , s.stu_name
+	        , s.stu_year
+	        , s.stu_regno
+	        , to_char(to_date(s.stu_sdate, 'yyyy-mm-dd'), 'yyyy"년 "mm"월 "dd"일') as stu_sdate
+	        , s.com_det_g_no
+       from 
+	         student s
+	        , department d
+            , common_code_detail ccd
+	    where 
+	        s.dept_no = d.dept_no 
+            and s.com_det_g_no = ccd.com_det_no 
+	        and s.stu_no = #{stuNo}
+	</select>
+	
+	<!-- 성적 증명서를 위한 성적 정보 조회 -->
+	<select id="gradeInfo" parameterType="string" resultType="gradeVO">
+		select 
+		         ccd.com_det_name /*강의 구분명*/
+		       , s.sub_name /*과목명*/
+		       , l.lec_name /*강의명*/
+		       , p.pro_name /*교수명*/
+		       , l.year /*년도*/
+		       , l.semester /*학기*/
+		       , l.lec_age /*수강가능학년*/
+		       , l.lec_score /*인정 학점*/
+		       , st.stu_name /*학생이름*/
+		       , c.cou_score    /*취득 학점(성적)*/
+	       	   , d.dept_name /*학과*/
+	       	   , st.stu_no /*학번*/
+	       	   , st.stu_regno /*주민등록번호*/
+		from lecture l, student st, professor p, subject s, course c, common_code_detail ccd, department d
+	
+		where s.sub_no = l.sub_no
+		  and l.pro_no = p.pro_no 
+		  and c.lec_no = l.lec_no
+		  and c.stu_no = st.stu_no
+		  and ccd.com_det_no = l.com_det_l_no
+		  and d.dept_no = st.dept_no
+		  and st.stu_no = #{stuNo}
+     order by l.year asc, l.semester asc 
+	</select>
+	 
+	 
+	 <!-- 졸업 증명서를 위한 졸업 관련 정보 조회 -->
+	 <select id="graduationInfo" parameterType="string" resultType="studentVO">
+	 	select 
+			      s.stu_name  /*이름*/
+			    , s.stu_no  /*학번*/
+			    , to_char(to_date(substr(s.stu_regno, 1, 6), 'yymmdd'), 'yyyy"년 "mm"월 "dd"일') as stu_regno /*생년월일*/
+			    , d.dept_name /*학과*/
+			    , to_char(to_date(s.stu_sdate, 'yyyy-mm-dd'), 'yyyy"년 "mm"월 "dd"일') as stu_sdate /*입학일*/
+  		 from student s, department d
+		where d.dept_no = s.dept_no
+		  and s.stu_no = #{stuNo}
+	 </select>
+	 
+	<!-- 증명서 발급을 누르면 증명서 발급 테이블에 데이터 삽입 -->	
+	<insert id="insertCertificationPrint" parameterType="certificationPrintVO">
+		insert into certification_print(
+    				 cer_pri_no
+    				, cer_no
+    				, stu_no
+    				, cer_pri_date
+         ) values (
+                     seq_certification_print.nextval
+                     , #{cerNo}
+                     , #{stuNo}
+                     , sysdate
+		)
+	</insert>
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

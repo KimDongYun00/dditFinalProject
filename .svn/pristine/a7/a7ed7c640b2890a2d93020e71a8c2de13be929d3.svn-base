@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IFacilityMapper">
+	
+	<!-- 셀렉트바이용 검색 -->
+	<sql id="facilityType">		
+		<if test="searchType != '' and searchType == 1">
+			and f.fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 2">
+			and f.fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 3">
+			and f.fac_type_no = #{searchType}
+		</if>		
+		<if test="searchType != '' and searchType == 4">
+			and f.fac_type_no = #{searchType}
+		</if>
+		<if test="searchType != '' and searchType == 999">
+			and f.fac_type_no = 2 or f.fac_type_no = 3
+		</if>				
+	</sql>
+	
+	<!-- 페이징처리 헤더 -->
+	<sql id="pagingHeader">
+		select
+	           rn.*
+	       from( 
+	        select
+				tbl.*, row_number() over(order by tbl.fac_type_no) AS rnum
+			from(
+	</sql>
+	
+	<!-- 페이징처리 푸터 -->
+	<sql id="pagingFooter">
+		) tbl
+	        )rn
+        <![CDATA[
+			where rn.rnum >= #{startRow} and rn.rnum <= #{endRow}	
+		]]> 
+	</sql>	
+	
+	<!-- 시설 상세 조회 -->
+	<select id="selectDetail" resultType="facilityVO" parameterType="String">
+		select f.fac_no
+		     , f.fac_type_no
+		     , f.bui_no
+		     , f.fac_name
+		     , f.fac_max
+		     , f.fac_img
+		     , f.fac_yn
+		     , b.bui_name
+		     , ft.fac_type_name
+		from facility f, building b, facility_type ft
+		where fac_no = #{facno}
+		  and f.bui_no = b.bui_no
+		  and f.fac_type_no = ft.fac_type_no
+	</select>
+	
+	<!-- 시설예약상세조회 -->
+	<select id="facreDetail" resultType="facReserveVO" parameterType="string">
+		select fac_res_no
+		     , user_no
+		     , fac_no
+		     , fac_res_num
+		     , rac_res_purpose
+		     , com_det_c_no
+		     , fac_res_regdate
+		     , fac_res_sdate
+		     , fac_res_edate
+		     , rej_content
+		  from facility_reserve
+		 where fac_no = #{facNo}
+	</select>
+	
+	<!-- 시설 리스트 조회 -->
+	<select id="selectFacility" resultType="facilityVO">
+		select f.fac_no
+		     , f.fac_type_no
+		     , f.bui_no
+		     , f.fac_name
+		     , f.fac_max
+		     , f.fac_img
+		     , f.fac_yn
+		     , b.bui_name
+		     , ft.fac_type_name
+		  from facility f, building b, facility_type ft 
+		 where fac_yn = 'Y'
+		   and f.bui_no = b.bui_no
+		   and f.fac_type_no = ft.fac_type_no
+	</select>
+	
+	
+	<select id="selectBuildingList" resultType="buildingVO">
+		select bui_no, bui_name
+		  from building
+	</select>
+	
+	<select id="facDetail" resultType="facilityVO" parameterType="string">
+		select f.fac_no
+		     , f.fac_type_no
+		     , f.bui_no
+		     , f.fac_name
+		     , f.fac_max
+		     , f.fac_img
+		     , f.fac_yn
+		     , b.bui_name
+		     , ft.fac_type_name
+		  from facility f, building b, facility_type ft
+		 where fac_yn = 'Y'
+		   and f.bui_no = b.bui_no
+		   and f.fac_type_no = ft.fac_type_no
+		   and fac_no = #{facNo}
+	</select>
+	
+	<insert id="facInsert" parameterType="facilityVO" useGeneratedKeys="true">
+		<selectKey keyProperty="facNo" resultType="String" order="BEFORE">
+			select 'FAC_'||seq_facility.nextval from dual
+		</selectKey>
+		insert into facility(
+				fac_no
+			  , fac_type_no
+			  , bui_no
+			  , fac_name
+			  , fac_max
+			  , fac_yn
+			  , fac_img 
+			  )
+		values(
+		        #{facNo}
+		      , #{facTypeNo}
+		      , #{buiNo}
+		      , #{facName}
+		      , ${facMax}
+		      , 'Y'
+		      , #{facImg}
+		      )
+	</insert>
+	
+	<update id="facUpdate" parameterType="facilityVO">
+		update facility
+		set
+			fac_type_no = #{facTypeNo},
+			bui_no = #{buiNo},
+			fac_name = #{facName},
+			fac_max = #{facMax},
+			fac_img = #{facImg}
+		where fac_no = #{facNo}
+	</update>
+	
+	<update id="facDelete" parameterType="string">
+		update facility
+		set fac_yn = 'N'
+		where fac_no = #{facNo}
+	</update>
+	
+	<select id="selectFacilityList" parameterType="pagingVO" resultType="facilityVO">
+		<include refid="pagingHeader"/>
+		          select f.fac_no
+				   	   , f.fac_type_no
+				   	   , f.bui_no
+				   	   , f.fac_name
+				   	   , f.fac_max
+				   	   , f.fac_img
+				   	   , f.fac_yn
+				   	   , b.bui_name
+				   	   , ft.fac_type_name
+			       	from facility f
+		           	left join building b on f.bui_no = b.bui_no
+		           	left join facility_type ft on f.fac_type_no = ft.fac_type_no
+		           	where fac_yn = 'Y'
+				   	<include refid="facilityType"/>
+				   	
+			       order by f.fac_type_no 
+		<include refid="pagingFooter"/>	     
+	</select>
+	
+	<select id="selectFacilityCount" parameterType="pagingVO" resultType="int">
+		select count(f.fac_no)
+		  from facility f
+		  left join building b on f.bui_no = b.bui_no
+	      left join facility_type ft on f.fac_type_no = ft.fac_type_no
+	     where f.fac_yn = 'Y'		
+		<include refid="facilityType"/>			
+	</select>
+	
+	<!-- 캘린더에 시설예약 -->
+	<insert id="facilityStuReserve" parameterType="facReserveVO">
+		insert into facility_reserve (
+					fac_res_no
+					, user_no
+					, fac_no
+					, fac_res_num
+					, fac_res_purpose
+					, com_det_c_no
+					, fac_res_regdate
+					, fac_res_sdate
+					, fac_res_edate					
+		)values(
+					'FacRes_'||lpad(seq_facility_reserve.nextval, 4, '0')
+					, #{userNo}
+					, #{facNo}
+					, #{facResNum}
+					, #{facResPurpose}
+					, 'C0102'
+					, sysdate
+					, #{facResSdate}
+					, #{facResEdate}
+		)		
+		
+	</insert>	
+	<!-- 캘린더에 시설예약 현황 -->
+	<select id="facilityStuReserveList" resultType="facReserveVO" parameterType="string">
+		  select  fac_res_no
+				, user_no
+				, fac_no
+				, fac_res_num
+				, fac_res_purpose
+				, com_det_c_no
+				, fac_res_regdate
+				, fac_res_sdate
+				, fac_res_edate
+				, rej_content
+			from facility_reserve
+		   where fac_no = #{facNo}		
+	</select>
+	
+	<!-- 자신의 예약 내역을 삭제하는 쿼리 -->
+	<delete id="facStuResDelete" parameterType="string">
+		delete facility_reserve
+		 where fac_res_no = #{facResNo}	
+	</delete>
+	
+	<!-- 관리자 시설예약 리스트 페이징처리위한 게시글 수  -->
+	<select id="selectFacResCount" parameterType="pagingVO" resultType="int">
+		select count(fac_res_no)
+		  from facility_reserve fr, facility f, building b 	
+		 where fr.fac_no = f.fac_no
+		   and f.bui_no = b.bui_no
+		 <if test="searchType != null and searchType !='C99'">
+		   and com_det_c_no = #{searchType}     
+		</if>
+		<if test="searchLecType != null and searchLecType!='C99'">
+		   and f.bui_no = #{searchLecType}
+		</if>
+		<if test="searchOnoff != null and searchOnoff != 99">
+		   and fac_type_no = #{searchOnoff}
+		</if>
+	</select>
+	
+	<!-- 관리자 시설예약 리스트 -->
+	<select id="selectFacResList" parameterType="pagingVO" resultType="facReserveVO">
+		<include refid="pagingHeader"/>
+		select fac_res_no
+		     , user_no      
+		     , fr.fac_no
+		     , f.fac_name
+		     , fac_res_num
+		     , fac_res_purpose
+		     , com_det_c_no
+		     , to_char(fac_res_regdate, 'yyyy-mm-dd') fac_res_regdate
+		     , REPLACE(fac_res_sdate,'T',' ') fac_res_sdate
+		     , REPLACE(fac_res_edate,'T',' ') fac_res_edate
+		     , rej_content
+		     , fac_type_no
+		     , f.bui_no
+		     , b.bui_name
+		 from facility_reserve fr, facility f, building b
+		 where fr.fac_no = f.fac_no
+		   and f.bui_no = b.bui_no
+		<if test="searchType != null and searchType !='C99'">
+		   and com_det_c_no = #{searchType}     
+		</if>
+		<if test="searchLecType != null and searchLecType!='C99'">
+		   and f.bui_no = #{searchLecType}
+		</if>
+		<if test="searchOnoff != null and searchOnoff != 99">
+		   and fac_type_no = #{searchOnoff}
+		</if>
+		<include refid="pagingFooter"/>
+	</select>
+	
+	<!-- 시설예약 상세내역 -->
+	<select id="facResRead" parameterType="string" resultType="facReserveVO">
+		select fac_res_no
+		     , user_no      
+		     , fr.fac_no
+		     , f.fac_name
+		     , fac_res_num
+		     , fac_res_purpose
+		     , com_det_c_no
+		     , to_char(fac_res_regdate, 'yyyy-mm-dd') fac_res_regdate
+		     , REPLACE(fac_res_sdate,'T',' ') fac_res_sdate
+		     , REPLACE(fac_res_edate,'T',' ') fac_res_edate
+		     , rej_content
+		     , fac_type_no
+		     , f.bui_no
+		     , b.bui_name
+		 from facility_reserve fr, facility f, building b
+		 where fr.fac_no = f.fac_no
+		   and f.bui_no = b.bui_no
+		   and fac_res_no = #{facResNo} 
+	</select>
+	
+	<update id="facResApprove" parameterType="string">
+		update facility_reserve
+		   set com_det_c_no = 'C0101'
+		     , rej_content = null
+		 where fac_res_no = #{facResNo}  	
+	</update>
+	
+	<update id="facResReject" parameterType="facReserveVO">
+		update facility_reserve
+		   set com_det_c_no = 'C0103'
+		     , rej_content = #{rejContent} 
+		 where fac_res_no = #{facResNo}  
+	</update>
+	<!-- 일괄승인 -->
+	<update id="facResAllAgree" parameterType="string">
+		update facility_reserve
+		   set com_det_c_no = 'C0101'
+		 where fac_res_no = #{facResNo}  
+	</update>
+</mapper>

@@ -1,0 +1,22 @@
+package kr.or.ddit.service.common;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ILoginMapper;
+import kr.or.ddit.vo.UserVO;
+
+@Service
+public class UserLoginServiceImpl implements IUserLoginService {
+
+	@Inject
+	private ILoginMapper loginMapper;
+	
+	// 로그인 체크 관련
+	@Override
+	public UserVO loginCheck(UserVO userVO) {
+		return loginMapper.loginCheck(userVO);
+	}
+
+}

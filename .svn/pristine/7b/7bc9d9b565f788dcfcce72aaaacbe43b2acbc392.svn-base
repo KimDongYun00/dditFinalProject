@@ -1,0 +1,53 @@
+package kr.or.ddit.controller.student;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.or.ddit.service.student.inter.IFoodBoardService;
+import kr.or.ddit.vo.FoodBoardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/student")
+public class StuFoodBoardController {
+
+	@Inject
+	private IFoodBoardService service;
+
+    @RequestMapping(value = "/foodList", method = RequestMethod.GET)
+    public String foodboardList(Model model) {
+        List<FoodBoardVO> foodboardList = service.foodList();
+        log.info("FoodBoard List: {}", foodboardList);
+        model.addAttribute("foodboardList", foodboardList);
+        return "student/board/foodboardList";
+    }
+
+    @RequestMapping(value = "/foodDetail/{foodNo}", method = RequestMethod.GET)
+    public String foodboardDetail(@PathVariable("foodNo") String foodNo, Model model) {
+        service.incrementViewCount(foodNo);
+        FoodBoardVO foodboardVO = service.detail(foodNo);
+        log.info("FoodBoard Detail: {}", foodboardVO);
+        model.addAttribute("foodboard", foodboardVO);
+        return "student/board/foodboardDetail";
+    }
+
+    @RequestMapping(value = "/foodWrite", method = RequestMethod.GET)
+    public String foodboardWriteForm() {
+        return "student/board/foodboardInsert";
+    }
+
+    @RequestMapping(value = "/foodWrite", method = RequestMethod.POST)
+    public String foodboardWrite(FoodBoardVO foodboardVO, Model model) {
+        service.foodboardInsert(foodboardVO);
+        model.addAttribute("message", "맛집 등록이 완료되었습니다!");
+        return "redirect:/student/foodList";
+    }
+}

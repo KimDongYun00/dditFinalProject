@@ -1,0 +1,50 @@
+package kr.or.ddit.service.common.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.mapper.ILoginMapper;
+import kr.or.ddit.service.common.IUserLoginService;
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.UserVO;
+
+@Service
+public class UserLoginServiceImpl implements IUserLoginService {
+
+	@Inject
+	private ILoginMapper loginMapper;
+	
+	// 로그인 체크 관련
+	@Override
+	public UserVO loginCheck(UserVO userVO) {
+		return loginMapper.loginCheck(userVO);
+	}
+
+	// 교수 데이터 뿌리기 test용
+	@Override
+	public ProfessorVO professorInfo(String userId) {
+		return loginMapper.professorInfo(userId);
+	}
+
+	// 학생 - 아이디 찾기
+	@Override
+	public String findIdByStudentDetails(String userName, String userBirth, String userEmail) {
+		return loginMapper.findIdByStudentDetails(userName, userBirth, userEmail);
+	}
+
+	// 교수 - 아이디 찾기
+	@Override
+	public String findIdByProfessorDetails(String userName, String userBirth, String userEmail) {
+		return loginMapper.findIdByProfessorDetails(userName, userBirth, userEmail);
+	}
+
+	// 관리자 - 아이디 찾기
+	@Override
+	public String findIdByAdminDetails(String userName, String userBirth, String userEmail) {
+		return loginMapper.findIdByAdminDetails(userName, userBirth, userEmail);
+	}
+
+
+	
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IMypageMapper">
+	
+	<!-- 학생 정보 쿼리 -->
+	<select id="selectStudent" parameterType="string" resultType="studentVO">
+		select stu_no, s.dept_no, stu_year, stu_name, com_det_g_no, stu_regno, stu_postcode, stu_add1, stu_add2, stu_email, stu_img,
+		       stu_ip, enabled, s.com_det_b_no, stu_account, stu_del_yn, stu_sdate, stu_edate, com_det_m_no, stu_phone, d.dept_name
+		  from student s, department d
+		 where s.dept_no = d.dept_no 
+		 and stu_no = #{userNo}		  
+	</select>
+	
+	<!-- 학생정보수정 -->
+	<update id="profileUpdate" parameterType="studentVO">
+		update student
+		   set
+		       stu_img = #{stuImg}
+		     , stu_email = #{stuEmail}
+		     , stu_phone = #{stuPhone}
+		     , stu_postcode = #{stuPostcode}
+		     , stu_add1 = #{stuAdd1}
+		     , stu_add2 = #{stuAdd2}
+		     , com_det_b_no = #{comDetBNo}
+		     , stu_account = #{stuAccount}
+		 where stu_no = #{stuNo}		       
+	</update>
+	
+	<!-- 관리자 정보 조회 -->
+	<select id="selectAdmin" parameterType="string" resultType="empVO">
+		select emp_no, com_det_d_no, com_det_p_no, emp_name, com_det_g_no, emp_regno, emp_postcode, emp_add1, emp_add2, emp_email
+		     , emp_img, emp_ip, enabled, com_det_b_no, emp_account, emp_del_yn, emp_sdate, emp_edate, com_det_m_no, emp_phone
+		  from employee
+		 where emp_no = #{userNo}		       
+	</select>
+	
+	<!-- 관리자 개인정보 수정 -->
+	<update id="empUpdate" parameterType="empVO">
+		update employee
+		   set 
+		       emp_img = #{empImg}
+		     , emp_email = #{empEmail}
+		     , emp_phone = #{empPhone}
+		     , emp_postcode = #{empPostcode}
+		     , emp_add1 = #{empAdd1}
+		     , emp_add2 = #{empAdd2}
+		     , com_det_b_no = #{comDetBNo}
+		     , emp_account = #{empAccount}
+		 where emp_no = #{empNo}      
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

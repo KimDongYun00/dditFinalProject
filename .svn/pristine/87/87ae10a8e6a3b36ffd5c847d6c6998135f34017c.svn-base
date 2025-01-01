@@ -1,0 +1,20 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+//import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.FoodBoardVO;
+
+//@Mapper
+public interface FoodBoardMapper {
+
+	 public List<FoodBoardVO> foodList();
+
+	public FoodBoardVO detail(String foodNo);
+
+	public void incrementViewCount(String foodNo);
+
+	public void foodboardInsert(FoodBoardVO foodboardVO);
+
+}

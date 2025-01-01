@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IExamMapper">
+
+	<resultMap type="examVO" id="examMap">
+		<id property="examNo" column="exam_no"/>
+		<result property="examNo" column="exam_no"/>
+		<result property="lecNo" column="lec_no"/>
+		<result property="lecName" column="lec_name"/>
+		<result property="comDetHNo" column="com_det_h_no"/>
+		<result property="comDetHName" column="com_det_h_name"/>
+		<result property="examName" column="exam_name"/>
+		<result property="examContent" column="exam_content"/>
+		<result property="examDate" column="exam_date"/>
+		<result property="examLimit" column="exam_limit"/>
+		<result property="examRegdate" column="exam_regdate"/>
+		<collection property="examQueList" resultMap="examQueMap"/>
+	</resultMap>
+	
+	<resultMap type="examQueVO" id="examQueMap">
+		<id property="examQueNo" column="exam_que_no"/>
+		<result property="examQueNo" column="exam_que_no"/>
+		<result property="examNo" column="exam_no"/>
+		<result property="examQueContent" column="exam_que_content"/>
+		<result property="examQueAnswer" column="exam_que_answer"/>
+		<result property="examQueScore" column="exam_que_score"/>
+		<collection property="examQueSelList" resultMap="examQueSelMap"/>
+	</resultMap>
+	
+	<resultMap type="examQueSelVO" id="examQueSelMap">
+		<id property="examQueSelNo" column="exam_que_sel_no"/>
+		<result property="examQueSelNo" column="exam_que_sel_no"/>
+		<result property="examQueNo" column="exam_que_no"/>
+		<result property="examQueSelContent" column="exam_que_sel_content"/>
+	</resultMap>
+
+	<insert id="insertExam" parameterType="examVO" useGeneratedKeys="true">
+		<selectKey keyProperty="examNo" resultType="String" order="BEFORE">
+			select 'EXAM_'||seq_exam.nextval from dual
+		</selectKey>
+		insert into exam(
+			EXAM_NO
+			,LEC_NO
+			,COM_DET_H_NO
+			,EXAM_NAME
+			,EXAM_CONTENT
+			,EXAM_DATE
+			,EXAM_LIMIT
+			,EXAM_REGDATE
+		) values(
+			#{examNo}
+			,#{lecNo}
+			,#{comDetHNo}
+			,#{examName}
+			,#{examContent}
+			,#{examDate}
+			,#{examLimit}
+			,sysdate
+		)
+	</insert>
+
+	<insert id="insertExamQue" parameterType="examQueVO" useGeneratedKeys="true">
+		<selectKey keyProperty="examQueNo" resultType="String" order="BEFORE">
+			select 'EXAM_QUE_'||seq_exam_question.nextval from dual
+		</selectKey>
+		insert into exam_question(
+			EXAM_QUE_NO
+			,EXAM_NO
+			,EXAM_QUE_CONTENT
+			,EXAM_QUE_ANSWER
+			,EXAM_QUE_SCORE
+		) values(
+			#{examQueNo}
+			,#{examNo}
+			,#{examQueContent}
+			,#{examQueAnswer}
+			,#{examQueScore}
+		)
+	</insert>
+
+	<insert id="insertExamQueSel" parameterType="examQueSelVO" useGeneratedKeys="true">
+		<selectKey keyProperty="examQueSelNo" resultType="String" order="BEFORE">
+			select 'EXAM_QUE_SEL_'||seq_exam_question_select.nextval from dual
+		</selectKey>
+		insert into exam_question_select(
+			EXAM_QUE_SEL_NO
+			,EXAM_QUE_NO
+			,EXAM_QUE_SEL_CONTENT
+		) values(
+			#{examQueSelNo}
+			,#{examQueNo}
+			,#{examQueSelContent}
+		)
+	</insert>
+	
+	<select id="getExamListByLecNo" parameterType="pagingVO" resultType="examVO">
+		select 
+			EXAM_NO
+			,LEC_NO
+			,COM_DET_H_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_h_no) com_det_h_name
+			,EXAM_NAME
+			,EXAM_CONTENT
+			,EXAM_DATE
+			,EXAM_LIMIT
+			,EXAM_REGDATE
+		from exam
+        where lec_no = #{lecNo}
+        <if test="searchType != ''">
+	        and com_det_h_no = #{searchType} 
+        </if>
+	</select>
+	
+	<select id="getExamDetail" parameterType="String" resultMap="examMap">
+		select 
+			a.EXAM_NO
+			,LEC_NO
+			,(select lec_name from lecture d where d.lec_no = a.lec_no) lec_name
+			,COM_DET_H_NO
+			,(select com_det_name from common_code_detail where com_det_no = com_det_h_no) com_det_h_name
+			,EXAM_NAME
+			,EXAM_CONTENT
+			,EXAM_DATE
+			,EXAM_LIMIT
+			,EXAM_REGDATE
+			,b.EXAM_QUE_NO
+			,EXAM_QUE_CONTENT
+			,EXAM_QUE_ANSWER
+			,EXAM_QUE_SCORE
+			,c.EXAM_QUE_SEL_NO
+			,EXAM_QUE_SEL_CONTENT
+		from 
+			exam a, exam_question b, exam_question_select c
+		where a.exam_no = b.exam_no
+        and b.exam_que_no = c.exam_que_no
+        and a.exam_no = #{examNo}
+        order by a.EXAM_NO desc, b.exam_que_no asc, c.EXAM_QUE_SEL_NO asc
+	</select>
+
+	<select id="getStudentExamList" parameterType="String" resultType="studentVO">
+		select 
+			stu_no
+			,stu_name
+			,dept_no
+			,(select dept_name from department d where d.dept_no = a.dept_no) dept_name
+			,stu_year
+		from student a
+		where stu_no in (select c.stu_no 
+						   from course c 
+						   where c.lec_no = (select e.lec_no
+										       from exam e
+										       where e.exam_no = #{examNo})) 
+	</select>
+	
+	<select id="getStudentExamSubmitList" parameterType="String" resultType="examSubVO">
+		select 
+			stu_no, sum(a.exam_sub_score) exam_sub_score
+		from exam_submit a
+		where a.exam_que_no in (select b.exam_que_no 
+								 from exam_question b
+								where b.exam_no = #{examNo})
+        group by stu_no
+	</select>
+	
+	<delete id="deleteExamSubmit" parameterType="String">
+		delete from exam_submit a
+		where a.exam_que_no in (select b.exam_que_no 
+							      from exam_question b
+							     where exam_no = #{examNo})
+	</delete>
+	
+	<delete id="deleteExamQueSel" parameterType="String">
+		delete from exam_question_select a
+		where a.exam_que_no in (select b.exam_que_no 
+							      from exam_question b
+							     where exam_no = #{examNo})
+	</delete>	
+	
+	<delete id="deleteExamQue" parameterType="String">
+		delete from exam_question
+		where exam_no = #{examNo}
+	</delete>	
+	
+	<delete id="deleteExam" parameterType="String">
+		delete from exam
+		where exam_no = #{examNo}
+	</delete>	
+	
+	<update id="updateExam" parameterType="examVO">
+		update exam
+		set 
+			COM_DET_H_NO = #{comDetHNo}
+			,EXAM_NAME = #{examName}
+			,EXAM_CONTENT = #{examContent}
+			,EXAM_DATE = #{examDate}
+			,EXAM_LIMIT = #{examLimit}
+			,EXAM_REGDATE = sysdate
+		where exam_no = #{examNo}	
+	</update>
+	
+	<select id="getExamQueAnswer" parameterType="String" resultType="examQueVO">
+		select 
+			EXAM_QUE_NO
+			,EXAM_QUE_ANSWER
+			,EXAM_QUE_SCORE
+		from EXAM_QUESTION
+		where exam_no = #{examNo}
+		order by exam_que_no asc
+	</select>
+	
+	<insert id="submitStudentAnswer" parameterType="examSubVO" useGeneratedKeys="true">
+		<selectKey keyProperty="examSubNo" order="BEFORE" resultType="String">
+			select 'EXAM_SUB_'||seq_exam_submit.nextval from dual
+		</selectKey>
+		insert into EXAM_SUBMIT(
+			EXAM_SUB_NO
+			,EXAM_QUE_NO
+			,STU_NO
+			,EXAM_SUB_ANSWER
+			,EXAM_SUB_SCORE
+		) values(
+			#{examSubNo}
+			,#{examQueNo}
+			,#{stuNo}
+			,#{examSubAnswer}
+			,#{examSubScore}
+		)
+	</insert>
+	
+	<select id="checkSubmit" parameterType="examSubVO" resultType="int">
+		select count(exam_sub_no) 
+		from EXAM_SUBMIT
+		where STU_NO = #{stuNo}
+		and exam_que_no in (select a.exam_que_no
+		 					  from exam_question a
+		 					 where a.exam_no = #{examNo})	
+	</select>
+	
+	<select id="getStuExamSubList" parameterType="examSubVO" resultType="examSubVO">
+		select 
+			EXAM_SUB_NO
+			,a.EXAM_QUE_NO
+			,STU_NO
+			,EXAM_SUB_ANSWER
+			,EXAM_SUB_SCORE
+		from EXAM_SUBMIT a
+		where stu_no = #{stuNo}
+		and a.EXAM_QUE_NO in (select b.EXAM_QUE_NO
+							  from EXAM_QUESTION b
+							 where exam_no = #{examNo})
+		order by a.EXAM_QUE_NO asc
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

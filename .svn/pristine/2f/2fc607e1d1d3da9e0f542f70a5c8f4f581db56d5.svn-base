@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IGraReqMapper">
+
+	<select id="getGraReqListByDeptNo" parameterType="String" resultType="graReqVO">
+		select GRA_REQ_NO,DEPT_NO,GRA_REQ_TOTAL,GRA_REQ_MC,GRA_REQ_LAC,GRA_REQ_VOL,YEAR,SEMESTER
+		from GRADUATION_REQUEST
+		where DEPT_NO = #{deptNo}
+	</select>
+	
+	<insert id="insertGraReq" parameterType="graReqVO">
+		insert into GRADUATION_REQUEST (
+			GRA_REQ_NO,DEPT_NO,GRA_REQ_TOTAL,GRA_REQ_MC,GRA_REQ_LAC,GRA_REQ_VOL,YEAR,SEMESTER
+		) values(
+			'GRA_REQ_'||seq_GRADUATION_REQUEST.nextval, #{deptNo}, #{graReqTotal}, #{graReqMc}
+			, #{graReqLac}, #{graReqVol}, #{year}, #{semester}
+		) 
+	</insert>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

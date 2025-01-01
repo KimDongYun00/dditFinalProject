@@ -1,0 +1,11 @@
+package kr.or.ddit.service.professor;
+
+import java.util.List;
+
+import kr.or.ddit.vo.LectureVO;
+
+public interface IProLectureService {
+
+	public List<LectureVO> lectureList(String userNo);
+
+}

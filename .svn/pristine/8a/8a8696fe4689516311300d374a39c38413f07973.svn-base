@@ -1,0 +1,11 @@
+package kr.or.ddit.service.student;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface notificationService {
+
+	public BoardVO read(int boardNo);
+
+
+
+}

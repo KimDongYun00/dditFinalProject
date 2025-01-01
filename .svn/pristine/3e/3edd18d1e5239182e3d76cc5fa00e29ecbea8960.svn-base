@@ -1,0 +1,167 @@
+<body>
+	<button id="btn_pdf">PDF</button>
+	<div class="transcript">
+		<!-- -------------- header 시작 -------------- -->
+		<!-- 대학교 로고, title, 발급일자 ($ 표시 있는 곳에 값 가져오기 ) -->
+		<div class="header">
+			<div class="logo">
+				<img alt="uni_icon.png"
+					src="${pageContext.request.contextPath }/resources/img/uni_icon.png" />
+			</div>
+			<h1 id="title">성 적 증 명 서</h1>
+			<div class="timestamp">발급일자 : $2020/07/07 16:56</div>
+		</div>
+		<!-- -------------- header 끝 -------------- -->
+		<br />
+		<!-- ----------- 학생 정보 표기란 시작 ----------- -->
+		<table class="grades">
+			<!-- $표시 있는 곳에 로그인한 학생의 정보 (학과, 학번 등)를 가져와서 값 넣기 -->
+			<tr>
+				<td>학과</td>
+				<td>$경영학과</td>
+				<td>학번</td>
+				<td>$170824</td>
+				<td>성명</td>
+				<td>$김로이</td>
+				<td>생년월일</td>
+				<td>$2016년 9월 6일</td>
+			</tr>
+			<tr>
+				<td>입학</td>
+				<td>$2017년 3월 2일</td>
+				<td>졸업</td>
+				<td>$2022년 2월 18일</td>
+				<td>졸업증서번호</td>
+				<td>$제 23024호</td>
+				<td>학위등록번호</td>
+				<td>$제 2001-0567호</td>
+			</tr>
+		</table>
+		<!-- ------------ 학생 정보 표기란 끝 ------------ -->
+		<br />
+		<br />
+		<!-- ----------- 학생 학기별 성적란 시작 ----------- -->
+		<table class="grades">
+			<thead>
+				<!-- 학생 학기별 성적란 -->
+				<tr>
+					<th width="350px">구분</th>
+					<th width="350px">교과목명</th>
+					<th width="150px">성적</th>
+					<th width="150px">학점</th>
+				</tr>
+			<thead>
+			<tbody>
+				<!-- $표시 있는 곳에 로그인한 학생의 정보 (구분, 교과목, 성적, 학점)를 가져와서 값 넣기 -->
+				<!-- for문으로 돌리기 시작 -->
+				<tr>
+					<td colspan="4" align="center">
+						************************************************************
+						$[2018학년도 1학기] ********************
+						****************************************</td>
+				</tr>
+				<tr>
+					<td>$구분(교양)</td>
+					<td>$교과목명(생활컴퓨터)</td>
+					<td>$성적(A)</td>
+					<td>$학점(4)</td>
+				</tr>
+				<tr>
+					<td colspan="3"></td>
+					<td>$평점(4.0)</td>
+				</tr>
+				<!-- for문으로 돌리기 끝 -->
+			</tbody>
+		</table>
+		<!-- ------------ 학생 학기별 성적란 끝 ------------ -->
+		<br />
+		<br />
+		<!-- ----------- 학생 총성적 표기란 시작 ----------- -->
+		<table class="grades">
+			<thead>
+				<tr>
+					<th>총신청학점</th>
+					<th>총취득학점</th>
+					<th>총평점</th>
+					<th>백분율</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- $표시 있는 곳에 로그인한 학생의 총신청학점 , 총취득학점 등 위와 동일한 내용의 값 출력 -->
+				<tr>
+					<td>$86</td>
+					<td>$86</td>
+					<td>$4.0</td>
+					<td>$20/100</td>
+				</tr>
+			</tbody>
+		</table>
+		<!-- ------------ 학생 총성적 표기란 끝 ------------ -->
+		<!-- ----------- 발급 문서 footer 시작 ----------- -->
+		<div class="footer_context">
+			<p>본 증명서는 대덕대학교에서 공식적으로 발급한 문서입니다 . 위변조 시 법적 처벌을 받을 수 있습니다.</p>
+		</div>
+		<br />
+		<br />
+		<div id="footer">
+			<p>성적원부와 상위 없음을 증명합니다 .</p>
+			<!-- 프린트하는 날짜 가져오기 -->
+			<p class="footer_date">$2024년 6월 4일</p>
+			<h1>대 덕 대 학 교 총 장</h1>
+		</div>
+		<!-- ------------ 발급 문서 footer 끝 ------------ -->
+	</div>
+</body>
+<script>
+	let jsPDF = jspdf.jsPDF;
+	//pdf download
+	$("#btn_pdf").on(
+			"click",
+			function() {
+				// transcript 안의 요소를 이미지로 변환해 pdf 로 다운
+				html2canvas($('.transcript')[0]).then(
+						function(canvas) {
+							// 캔버스를 이미지로 변환
+							var imgData = canvas.toDataURL('image/png');
+							// a4 용지 크기 에 맞는 너비 와 높이 설정
+							var imgWidth = 190; // a4 너비
+							var pageHeight = 295; // a4 높이
+
+							// 종횡비에 맞춰 출력하기 위해 캔버스의 높이 와 이미지의 너비를 이용해 이미지의 높이를 계산
+							var imgHeight = parseInt(canvas.height * imgWidth
+									/ canvas.width);
+							var heightLeft = imgHeight;
+							console.log("heightLeft1", heightLeft);
+							var margin = 10; // 출력 페이지 왼쪽 여백설정
+
+							// p-> portrait(세로), mm->millimeters(단위), a4-> export a4로 디폴트값 (용지 크기)
+							var doc = new jsPDF('p', 'mm', 'a4');
+							var position = 10; // 출력 페이지 위쪽 여백 설정
+
+							// 첫 페이지 출력
+							doc.addImage(imgData, 'PNG', margin, position,
+									imgWidth, imgHeight);
+							// 이미지를 PDF 페이지에 출력할 때 , 한 페이지의 높이 (pageHeight)만큼 heightLeft에서 차감
+							// 현재 페이지에 남아있는 높이 계산
+							heightLeft -= pageHeight;
+
+							console.log("imgHeight", imgHeight);
+							console.log("heightLeft", heightLeft);
+
+							// 페이지가 더 있을 경우 루프 돌면서 출력
+							while (heightLeft >= 0) {
+								// 이미지를 추가할 위치를 계산
+								position = heightLeft - imgHeight;
+								//새로운 페이지 추가
+								doc.addPage();
+								// 이미지 추가
+								doc.addImage(imgData, 'PNG', margin, position,
+										imgWidth, imgHeight);
+								heightLeft -= pageHeight;
+							}
+
+							// 파일 저장(다운로드) – 파일 이름 지정
+							doc.save('홍길동_성적증명서.pdf');
+						});
+			});
+</script>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IAdminScholarshipMapper">
+
+	<!-- 장학금 종류 내역 조회 쿼리-->
+	<select id="getScholarshipList" resultType="scholarshipVO">
+		select 
+			sch_no
+			, sch_name
+			, sch_content
+			, sch_req
+			, sch_amount
+			, sch_type
+			, sch_max
+			from scholarship
+		order by sch_no asc	 
+	</select>
+	
+	<!-- 장학 종류 등록 -->
+	<insert id="scholarshipInsert" parameterType="scholarshipVO">
+		insert into scholarship (sch_no,sch_name, sch_content, sch_req,sch_amount, sch_type, sch_max )
+             values  (seq_scholarship.nextval, #{schName}, #{schContent}, #{schReq}, #{schAmount} , #{schType} ,#{schMax})
+	</insert>
+	
+	<!-- 장학 종류 삭제 -->
+	<delete id="deleteScholarship" parameterType="String">
+		delete from scholarship
+		 where sch_no = #{schNo} 
+	</delete>
+	
+	<!-- 장학금 종류 상세 조회 -->
+	<select id="scholarshipDetail" parameterType="String" resultType="scholarshipVO">
+		select 
+				sch_no
+				, sch_name
+				, sch_content
+				, sch_req
+				, sch_amount
+				, sch_type
+				, sch_max
+		 from scholarship
+		where sch_no = #{schNo}
+	</select>
+	
+ 	<!-- 총 레코드 수 조회 -->
+    <select id="countScholarshipRequests" resultType="int">
+        select count(*) from scholarship_receive
+    </select>
+	
+	<!-- 장학금 신청 내역 조회 쿼리 -->
+	<select id="getScholarshipRequestList" resultType="scholarshipVO">
+		 select 	
+			 	sr.sch_rec_no /*장학 신청 번호*/
+			 	, sr.sch_no
+			 	, sr.stu_no
+			 	, sr.sch_rec_date
+			 	, sr.com_det_c_no
+			 	, sr.year
+			 	, sr.semester
+			 	, sr.rej_content
+			 	, s.sch_name
+	            , s.sch_content
+	            , s.sch_req
+	            , s.sch_amount
+	            , s.sch_type
+	            , s.sch_max
+           from 
+           	scholarship_receive sr
+           join scholarship s on sr.sch_no = s.sch_no
+        order by sr.sch_rec_no asc   
+	</select>
+	
+	<!-- 장학금 신청 상세보기 -->
+	<select id="getScholarshipRequestDetail" parameterType="String" resultType="scholarshipVO">
+		select /* kr.or.ddit.mapper.IScholarshipMapper.getScholarshipRequestDetail*/
+			sr.sch_rec_no
+			, sr.sch_no
+			, sr.stu_no
+			, sr.sch_rec_date
+			, sr.com_det_c_no
+			, sr.year, sr.semester
+			, sr.rej_content
+			, s.sch_name
+			, s.sch_content
+			, s.sch_req
+			, s.sch_amount
+			, s.sch_type
+			, s.sch_max
+		  from 
+		  	scholarship_receive sr left outer join scholarship s on(sr.sch_no = s.sch_no)
+		 where 
+		 	sr.sch_rec_no = #{schRecNo}
+	</select>
+	
+	<!-- 미승인 처리 건들 SELECT  -->
+	<!--  <select id="">
+	    select   
+	    	  sch_rec_no
+			, sch_no
+			, stu_no
+			, sch_rec_date
+			, com_det_c_no
+			, year
+			, semester
+			, rej_content
+		 from 
+		 	scholarship_receive
+        where 
+        	com_det_c_no = 'N00'
+	</select> -->
+
+	<!-- 미승인 처리 장학금 일괄 승인 처리 -->
+	<update id="scholarshipRequestsApprove">
+    	update 
+        	scholarship_receive
+    	set 
+        	com_det_c_no = 'C02'
+    	where 
+        	com_det_c_no = 'C03'
+	</update>
+
+	<!-- 미승인 처리 장학금 승인 처리(상세보기 내에서) -->
+	<update id="scholarshipRequestApprove" parameterType="String">
+		update 
+			scholarship_receive
+  		   set 
+  		   	com_det_c_no = 'C02'
+         where 
+         	sch_rec_no = #{schRecNo}  
+	</update>	
+
+	<!-- 미승인 처리 장학금 반려 처리(상세보기 내에서) -->
+    <update id="scholarshipRequestWait">
+    <![CDATA[
+        UPDATE scholarship_receive
+        SET com_det_c_no = 'C04', rej_content = #{rejContent}
+        WHERE sch_rec_no = #{schRecNo}
+    ]]>
+</update>
+</mapper>
+	
+
+
+
+
+
+
+
+
+
+

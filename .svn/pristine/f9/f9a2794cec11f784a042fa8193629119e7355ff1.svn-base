@@ -1,0 +1,19 @@
+package kr.or.ddit.mapper;
+
+import java.util.List;
+
+import kr.or.ddit.vo.LicenseVO;
+
+public interface ILicenseMapper {
+
+	// 학생 - 자격증 신청 
+	public int insertLicense(LicenseVO licenseVO);
+
+	// 학생 - 본인이 신청한 자격증 내역 조회
+	public List<LicenseVO> myLicenseList(String stuNo);
+
+	// 자격증 부분에 대한 파일그룹번호 생성
+	public void insertFileGroupNoToLicense(LicenseVO licenseVO);
+
+	
+}

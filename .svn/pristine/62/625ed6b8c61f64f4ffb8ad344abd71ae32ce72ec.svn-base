@@ -1,0 +1,39 @@
+package kr.or.ddit.service.professor.impl;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.ServiceResult;
+import kr.or.ddit.mapper.IProfessorMapper;
+import kr.or.ddit.service.professor.IProMypageService;
+import kr.or.ddit.vo.DepartmentVO;
+import kr.or.ddit.vo.ProfessorVO;
+
+@Service
+public class ProMypageServiceImpl implements IProMypageService {
+	
+	@Inject
+	private IProfessorMapper professorMapper;
+	
+	@Override
+	public ProfessorVO selectProfessor(String userNo) {
+		ProfessorVO professorVO = professorMapper.selectProfessor(userNo);
+		return professorVO;
+	}
+
+	@Override
+	public DepartmentVO selectProfessorDep(String userNo) {
+		DepartmentVO departmentVO = professorMapper.selectProfessorDep(userNo);
+		return departmentVO;
+	}
+
+	@Override
+	public ServiceResult profileUpdate(HttpServletRequest req, ProfessorVO professorVO) {
+		ServiceResult result = null; 
+		String uploadPath = req.getServletContext().getRealPath("");
+		return null;
+	}
+
+}

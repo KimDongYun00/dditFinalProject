@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.IConsultingMapper">
+
+	<sql id="consultingSearch">
+		<if test="searchType != null and searchType == 'student'">
+			and (s.stu_name like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'professor'">
+			and (p.pro_name like '%'||#{searchWord}||'%')
+		</if>
+	</sql>
+
+	<select id="selectConsultingCount" parameterType="pagingVO" resultType="int">
+		select count(CON_NO)
+		from CONSULTING	
+		where 1=1	
+		<include refid="consultingSearch"/>	
+	</select>
+	
+	<select id="selectConsultingList" parameterType="pagingVO" resultType="consultingVO">
+		select
+            b.*
+        from(    
+            select
+				a.*, row_number() over(order by a.CON_NO) AS rnum
+			from(
+                select 
+					c.CON_NO, c.STU_NO, c.PRO_NO, c.CON_TITLE, c.CON_CONTENT, c.CON_REGDATE, c.CON_DATE, c.CON_ONOFF, 
+                    c.COM_DET_D_NO, c.COM_DET_T_NO, c.COM_DET_N_NO, c.REJ_CONTENT,
+                    s.stu_name, p.pro_name
+				 from CONSULTING c, STUDENT s, PROFESSOR p
+			     where c.stu_no = s.stu_no
+				 and c.pro_no = p.pro_no
+				 <include refid="consultingSearch"/>	
+			     order by CON_NO)a
+                )b
+        <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}	
+		]]> 
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+package kr.or.ddit.service.common;
+
+import kr.or.ddit.vo.ProfessorVO;
+import kr.or.ddit.vo.UserVO;
+
+public interface IUserLoginService {
+
+	public UserVO loginCheck(UserVO userVO); // 로그인 처리
+
+	public ProfessorVO professorInfo(String userId); // 로그인한 학번/사번으로 이름 개인정보 다 꺼내오는 용도
+
+
+	
+}

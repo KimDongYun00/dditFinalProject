@@ -1,0 +1,91 @@
+package kr.or.ddit.controller.student;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.service.student.inter.INotificationService;
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.PaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/student")
+public class StuBoardController {
+
+	@Inject
+	private INotificationService service;
+
+//	@RequestMapping(value = "/notificationList", method = RequestMethod.GET)
+//    public String notificationList(Model model) {
+//        List<BoardVO> boardList = service.list();
+//        model.addAttribute("boardList", boardList);
+//        return "student/board/notificationList";
+//    }
+	
+	@RequestMapping(value = "/notificationList", method = RequestMethod.GET)
+    public String notificationList(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                   @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+                                   Model model) {
+        // 한 화면에 보여질 게시글의 수
+        int itemsPerPage = 10;
+
+        Map<String, Object> map = new HashMap<>();
+        // 현재 페이지 번호
+        map.put("page", page);
+        // 한 화면에 보여질 글의 수
+        map.put("itemsPerPage", itemsPerPage);
+        // 검색어
+        map.put("keyword", keyword);
+
+        // board 테이블의 전체 행의 수
+        int totalItems = service.getBoardCount(map);
+
+        // 전체 페이지 수 구하기
+        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+
+        List<BoardVO> boardList = service.list(map);
+
+        // 페이징 정보 설정
+        PaginationInfoVO<BoardVO> paginationInfoVO = new PaginationInfoVO<>(itemsPerPage, 5);
+        paginationInfoVO.setTotalRecord(totalItems);
+        paginationInfoVO.setCurrentPage(page);
+
+        model.addAttribute("boardList", boardList);
+        model.addAttribute("paginationInfoVO", paginationInfoVO); // paginationInfoVO가 꼭 있어야 함
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        return "sum/student/board/notificationList";
+    }
+
+	// 상세
+	@RequestMapping(value = "/detail/{boNo}", method = RequestMethod.GET)
+	public String announcementDetail(@PathVariable("boNo") String boNo, Model model) {
+		service.incrementViewCount(boNo);
+		BoardVO board = service.detail(boNo);
+		model.addAttribute("board", board);
+		return "sum/student/board/notificationDetail";
+	}
+	
+	// 페이징 처리에 검색 포함되어서 필요없음
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public String search(@RequestParam("keyword") String keyword, Model model) {
+		List<BoardVO> searchResults = service.search(keyword);
+		model.addAttribute("boardList", searchResults);
+		model.addAttribute("keyword", keyword);
+		return "sum/student/board/notificationList";
+	}
+
+}

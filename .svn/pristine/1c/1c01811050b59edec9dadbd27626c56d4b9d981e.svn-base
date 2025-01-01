@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ILectureNoticeMapper">
+
+	<select id="selectLectureNoticeCount" parameterType="pagingVO" resultType="int">
+		select count(*)
+		from lecture_notice
+		where lec_no = #{lecNo}
+	</select>
+	
+	<select id="selectLectureNoticeList" parameterType="pagingVO" resultType="lectureNoticeVO">
+		select
+				b.*
+			from(
+				select 
+					a.*, row_number() over (order by a.LEC_NOT_NO desc) rnum
+				from(
+					select 
+	                    lec_not_no,
+						lec_no,
+						lec_not_title,
+						lec_not_content,
+						lec_not_date,
+						lec_not_cnt
+	                from lecture_notice                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+	                where lec_no=#{lecNo}
+					order by LEC_NOT_NO desc
+				) a
+			) b
+			<![CDATA[
+				where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+			]]>
+	</select>
+	<!-- 게시글 조회수 -->
+	<update id="updateCnt" parameterType="string">
+		update lecture_notice
+		set LEC_NOT_CNT = LEC_NOT_CNT +1
+		where LEC_NOT_NO = #{lecNotNo}
+	</update>
+	
+	<select id="selectLectureNoticeDetail" parameterType="string" resultType="lectureNoticeVO">
+		select *
+		from lecture_notice
+		where LEC_NOT_NO = #{lecNotNo}
+	</select>
+	
+	<!-- 등록 
+	들어올 때 lectureNoticeVO{lecNotNo=null,lecNo=L0103,lecNotTitle=제목,lecNotContent=내용,lecNotDate=null,lecNotCnt=0}
+	나갈    때 lectureNoticeVO{lecNotNo=LEC_NOT_20240022,lecNo=L0103,lecNotTitle=제목,lecNotContent=내용,lecNotDate=null,lecNotCnt=0}
+	-->
+	<insert id="insertLectureNotice" parameterType="lectureNoticeVO">
+		<!-- selectKey : insert문을 실행하기 BEFORE 먼저 lecNotNo에 값을 넣어줌 
+		들어올 때 lectureNoticeVO{lecNotNo=LEC_NOT_20240022,lecNo=L0103,..
+		-->		
+		<selectKey resultType="String" order="BEFORE" keyProperty="lecNotNo">
+			SELECT 'LEC_NOT_'|| to_char(sysdate,'yyyy')|| LPAD(SEQ_LECTURE_NOTICE.nextval, 4, '0') FROM DUAL
+		</selectKey>
+	
+		insert into lecture_notice(LEC_NOT_NO, LEC_NO, LEC_NOT_TITLE, LEC_NOT_CONTENT, LEC_NOT_DATE, LEC_NOT_CNT)
+		values(#{lecNotNo},#{lecNo},#{lecNotTitle},#{lecNotContent},sysdate,0)
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="updateLectureNotice" parameterType="lectureNoticeVO">
+		update lecture_notice
+		set LEC_NOT_TITLE = #{lecNotTitle},
+		    LEC_NOT_CONTENT =#{lecNotContent},
+		    LEC_NOT_DATE = sysdate
+		where LEC_NOT_NO = #{lecNotNo}
+	</update>
+	
+	<!-- 삭제  -->
+	<delete id="deleteLectureNotice" parameterType="string">
+		delete from LECTURE_NOTICE
+		where LEC_NOT_NO = #{lecNotNo}
+	</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

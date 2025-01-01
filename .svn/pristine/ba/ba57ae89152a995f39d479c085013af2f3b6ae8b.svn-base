@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ILicenseMapper">
+
+
+
+<!-- 학생 -->
+
+	<!-- 자격증 등록 -->
+	<insert id="insertLicense" parameterType="licenseVO">
+		<selectKey keyProperty="licNo" resultType="String" order="BEFORE">
+			select 'LIC_'||seq_license.nextval from dual
+		</selectKey>
+		insert into license(
+					lic_no
+				  , stu_no	
+				  , lic_name
+				  , lic_content
+				  , lic_limit
+				  , lic_date
+				  , com_det_c_no
+				  , lic_regdate
+				  , file_group_no
+				  , rej_content
+				 ) values(
+					#{licNo}
+				  ,#{stuNo}
+				  ,#{licName}
+				  ,#{licContent}
+				  ,#{licLimit}
+				  ,#{licDate}
+				  ,'C0202'
+				  , to_char(sysdate, 'YYYY/MM/DD')
+				  , null
+				  , null
+				)      
+	</insert>
+	
+	
+	<!-- 본인이 신청한 자격증 내역 조회 -->
+	<select id="myLicenseList" parameterType="String" resultType="licenseVO">
+		select 
+		     lic_name
+		   , lic_content
+		   , lic_limit
+		   , lic_date
+		   , lic_regdate
+		   , rej_content
+		   , com_det_c_no
+		  from license
+		  where stu_no = #{stuNo}
+	</select>	
+
+	<update id="insertFileGroupNoToLicense" parameterType="licenseVO">
+		update license
+		set 
+			file_group_no = #{fileGroupNo}
+		where lic_no = #{licNo}
+	</update>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
